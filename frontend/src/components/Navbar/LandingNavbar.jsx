@@ -1,14 +1,13 @@
 import { Link } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
 import emblemGov from "../../assets/emblem-gov.svg";
 import "./Navbar.css";
 
-export default function Navbar() {
+export default function LandingNavbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-teal py-2 shadow-sm">
       <div className="container-fluid px-4">
 
-        <Link className="navbar-brand fw-bold d-flex align-items-center" to="/">
+        <a className="navbar-brand fw-bold d-flex align-items-center" href="#home">
           <img
             src={emblemGov}
             alt="Government emblem"
@@ -20,20 +19,20 @@ export default function Navbar() {
             </span>
             <span className="brand-subtitle">Towards Healthy Bharat</span>
           </div>
-        </Link>
+        </a>
 
         <button
           className="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
+          data-bs-target="#landingNavbar"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div className="collapse navbar-collapse" id="navbarNav">
-
+        <div className="collapse navbar-collapse" id="landingNavbar">
           <ul className="navbar-nav mx-auto gap-3 align-items-center">
+
             <li className="nav-item">
               <a className="nav-link" href="#home">Home</a>
             </li>
@@ -49,20 +48,20 @@ export default function Navbar() {
             <li className="nav-item">
               <a className="nav-link" href="#faq">FAQ</a>
             </li>
+
             <li className="nav-item">
-              <a className="nav-link" href="#contact">Contact Us</a>
+              <Link className="nav-link" to="/contact">Contact Us</Link>
             </li>
           </ul>
 
-          <Link className="btn btn-register px-4 ms-2" to="/login">
+          <a className="btn btn-register px-4 ms-2" href="/login">
             Sign In
-          </Link>
-          <Link className="btn btn-register px-4 ms-2" to="/register">
+          </a>
+          <a className="btn btn-register px-4 ms-2" href="/register">
             Register
-          </Link>
+          </a>
         </div>
       </div>
-
     </nav>
   );
 }

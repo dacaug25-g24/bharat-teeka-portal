@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import emblemGov from "../../assets/emblem-gov.svg";
 import "./Footer.css";
 export default function Footer() {
@@ -25,27 +26,27 @@ export default function Footer() {
           <div className="col-md-2">
             <h6 className="footer-heading">CoWIN</h6>
             <ul className="list-unstyled footer-links">
-              <li><a href="#">About</a></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Help</a></li>
+              <li><Link to="/about">About</Link>              </li>
+              <li><Link to="/privacy-policy">Privacy Policy</Link></li>
+              <li><Link to="/help">Help</Link></li>
             </ul>
           </div>
 
           <div className="col-md-2">
             <h6 className="footer-heading">Services</h6>
             <ul className="list-unstyled footer-links">
-              <li><a href="#">Register</a></li>
-              <li><a href="#">Certificate</a></li>
-              <li><a href="#">Book Slot</a></li>
+              <li><Link to="/register">Register</Link></li>
+              <li><Link to="/download-certificate">Certificate</Link></li>
+              <li><Link to="/book-slot">Book Slot</Link></li>
             </ul>
           </div>
 
           <div className="col-md-2">
             <h6 className="footer-heading">Support</h6>
             <ul className="list-unstyled footer-links">
-              <li><a href="#">FAQs</a></li>
-              <li><a href="#">Raise Issue</a></li>
-              <li><a href="#">Contact</a></li>
+              <li><Link to="/faq">FAQs</Link></li>
+              <li><Link to="/raise-issue">Raise Issue</Link></li>
+              <li><Link to="/contact">Contact</Link></li>
             </ul>
           </div>
 

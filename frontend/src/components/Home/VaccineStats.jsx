@@ -63,7 +63,7 @@ const Stats = () => {
         <div className="container my-5" ref={containerRef}>
             <div className="text-center mb-4">
                 <span className="badge rounded-pill bg-teal-subtle text-teal fw-semibold px-3 py-2">
-                    Live Platform Stats
+                    Platform Stats
                 </span>
                 <h2 className="mt-3 mb-1 fw-bold">India’s Vaccination Progress</h2>
                 <p className="text-muted mb-0">
