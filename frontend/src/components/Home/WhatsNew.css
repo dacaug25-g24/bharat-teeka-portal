@@ -1,0 +1,67 @@
+.whatsnew-card {
+  background: linear-gradient(145deg, #ffffff 0%, #eef8f8 100%);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(0, 140, 140, 0.15);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.whatsnew-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at top left,
+    rgba(99, 236, 236, 0.12),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.whatsnew-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 140, 140, 0.35);
+}
+
+.whatsnew-card:hover::after {
+  opacity: 1;
+}
+
+
+.whatsnew-number {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #46a2a2, #4eb9b9);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 6px 14px rgba(0, 140, 140, 0.35);
+}
+
+.card-text {
+  font-size: 0.95rem;
+  color: #445;
+  margin-bottom: 0;
+}
+
+.section-title.text-teal {
+  color: #008c8c;
+}
+
+.bg-light {
+  background-color: #f5f9f9;
+}

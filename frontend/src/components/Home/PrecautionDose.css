@@ -1,0 +1,41 @@
+.precaution-list li {
+  margin-bottom: 0.35rem;
+  color: #445;
+  font-size: 0.95rem;
+}
+
+.precaution-list li i {
+  font-size: 1rem;
+}
+
+.precaution-img {
+  max-width: 520px;
+  width: 100%;
+  filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.18));
+}
+
+.secondary-btn {
+  border-color: rgba(255, 255, 255, 0.7);
+  background-color: #ffffff;
+  color: #026b6c;
+  transition: 0.2s ease;
+  border-color: #000 !important;
+}
+
+.btn-teal {
+  background-color: #008c8c;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition:
+    background-color 0.2s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.btn-teal:hover {
+  background-color: #007575;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+}

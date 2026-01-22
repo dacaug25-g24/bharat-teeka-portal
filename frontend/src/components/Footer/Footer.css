@@ -1,0 +1,83 @@
+.footer-main {
+  background: radial-gradient(circle at top left, #024c4d 0, #012b2c 50%, #011719 100%);
+  color: #e9f5f5;
+  font-size: 0.95rem;
+  padding-top: 3rem;
+  padding-bottom: 1rem;
+}
+
+.brand-pill {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffcc33;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-pill img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.footer-heading {
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: #b7e0e0;
+  margin-bottom: 0.8rem;
+}
+
+.footer-links li {
+  margin-bottom: 0.35rem;
+}
+
+.footer-main ul.footer-links li a {
+  color: #ffffff;
+  font-weight: 400;
+}
+
+.footer-main ul.footer-links li a:hover {
+  color: #7bd9d9;
+
+}
+
+.footer-social {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(231, 248, 248, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e9f5f5;
+  font-size: 1.1rem;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.footer-social:hover {
+  background-color: #ddedee;
+  color: #024c4d;
+  transform: translateY(-2px);
+}
+
+.text-footer-muted {
+  color: #9ababa;
+  font-size: 0.85rem;
+}
+
+.border-footer {
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+@media (max-width: 767.98px) {
+  .footer-main {
+    text-align: center;
+  }
+
+  .brand-pill {
+    margin: 0 auto 0.5rem;
+  }
+}

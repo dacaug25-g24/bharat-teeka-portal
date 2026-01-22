@@ -1,0 +1,246 @@
+/* ==========================
+   COMMON COLORS & UTILS
+========================== */
+.text-teal {
+  color: #008c8c !important;
+}
+
+.text-teal-subtle {
+  color: #026b6c !important;
+}
+
+.bg-teal {
+  background-color: #008c8c !important;
+  color: #fff;
+}
+
+.bg-teal-subtle {
+  background-color: rgba(0, 140, 140, 0.1) !important;
+  color: #008c8c !important;
+}
+
+.btn-teal {
+  background-color: #008c8c;
+  color: #fff;
+  transition: background-color 0.3s;
+}
+
+.btn-teal:hover {
+  background-color: #007575;
+}
+
+.secondary-btn {
+  background-color: #e5f9f7;
+  color: #008c8c;
+  border: 1px solid #008c8c;
+  transition: all 0.25s ease;
+}
+
+.secondary-btn:hover {
+  background-color: #008c8c;
+  color: #fff;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35em 0.65em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+/* ==========================
+   SECTION WRAPPER
+========================== */
+.section-padding {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.section-bg {
+  background-color: #f5f9f9;
+}
+
+/* ==========================
+   HERO & IMAGE UTILS
+========================== */
+.hero-img {
+  max-width: 100%;
+  border-radius: 16px;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+/* ==========================
+   TABS
+========================== */
+.custom-tabs .nav-link {
+  color: #006d6d !important;
+  font-weight: 600;
+  border: none;
+  background-color: transparent;
+  transition: color 0.25s ease;
+}
+
+.custom-tabs .nav-link:hover {
+  color: #009999 !important;
+}
+
+.custom-tabs .nav-link.active {
+  color: #006d6d !important;
+  border-bottom: 3px solid #00a5a5 !important;
+  font-weight: 700;
+}
+
+/* ==========================
+   STEPS CARD
+========================== */
+.step-card {
+  background: linear-gradient(145deg, #ffffff, #f6fbff);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  border: 1px solid rgba(0, 140, 140, 0.12);
+}
+
+.step-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(0, 140, 140, 0.12), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 140, 140, 0.35);
+}
+
+.step-card:hover::after {
+  opacity: 1;
+}
+
+.step-badge {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border-radius: 999px;
+  border: 1.5px solid #009688;
+  color: #009688;
+  padding: 4px 18px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.step-image img {
+  width: 110px;
+  height: auto;
+  margin-top: 40px;
+}
+
+.step-body {
+  margin-top: 14px;
+}
+
+/* ==========================
+   UPDATES / STAT CARDS
+========================== */
+.update-card,
+.stat-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.update-card:hover,
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+}
+
+.update-icon,
+.stat-icon {
+  font-size: 2rem;
+  color: #008c8c;
+}
+
+/* ==========================
+   FOOTER
+========================== */
+.footer-main {
+  background-color: #f5f5f5;
+  padding: 3rem 0;
+  font-size: 0.9rem;
+}
+
+.footer-heading {
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.footer-links li a {
+  color: #6c757d;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.footer-links li a:hover {
+  color: #008c8c;
+}
+
+.footer-social i {
+  font-size: 1.2rem;
+  color: #008c8c;
+  transition: color 0.25s;
+}
+
+.footer-social:hover i {
+  color: #005757;
+}
+
+.border-footer {
+  border-color: #ccc;
+}
+
+.text-footer-muted {
+  color: #6c757d;
+}
+
+/* ==========================
+   FAQ ACCORDION
+========================== */
+.accordion-button {
+  background-color: #f5f9f9;
+  color: #008c8c;
+  font-weight: 600;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #008c8c;
+  color: #fff;
+}
+
+/* ==========================
+   RESPONSIVE UTILITIES
+========================== */
+@media (min-width: 992px) {
+  .hero-search-card {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}

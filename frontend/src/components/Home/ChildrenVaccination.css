@@ -1,0 +1,49 @@
+.vaccine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.vaccine-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  border: 1px solid rgba(0, 140, 140, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vaccine-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 140, 140, 0.15);
+}
+
+.vaccine-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(0, 140, 140, 0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #008c8c;
+  font-size: 1.1rem;
+  margin: 0 auto 0.25rem;
+}
+
+.children-img {
+  max-width: 520px;
+  width: 100%;
+  filter: drop-shadow(0 16px 40px rgba(0, 0, 0, 0.18));
+}
+
+.secondary-btn {
+  background-color: #ffffff;
+  color: #026b6c;
+  border: 1px solid #000 !important;
+  transition: 0.2s ease;
+}
+
+.secondary-btn:hover {
+  background-color: #f5f5f5;
+}

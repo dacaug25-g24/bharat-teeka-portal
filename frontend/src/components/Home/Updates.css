@@ -1,0 +1,51 @@
+.update-card {
+  background: linear-gradient(135deg, #ffffff, #f5fbff);
+  border: 1px solid rgba(0, 140, 140, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+  cursor: pointer;
+}
+
+.update-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 140, 140, 0.3);
+  background: linear-gradient(135deg, #e7f9f9, #ffffff);
+}
+
+.update-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(0, 140, 140, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #008c8c;
+  font-size: 1.2rem;
+}
+
+.bg-update-tag {
+  background-color: rgba(0, 140, 140, 0.08);
+  color: #008c8c;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.update-card h5 {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.update-card p {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 0;
+}
