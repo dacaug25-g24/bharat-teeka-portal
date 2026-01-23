@@ -1,13 +1,14 @@
-import { Link } from "react-router-dom";
-import "./Login.css";
+import { Link, useNavigate } from "react-router-dom";
 import loginImg from "./../assets/login.jpg";
 import { useState } from "react";
+import "./Login.css"; // Separate CSS file
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,6 +33,9 @@ export default function Login() {
         // Store user data
         localStorage.setItem("user", JSON.stringify(data.user));
         
+         // Dispatch event to update navbar
+          window.dispatchEvent(new Event('userChange'));
+
         // Show success message
         alert(`✅ Login Successful!\n\nWelcome ${data.user.username}\nRole: ${data.user.roleName}\nEmail: ${data.user.email}`);
         
@@ -41,7 +45,7 @@ export default function Login() {
         setError(data.message || "Login failed. Please try again.");
       }
     } catch (err) {
-      setError("❌ Connection error. Make sure backend is running on port 8080.");
+      setError("❌ Cannot connect to server. Make sure backend is running on port 8080.");
       console.error("Login error:", err);
     } finally {
       setLoading(false);
@@ -49,15 +53,22 @@ export default function Login() {
   };
 
   const redirectBasedOnRole = (roleId) => {
-    const routes = {
-      1: "/admin-dashboard",
-      2: "/hospital-dashboard", 
-      3: "/patient-dashboard",
-      4: "/parent-dashboard"
-    };
-    
-    const route = routes[roleId] || "/dashboard";
-    window.location.href = route;
+    switch(roleId) {
+      case 1:
+        navigate("/admin-dashboard");
+        break;
+      case 2:
+        navigate("/hospital-dashboard");
+        break;
+      case 3:
+        navigate("/patient-dashboard");
+        break;
+      case 4:
+        navigate("/parent-dashboard");
+        break;
+      default:
+        navigate("/");
+    }
   };
 
   const fillTestCredentials = (user, pass) => {
@@ -76,137 +87,151 @@ export default function Login() {
   };
 
   return (
-    <div className="container vh-100 d-flex justify-content-center align-items-center">
-      <div className="card shadow p-0" style={{ maxWidth: "900px", width: "100%" }}>
+    <div className="login-container">
+      <div className="card login-card">
         <div className="row g-0">
+          {/* Left side - Image */}
           <div className="col-md-6 d-none d-md-block">
             <img
               src={loginImg}
-              className="img-fluid h-100"
-              alt="Login"
-              style={{ objectFit: "cover", borderRadius: "8px 0 0 8px" }}
+              className="login-left-img"
+              alt="Vaccination Login"
             />
           </div>
 
-          <div className="col-md-6 p-4 d-flex flex-column justify-content-center">
-            <h3 className="text-center mb-3">Bharat Teeka Portal</h3>
-            <p className="text-center text-muted mb-4">Login to your account</p>
-            
-            {/* Backend Status Check */}
-            <div className="mb-3 text-center">
-              <button 
-                type="button" 
-                className="btn btn-sm btn-outline-info"
-                onClick={checkBackendStatus}
-              >
-                🔍 Check Backend Status
-              </button>
-            </div>
-            
-            {/* Test Users Buttons */}
-            <div className="mb-3">
-              <small className="text-muted">Quick Test Credentials:</small>
-              <div className="d-flex flex-wrap gap-1 mt-1">
+          {/* Right side - Login Form */}
+          <div className="col-md-6">
+            <div className="login-form-container">
+              <h2 className="login-title">Bharat Teeka Portal</h2>
+              <p className="login-subtitle">Login to your account</p>
+              
+              {/* Backend Status Check */}
+              <div className="text-center mb-3">
                 <button 
                   type="button" 
-                  className="btn btn-sm btn-outline-success"
-                  onClick={() => fillTestCredentials("admin", "admin123")}
+                  className="btn btn-outline-info btn-sm"
+                  onClick={checkBackendStatus}
                 >
-                  👑 Admin
+                  🔍 Check Backend Status
                 </button>
+              </div>
+              
+              {/* Error Message */}
+              {error && (
+                <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                  <strong>Error:</strong> {error}
+                  <button 
+                    type="button" 
+                    className="btn-close" 
+                    onClick={() => setError("")}
+                  ></button>
+                </div>
+              )}
+
+              {/* Login Form */}
+              <form className="login-form" onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <label className="form-label">Username</label>
+                  <input 
+                    type="text" 
+                    className="form-control" 
+                    placeholder="Enter username" 
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Password</label>
+                  <input 
+                    type="password" 
+                    className="form-control" 
+                    placeholder="Enter password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
                 <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline-primary"
-                  onClick={() => fillTestCredentials("aiims", "hospital123")}
+                  type="submit" 
+                  className="btn login-btn"
+                  disabled={loading}
                 >
-                  🏥 Hospital
+                  {loading ? (
+                    <>
+                      <span className="spinner"></span>
+                      Logging in...
+                    </>
+                  ) : "Login"}
                 </button>
-                <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline-warning"
-                  onClick={() => fillTestCredentials("raj", "patient123")}
-                >
-                  👤 Patient
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline-secondary"
-                  onClick={() => fillTestCredentials("parent1", "parent123")}
-                >
-                  👪 Parent
-                </button>
-              </div>
-            </div>
-            
-            {error && (
-              <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>Error:</strong> {error}
-                <button type="button" className="btn-close" onClick={() => setError("")}></button>
-              </div>
-            )}
+              </form>
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label className="form-label">Username</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="Enter username" 
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
+              {/* Forgot Password */}
+              <Link to="/forgot-password" className="forgot-password-link">
+                Forgot Password?
+              </Link>
 
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input 
-                  type="password" 
-                  className="form-control" 
-                  placeholder="Enter password" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+              {/* Test Credentials */}
+              <div className="test-credentials-container">
+                <div className="test-credentials-title">
+                  Quick Test Credentials:
+                </div>
+                <div className="test-buttons-container">
+                  <button 
+                    type="button" 
+                    className="btn test-btn admin"
+                    onClick={() => fillTestCredentials("admin", "admin123")}
+                  >
+                    👑 Admin
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn test-btn hospital"
+                    onClick={() => fillTestCredentials("aiims", "hospital123")}
+                  >
+                    🏥 Hospital
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn test-btn patient"
+                    onClick={() => fillTestCredentials("raj", "patient123")}
+                  >
+                    👤 Patient
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn test-btn parent"
+                    onClick={() => fillTestCredentials("parent1", "parent123")}
+                  >
+                    👪 Parent
+                  </button>
+                </div>
               </div>
 
-              <button 
-                type="submit" 
-                className="btn btn-primary w-100"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                    Authenticating...
-                  </>
-                ) : "🚀 Login"}
-              </button>
-            </form>
+              {/* Register Link */}
+              <div className="register-link">
+               New Patient? <Link to="/register">Register Here</Link>  {/* This now goes to CreateAccount */}
+              </div>
 
-            <div className="text-center mt-3">
-              <Link to="/forgot-password" className="small me-3">Forgot Password?</Link>
-              <Link to="/register" className="small">New Patient? Register Here</Link>
-            </div>
-
-            {/* Backend Info */}
-            <div className="mt-4 p-3 bg-light rounded">
-              <small className="text-muted">
-                <strong>Backend Info:</strong><br/>
-                • Port: 8080<br/>
-                • Database: p24_bharat_teeka_portal<br/>
-                • Test: <a 
+              {/* Backend Info */}
+              <div className="backend-info">
+                <strong>Backend Information:</strong>
+                <div>Port: 8080</div>
+                <div>Database: p24_bharat_teeka_portal</div>
+                <a 
                   href="http://localhost:8080/api/auth/test" 
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
-                  http://localhost:8080/api/auth/test
+                  Test Connection
                 </a>
-              </small>
+              </div>
             </div>
           </div>
         </div>
-      </div>  
+      </div>
     </div>
   );
 }
