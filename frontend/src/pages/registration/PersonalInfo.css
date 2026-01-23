@@ -1,0 +1,233 @@
+/* Personal Information Page */
+.personal-info-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  padding: 20px;
+}
+
+.personal-info-card {
+  width: 100%;
+  max-width: 1200px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.personal-info-left {
+  background: linear-gradient(135deg, #0dcaf0, #0aa2c0);
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.personal-info-left-content {
+  max-width: 400px;
+}
+
+.personal-info-left h2 {
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.personal-info-left p {
+  opacity: 0.9;
+  margin-bottom: 30px;
+}
+
+.steps {
+  margin-bottom: 30px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.step.completed {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.step.active {
+  background: rgba(255, 255, 255, 0.3);
+  border: 2px solid white;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  background: white;
+  color: #0aa2c0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 15px;
+}
+
+.step.completed .step-number {
+  background: #198754;
+  color: white;
+}
+
+.step.active .step-number {
+  background: white;
+  color: #0aa2c0;
+}
+
+.step-info {
+  flex: 1;
+}
+
+.step-info strong {
+  display: block;
+  font-size: 16px;
+}
+
+.step-info small {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.role-info {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.role-info h5 {
+  margin-bottom: 15px;
+  color: white;
+}
+
+.role-rule {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.role-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+}
+
+.role-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-badge.patient {
+  background: #fd7e14;
+  color: white;
+}
+
+.role-badge.parent {
+  background: #0dcaf0;
+  color: white;
+}
+
+.role-desc {
+  font-size: 12px;
+}
+
+.account-info {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.account-info h5 {
+  margin-bottom: 10px;
+  color: white;
+}
+
+.account-info p {
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.personal-info-form-container {
+  padding: 40px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.personal-info-title {
+  color: #0aa2c0;
+  font-weight: 700;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+.personal-info-subtitle {
+  color: #666;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
+
+.personal-info-form {
+  width: 100%;
+}
+
+.personal-info-btn {
+  background: linear-gradient(135deg, #0dcaf0, #0aa2c0);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.personal-info-btn:hover {
+  background: linear-gradient(135deg, #0aa2c0, #0987a5);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(13, 202, 240, 0.3);
+}
+
+.personal-info-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .personal-info-container {
+    padding: 10px;
+  }
+  
+  .personal-info-form-container {
+    padding: 25px;
+  }
+  
+  .personal-info-left {
+    display: none;
+  }
+  
+  .personal-info-card {
+    border-radius: 15px;
+  }
+}

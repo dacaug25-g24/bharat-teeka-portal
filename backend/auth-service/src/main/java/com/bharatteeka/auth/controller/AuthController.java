@@ -1,7 +1,6 @@
 package com.bharatteeka.auth.controller;
 
-import com.bharatteeka.auth.dto.LoginRequest;
-import com.bharatteeka.auth.dto.LoginResponse;
+import com.bharatteeka.auth.dto.*;
 import com.bharatteeka.auth.entity.User;
 import com.bharatteeka.auth.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +21,125 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     
-    // Login endpoint
+    // Step 1: Create account
+    @PostMapping("/create-account")
+    public ResponseEntity<Map<String, Object>> createAccount(@RequestBody CreateAccountRequest request) {
+        try {
+            System.out.println("Creating account for: " + request.getUsername());
+            
+            // Validate required fields
+            if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+                throw new RuntimeException("Username is required");
+            }
+            if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
+                throw new RuntimeException("Password is required");
+            }
+            if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
+                throw new RuntimeException("Email is required");
+            }
+            if (request.getPhone() == null || request.getPhone().trim().isEmpty()) {
+                throw new RuntimeException("Phone is required");
+            }
+            if (request.getAddress() == null || request.getAddress().trim().isEmpty()) {
+                throw new RuntimeException("Address is required");
+            }
+            
+            // Validate phone format (simple validation)
+            if (!request.getPhone().matches("\\d{10}")) {
+                throw new RuntimeException("Phone must be 10 digits");
+            }
+            
+            User user = authService.createAccount(
+                request.getUsername().trim(),
+                request.getPassword().trim(),
+                request.getEmail().trim(),
+                request.getPhone().trim(),
+                request.getAddress().trim()
+            );
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Account created successfully. Please complete registration.");
+            response.put("userId", user.getUserId());
+            response.put("username", user.getUsername());
+            
+            System.out.println("Account created with ID: " + user.getUserId());
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            System.out.println("Account creation error: " + e.getMessage());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+    
+    // Step 2: Complete registration
+    @PostMapping("/complete-registration")
+    public ResponseEntity<Map<String, Object>> completeRegistration(@RequestBody CompleteRegistrationRequest request) {
+        try {
+            System.out.println("Completing registration for user ID: " + request.getUserId());
+            
+            // Validate required fields
+            if (request.getUserId() == null) {
+                throw new RuntimeException("User ID is required");
+            }
+            if (request.getFullName() == null || request.getFullName().trim().isEmpty()) {
+                throw new RuntimeException("Full name is required");
+            }
+            if (request.getDateOfBirth() == null) {
+                throw new RuntimeException("Date of birth is required");
+            }
+            if (request.getGender() == null || request.getGender().trim().isEmpty()) {
+                throw new RuntimeException("Gender is required");
+            }
+            
+            // Parse date string to LocalDate
+            LocalDate dob;
+            try {
+                dob = LocalDate.parse(request.getDateOfBirth());
+            } catch (DateTimeParseException e) {
+                throw new RuntimeException("Invalid date format. Use YYYY-MM-DD format");
+            }
+            
+            User user = authService.completeRegistration(
+                request.getUserId(),
+                request.getFullName().trim(),
+                dob,
+                request.getGender().trim(),
+                request.getAadhaarNumber() != null ? request.getAadhaarNumber().trim() : null,
+                request.getRemarks() != null ? request.getRemarks().trim() : null
+            );
+            
+            // Get role name
+            String roleName = getRoleName(user.getRoleId());
+            int age = calculateAge(dob);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Registration completed successfully!");
+            response.put("userId", user.getUserId());
+            response.put("username", user.getUsername());
+            response.put("roleId", user.getRoleId());
+            response.put("roleName", roleName);
+            response.put("age", age);
+            
+            System.out.println("Registration completed. User ID: " + user.getUserId() + ", Role: " + roleName);
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            System.out.println("Registration completion error: " + e.getMessage());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+    
+    // Login (existing)
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
         try {
@@ -52,62 +171,23 @@ public class AuthController {
         }
     }
     
-    // Simple test endpoint
-    @GetMapping("/test")
-    public Map<String, String> test() {
-        Map<String, String> response = new HashMap<>();
-        response.put("status", "success");
-        response.put("message", "Auth Service is running!");
-        response.put("timestamp", new java.util.Date().toString());
-        response.put("database", "p24_bharat_teeka_portal");
-        return response;
-    }
-    
-    // Get all users (for testing)
-    @GetMapping("/all-users")
-    public ResponseEntity<?> getAllUsers() {
-        try {
-            var users = authService.getAllUsers();
-            return ResponseEntity.ok(users);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error fetching users: " + e.getMessage());
-        }
-    }
-    
-    // Test users info
-    @GetMapping("/test-users")
-    public Map<String, Object> getTestUsers() {
-        Map<String, Object> response = new HashMap<>();
-        
-        Map<String, String> testUsers = new HashMap<>();
-        testUsers.put("admin", "admin123 (Role: Admin)");
-        testUsers.put("aiims", "hospital123 (Role: Hospital)");
-        testUsers.put("kims", "hospital123 (Role: Hospital)");
-        testUsers.put("apollo", "hospital123 (Role: Hospital)");
-        testUsers.put("civil", "hospital123 (Role: Hospital)");
-        testUsers.put("raj", "patient123 (Role: Patient)");
-        testUsers.put("priya", "patient123 (Role: Patient)");
-        testUsers.put("arun", "patient123 (Role: Patient)");
-        testUsers.put("meera", "patient123 (Role: Patient)");
-        testUsers.put("parent1", "parent123 (Role: Parent)");
-        testUsers.put("parent2", "parent123 (Role: Parent)");
-        
-        response.put("available_test_users", testUsers);
-        response.put("instruction", "Use these credentials to test login");
-        response.put("login_endpoint", "POST http://localhost:8080/api/auth/login");
-        
-        return response;
-    }
-    
     // Helper method to get role name
     private String getRoleName(Integer roleId) {
+        if (roleId == null) {
+            return "Unknown";
+        }
         switch(roleId) {
             case 1: return "Admin";
             case 2: return "Hospital";
             case 3: return "Patient";
             case 4: return "Parent";
+            case 0: return "Pending Registration";
             default: return "Unknown";
         }
+    }
+    
+    // Helper method to calculate age
+    private int calculateAge(LocalDate dob) {
+        return java.time.Period.between(dob, LocalDate.now()).getYears();
     }
 }
