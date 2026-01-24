@@ -19,12 +19,13 @@ import HeroSearch from "../components/Home/HeroSearch";
 import DownloadCertificate from "../components/Home/DownloadCertificate";
 import Faq from "../components/Home/Faq";
 import ProtectedRoute from "../components/ProtectedRoute";
-import AdminDashboard from "../pages/dashboard/AdminDashboard";
-import HospitalDashboard from "../pages/dashboard/HospitalDashboard";
-import PatientDashboard from "../pages/dashboard/PatientDashboard";
-import ParentDashboard from "../pages/dashboard/ParentDashboard";
+
 import CreateAccount from "../pages/registration/CreateAccount";
 import PersonalInfo from "../pages/registration/PersonalInfo";
+import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
+import HospitalDashboard from "../pages/hospital/dashboard/HospitalDashboard";
+import PatientDashboard from "../pages/patient/dashboard/PatientDashboard";
+import ParentDashboard from "../pages/patient/dashboard/ParentDashboard";
 
 
 const AppRoutes = () => {
