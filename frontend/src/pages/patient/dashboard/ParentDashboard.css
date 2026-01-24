@@ -1,0 +1,76 @@
+.parent-sidebar {
+  width: 250px;
+  background: linear-gradient(180deg, #0a9092, #012223);
+  color: white;
+  padding: 1.5rem 1rem;
+  flex-shrink: 0;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-title {
+  font-weight: 800;
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.sidebar-menu li {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.sidebar-menu li:hover,
+.sidebar-menu li.active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.parent-topbar {
+  background: linear-gradient(to right, #169c9e, #1b8a8e);
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.2);
+}
+
+.parent-topbar small {
+  font-size: 1.6rem;
+  color: white;
+}
+
+.parent-name {
+  font-weight: 700;
+}
+
+.parent-content {
+  background: #f4f6f9;
+}
+
+.parent-info-panel {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.logout-btn {
+  background: #dc3545;
+  color: white;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.logout-btn:hover {
+  background: #c82333;
+}
