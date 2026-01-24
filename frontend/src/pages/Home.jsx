@@ -28,7 +28,7 @@ export default function Home() {
       <DownloadCertificate/>
       <Faq />
       <WhatsNew />
-      {/* <Footer /> */}
+      <Footer />
       <FloatingHelp />
     </>
   );
