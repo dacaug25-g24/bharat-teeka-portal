@@ -54,12 +54,8 @@ export default function LandingNavbar() {
             </li>
           </ul>
 
-          <a className="btn btn-register px-4 ms-2" href="/login">
-            Sign In
-          </a>
-          <a className="btn btn-register px-4 ms-2" href="/register">
-            Register
-          </a>
+          <a className="btn btn-register px-4 ms-2" href="/login">Sign In</a>
+          <a className="btn btn-register px-4 ms-2" href="/register">Register</a>
         </div>
       </div>
     </nav>

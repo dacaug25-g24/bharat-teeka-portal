@@ -1,41 +1,143 @@
 package com.bharatteeka.auth.service;
 
+import com.bharatteeka.auth.entity.Patient;
 import com.bharatteeka.auth.entity.User;
+import com.bharatteeka.auth.repository.PatientRepository;
 import com.bharatteeka.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Optional;
+
 @Service
 public class AuthService {
-    
+
     @Autowired
     private UserRepository userRepository;
-    
+
+    @Autowired
+    private PatientRepository patientRepository;
+
+    // --------------------------
+    // Step 1: Create account
+    // --------------------------
+    public User createAccount(String username, String password, String email, String phone, String address) {
+        // Check if username exists
+        if (userRepository.findByUsername(username).isPresent()) {
+            throw new RuntimeException("Username already exists");
+        }
+        // Check if email exists
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new RuntimeException("Email already exists");
+        }
+        // Check if phone exists
+        if (userRepository.findByPhone(phone).isPresent()) {
+            throw new RuntimeException("Phone number already exists");
+        }
+
+        // Create user
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password); // TODO: encrypt password
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setAddress(address);
+        user.setRoleId(0); // pending registration
+        user.setIsActive(false);
+
+        return userRepository.save(user);
+    }
+
+    // --------------------------
+    // Step 2: Complete registration
+    // --------------------------
+    public User completeRegistration(
+            Integer userId,
+            String fullName,
+            LocalDate dob,
+            String gender,
+            String aadhaar,
+            String bloodGroup,
+            String remarks
+    ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (patientRepository.existsByUser_UserId(userId)) {
+            throw new RuntimeException("Patient profile already exists");
+        }
+
+        // Split full name
+        String[] nameParts = fullName.trim().split("\\s+", 2);
+        String firstName = nameParts[0];
+        String lastName = (nameParts.length > 1) ? nameParts[1] : "NA";
+
+        // Calculate age & role
+        int age = calculateAge(dob);
+        boolean isAdult = age >= 18;
+        int roleId = isAdult ? 3 : 4; // Patient / Parent
+
+        // Create patient
+        Patient patient = new Patient();
+        patient.setUser(user);
+        patient.setFirstName(firstName);
+        patient.setLastName(lastName);
+        patient.setDateOfBirth(dob);
+        patient.setGender(gender);
+        patient.setAadhaarNumber(aadhaar);
+        patient.setBloodGroup(bloodGroup); // ✅ new field
+        patient.setIsAdult(isAdult);
+        patient.setIsActive(true);
+        patient.setRemarks(remarks);
+
+        patientRepository.save(patient);
+
+        // Update user
+        user.setRoleId(roleId);
+        user.setIsActive(true);
+
+        return userRepository.save(user);
+    }
+
+    // --------------------------
+    // Authenticate user
+    // --------------------------
     public User authenticate(String username, String password) {
-        // First try to find user by username and password (plain text match)
-        var userOpt = userRepository.findByUsernameAndPassword(username, password);
-        
+        Optional<User> userOpt = userRepository.findByUsernameAndPassword(username, password);
+
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            
-            // Check if user is active
-            if (user.getIsActive() == null || user.getIsActive()) {
-                return user;
-            } else {
-                throw new RuntimeException("Account is inactive. Please contact administrator.");
+            if (!user.getIsActive()) {
+                throw new RuntimeException("Account not activated. Please complete registration.");
             }
+            return user;
         }
-        
-        // If not found, check if username exists (for better error message)
+
         if (userRepository.findByUsername(username).isPresent()) {
             throw new RuntimeException("Incorrect password");
         }
-        
+
         throw new RuntimeException("User not found");
     }
-    
-    // Get all users for testing
-    public java.util.List<User> getAllUsers() {
-        return userRepository.findAll();
+
+    // --------------------------
+    // Helper: calculate age
+    // --------------------------
+    private int calculateAge(LocalDate dob) {
+        if (dob == null) throw new RuntimeException("Date of birth is required");
+
+        LocalDate today = LocalDate.now();
+        if (dob.isAfter(today)) throw new RuntimeException("Date of birth cannot be in the future");
+
+        return Period.between(dob, today).getYears();
+    }
+
+    // --------------------------
+    // Optional: check if user exists
+    // --------------------------
+    public boolean userExists(Integer userId) {
+        return userRepository.existsById(userId);
     }
 }

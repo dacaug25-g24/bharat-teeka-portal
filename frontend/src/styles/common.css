@@ -1,6 +1,3 @@
-/* ==========================
-   COMMON COLORS & UTILS
-========================== */
 .text-teal {
   color: #008c8c !important;
 }
@@ -52,9 +49,6 @@
   border-radius: 999px;
 }
 
-/* ==========================
-   SECTION WRAPPER
-========================== */
 .section-padding {
   padding-top: 50px;
   padding-bottom: 50px;
@@ -64,9 +58,6 @@
   background-color: #f5f9f9;
 }
 
-/* ==========================
-   HERO & IMAGE UTILS
-========================== */
 .hero-img {
   max-width: 100%;
   border-radius: 16px;
@@ -76,9 +67,6 @@
   color: #6c757d !important;
 }
 
-/* ==========================
-   TABS
-========================== */
 .custom-tabs .nav-link {
   color: #006d6d !important;
   font-weight: 600;
@@ -97,9 +85,6 @@
   font-weight: 700;
 }
 
-/* ==========================
-   STEPS CARD
-========================== */
 .step-card {
   background: linear-gradient(145deg, #ffffff, #f6fbff);
   border-radius: 16px;
@@ -154,9 +139,6 @@
   margin-top: 14px;
 }
 
-/* ==========================
-   UPDATES / STAT CARDS
-========================== */
 .update-card,
 .stat-card {
   background: #fff;
@@ -178,9 +160,6 @@
   color: #008c8c;
 }
 
-/* ==========================
-   FOOTER
-========================== */
 .footer-main {
   background-color: #f5f5f5;
   padding: 3rem 0;
@@ -221,9 +200,6 @@
   color: #6c757d;
 }
 
-/* ==========================
-   FAQ ACCORDION
-========================== */
 .accordion-button {
   background-color: #f5f9f9;
   color: #008c8c;
@@ -235,9 +211,6 @@
   color: #fff;
 }
 
-/* ==========================
-   RESPONSIVE UTILITIES
-========================== */
 @media (min-width: 992px) {
   .hero-search-card {
     padding-left: 4rem;

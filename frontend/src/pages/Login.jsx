@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import "./Login.css";
-import loginImg from "./../assets/login.jpg";
 import { useState } from "react";
+import Footer from "../components/Footer/Footer";
+import "./Login.css";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -17,31 +17,20 @@ export default function Login() {
     try {
       const response = await fetch("http://localhost:8080/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // Store user data
         localStorage.setItem("user", JSON.stringify(data.user));
-        
-        // Show success message
-        alert(`✅ Login Successful!\n\nWelcome ${data.user.username}\nRole: ${data.user.roleName}\nEmail: ${data.user.email}`);
-        
-        // Redirect based on role
         redirectBasedOnRole(data.user.roleId);
       } else {
         setError(data.message || "Login failed. Please try again.");
       }
     } catch (err) {
-      setError("❌ Connection error. Make sure backend is running on port 8080.");
+      setError("Connection error. Please ensure the backend is running on port 8080.");
       console.error("Login error:", err);
     } finally {
       setLoading(false);
@@ -51,128 +40,65 @@ export default function Login() {
   const redirectBasedOnRole = (roleId) => {
     const routes = {
       1: "/admin-dashboard",
-      2: "/hospital-dashboard", 
+      2: "/hospital-dashboard",
       3: "/patient-dashboard",
-      4: "/parent-dashboard"
+      4: "/parent-dashboard",
     };
-    
-    const route = routes[roleId] || "/dashboard";
-    window.location.href = route;
-  };
-
-  const fillTestCredentials = (user, pass) => {
-    setUsername(user);
-    setPassword(pass);
-  };
-
-  const checkBackendStatus = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/auth/test");
-      const data = await response.json();
-      alert(`✅ Backend is running!\n\nStatus: ${data.status}\nMessage: ${data.message}`);
-    } catch (error) {
-      alert("❌ Backend is not running. Please start Spring Boot application on port 8080.");
-    }
+    window.location.href = routes[roleId] || "/dashboard";
   };
 
   return (
-    <div className="container vh-100 d-flex justify-content-center align-items-center">
-      <div className="card shadow p-0" style={{ maxWidth: "900px", width: "100%" }}>
-        <div className="row g-0">
-          <div className="col-md-6 d-none d-md-block">
-            <img
-              src={loginImg}
-              className="img-fluid h-100"
-              alt="Login"
-              style={{ objectFit: "cover", borderRadius: "8px 0 0 8px" }}
-            />
+    <div className="login-page">
+
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="login-container shadow-lg rounded-4 d-flex flex-column flex-md-row overflow-hidden">
+
+          <div className="login-left d-none d-md-flex flex-column justify-content-center p-5">
+            <h2 className="fw-bold mb-3">Welcome Back!</h2>
+            <p className="text-light mb-0">
+              Login to your Bharat Teeka Portal account to access vaccination information,
+              book slots, and manage your profile securely.
+            </p>
           </div>
 
-          <div className="col-md-6 p-4 d-flex flex-column justify-content-center">
-            <h3 className="text-center mb-3">Bharat Teeka Portal</h3>
-            <p className="text-center text-muted mb-4">Login to your account</p>
-            
-            {/* Backend Status Check */}
-            <div className="mb-3 text-center">
-              <button 
-                type="button" 
-                className="btn btn-sm btn-outline-info"
-                onClick={checkBackendStatus}
-              >
-                🔍 Check Backend Status
-              </button>
-            </div>
-            
-            {/* Test Users Buttons */}
-            <div className="mb-3">
-              <small className="text-muted">Quick Test Credentials:</small>
-              <div className="d-flex flex-wrap gap-1 mt-1">
-                <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline-success"
-                  onClick={() => fillTestCredentials("admin", "admin123")}
-                >
-                  👑 Admin
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline-primary"
-                  onClick={() => fillTestCredentials("aiims", "hospital123")}
-                >
-                  🏥 Hospital
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline-warning"
-                  onClick={() => fillTestCredentials("raj", "patient123")}
-                >
-                  👤 Patient
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-sm btn-outline-secondary"
-                  onClick={() => fillTestCredentials("parent1", "parent123")}
-                >
-                  👪 Parent
-                </button>
-              </div>
-            </div>
-            
+          <div className="login-right p-5 flex-grow-1">
+            <h3 className="text-center text-teal mb-3 fw-bold">Login</h3>
+
             {error && (
               <div className="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>Error:</strong> {error}
+                {error}
                 <button type="button" className="btn-close" onClick={() => setError("")}></button>
               </div>
             )}
 
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label className="form-label">Username</label>
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="Enter username" 
+                <label className="form-label fw-semibold">Username</label>
+                <input
+                  type="text"
+                  className="form-control input-modern"
+                  placeholder="Enter username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
                 />
               </div>
 
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input 
-                  type="password" 
-                  className="form-control" 
-                  placeholder="Enter password" 
+              <div className="mb-4">
+                <label className="form-label fw-semibold">Password</label>
+                <input
+                  type="password"
+                  className="form-control input-modern"
+                  placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
               </div>
 
-              <button 
-                type="submit" 
-                className="btn btn-primary w-100"
+              <button
+                type="submit"
+                className="btn btn-modern w-100 fw-bold mb-3"
                 disabled={loading}
               >
                 {loading ? (
@@ -180,33 +106,25 @@ export default function Login() {
                     <span className="spinner-border spinner-border-sm me-2" role="status"></span>
                     Authenticating...
                   </>
-                ) : "🚀 Login"}
+                ) : (
+                  "Login"
+                )}
               </button>
             </form>
 
-            <div className="text-center mt-3">
-              <Link to="/forgot-password" className="small me-3">Forgot Password?</Link>
-              <Link to="/register" className="small">New Patient? Register Here</Link>
-            </div>
-
-            {/* Backend Info */}
-            <div className="mt-4 p-3 bg-light rounded">
-              <small className="text-muted">
-                <strong>Backend Info:</strong><br/>
-                • Port: 8080<br/>
-                • Database: p24_bharat_teeka_portal<br/>
-                • Test: <a 
-                  href="http://localhost:8080/api/auth/test" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                >
-                  http://localhost:8080/api/auth/test
-                </a>
-              </small>
+            <div className="text-center">
+              <Link to="#" className="text-decoration-none me-3 small">
+                Forgot Password?
+              </Link>
+              <Link to="/register" className="text-decoration-none small">
+                Register
+              </Link>
             </div>
           </div>
         </div>
-      </div>  
+      </div>
+
+      <Footer />
     </div>
   );
 }

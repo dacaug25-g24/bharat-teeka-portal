@@ -51,14 +51,16 @@ export default function ChildrenVaccination() {
                     </div>
                 </div>
 
-                <div className="d-flex flex-wrap gap-2">
-                    <button className="btn btn-teal rounded-pill px-4">
+                {/* Buttons like PrecautionDose */}
+                <div className="d-flex gap-2 flex-wrap">
+                    <button className="btn btn-precaution rounded-pill px-4">
                         Book Your Slot
                     </button>
                     <button className="btn rounded-pill px-4 secondary-btn">
                         Find Nearby Centers
                     </button>
                 </div>
+
             </div>
 
             <div className="col-md-6 text-center">
