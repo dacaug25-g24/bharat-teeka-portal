@@ -1,2 +1,0 @@
-INDEX VERSION 1.134+D:\HP Data\D Drive\CDAC 2025\BharatTeekProject\bharat-teeka-portal-main\backend\auth-service\.metadata\.plugins\org.eclipse.jdt.core
-1865797976.index

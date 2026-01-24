@@ -18,7 +18,7 @@ public class User {
     private Integer userId;
     
     @Column(name = "role_id")
-    private Integer roleId;  // 0 = pending, 1 = admin, 2 = hospital, 3 = patient, 4 = parent
+    private Integer roleId;
     
     @Column(name = "username", unique = true, nullable = false)
     private String username;

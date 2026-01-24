@@ -1,9 +1,13 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import CreateAccount from "../pages/registration/CreateAccount";
-import PersonalInfo from "../pages/registration/PersonalInfo";
+import BookSlot from "../pages/BookSlot";
+import Contact from "../pages/Contact";
+import RaiseIssue from "../pages/RaiseIssue";
+import Support from "../pages/Support";
+
 import About from "../components/Footer/About";
 import PrivacyPolicy from "../components/Footer/PrivacyPolicy";
 import Help from "../components/Footer/Help";
@@ -24,20 +28,13 @@ import PersonalInfo from "../pages/registration/PersonalInfo";
 
 
 const AppRoutes = () => {
-  const location = useLocation();
-  
-  // Hide navbar on these pages
-  const hideNavbar = ["/login", "/register", "/create-account", "/personal-info"].includes(location.pathname);
-  
-  // Hide footer on these pages
-  const hideFooter = ["/login", "/register", "/create-account", "/personal-info"].includes(location.pathname);
+  const { pathname } = useLocation();
 
   return (
     <>
       {pathname === "/" ? <LandingNavbar /> : <AppNavbar />}
 
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/find-center" element={<HeroSearch showFooter />} />
         <Route path="/book-slot" element={<BookSlot />} />
@@ -45,6 +42,7 @@ const AppRoutes = () => {
         <Route path="/faq" element={<Faq showFooter />} />
 
         <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/help" element={<Help />} />
 
@@ -80,14 +78,12 @@ const AppRoutes = () => {
 
     </>
   );
-}
+};
 
-function AppRouter() {
-  return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
-  );
-}
+const AppRouter = () => (
+  <BrowserRouter>
+    <AppRoutes />
+  </BrowserRouter>
+);
 
 export default AppRouter;
