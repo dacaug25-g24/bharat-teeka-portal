@@ -85,3 +85,7 @@
     padding: 3rem 2rem;
   }
 }
+
+.register-link a:hover {
+  text-decoration: underline;
+}

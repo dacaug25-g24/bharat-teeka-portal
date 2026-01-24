@@ -1,92 +1,192 @@
+/* Navbar.css */
 .bg-teal {
-  background-color: #026b6c !important;
-}
-
-.navbar-brand {
-  font-size: 1rem;
+  background: linear-gradient(135deg, #026b6c, #008c8c) !important;
 }
 
 .brand-pill {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
+  background: white;
   border-radius: 50%;
-  background-color: transparent;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.brand-pill img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  padding: 5px;
 }
 
 .brand-title {
-  font-size: 1.1rem;
-  line-height: 1.1;
+  font-size: 1.3rem;
+  color: white;
 }
 
 .brand-subtitle {
-  font-size: 0.7rem;
-  color: #e0f2f1;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.navbar-nav .nav-link {
-  color: #ffffff !important;
-  font-weight: 550;
-  font-size: 1.05rem;
-}
-
-.navbar-nav .nav-link:hover {
-  color: #ffe483 !important;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .nav-link {
-  color: #026b6c !important;
+  color: rgba(255, 255, 255, 0.85) !important;
   font-weight: 500;
+  transition: all 0.3s ease;
 }
 
-.btn-font {
-  padding: 2px 8px;
-  font-size: 0.8rem;
-  line-height: 1;
-  border-radius: 4px;
-  border-color: rgba(255, 255, 255, 0.6);
-  color: #ffffff;
+.nav-link:hover {
+  color: white !important;
+  transform: translateY(-2px);
 }
 
-.btn-font:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+/* Login/Register Buttons */
+.btn-login {
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px solid white;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-.btn-lang {
-  border-color: rgba(255, 255, 255, 0.6);
-  color: #ffffff;
-  font-size: 0.85rem;
-  padding: 4px 10px;
-}
-
-.btn-lang:hover,
-.btn-lang:focus {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+.btn-login:hover {
+  background: white;
+  color: #026b6c;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
 }
 
 .btn-register {
-  background-color: transparent;
-  border: 2px solid #ffffff;
-  border-radius: 50px;
-  color: #ffffff;
-  font-weight: 500;
-  padding-top: 6px;
-  padding-bottom: 6px;
+  background: #ffe483;
+  border: 2px solid #ffe483;
+  color: #026b6c;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
 .btn-register:hover {
-  background-color: #ffffff;
+  background: #ffd95a;
+  border-color: #ffd95a;
+  color: #024c4d;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 228, 131, 0.4);
+}
+
+/* User Dropdown */
+.user-info {
+  color: white;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.user-role {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.75rem;
+}
+
+.dropdown-toggle::after {
+  margin-left: 0.5em;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .navbar-nav {
+    text-align: center;
+    margin: 15px 0;
+  }
+  
+  .d-flex {
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .dropdown {
+    width: 100%;
+    text-align: center;
+  }
+  /* Add these styles to your Navbar.css */
+
+.user-avatar {
+  color: white;
+}
+
+.user-info {
+  color: white;
+  line-height: 1.2;
+}
+
+.dropdown-toggle::after {
+  margin-left: 0.5em;
+  vertical-align: middle;
+}
+
+/* Make dropdown menu look better */
+.dropdown-menu {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  min-width: 200px;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
   color: #026b6c;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+}
+
+/* Ensure navbar doesn't hide content */
+.navbar {
+  z-index: 1030;
+}
+/* Add these styles to your Navbar.css */
+
+.user-avatar {
+  color: white;
+}
+
+.user-info {
+  color: white;
+  line-height: 1.2;
+}
+
+.dropdown-toggle::after {
+  margin-left: 0.5em;
+  vertical-align: middle;
+}
+
+/* Make dropdown menu look better */
+.dropdown-menu {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  min-width: 200px;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #026b6c;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+}
+
+/* Ensure navbar doesn't hide content */
+.navbar {
+  z-index: 1030;
+}
 }

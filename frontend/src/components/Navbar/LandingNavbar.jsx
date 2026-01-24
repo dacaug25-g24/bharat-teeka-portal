@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 import emblemGov from "../../assets/emblem-gov.svg";
 import "./Navbar.css";
 
-export default function LandingNavbar() {
+export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-teal py-2 shadow-sm">
       <div className="container-fluid px-4">
 
-        <a className="navbar-brand fw-bold d-flex align-items-center" href="#home">
+        <Link className="navbar-brand fw-bold d-flex align-items-center" to="/">
           <img
             src={emblemGov}
             alt="Government emblem"
@@ -19,7 +20,7 @@ export default function LandingNavbar() {
             </span>
             <span className="brand-subtitle">Towards Healthy Bharat</span>
           </div>
-        </a>
+        </Link>
 
         <button
           className="navbar-toggler"
@@ -30,23 +31,24 @@ export default function LandingNavbar() {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        <div className="collapse navbar-collapse" id="landingNavbar">
+        <div className="collapse navbar-collapse" id="navbarNav">
+
           <ul className="navbar-nav mx-auto gap-3 align-items-center">
 
             <li className="nav-item">
-              <a className="nav-link" href="#home">Home</a>
+              <Link className="nav-link" to="/">Home</Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#find-center">Find Center</a>
+              <Link className="nav-link" to="/find-center">Find Center</Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#book-slot">Book Slot</a>
+              <Link className="nav-link" to="/book-slot">Book Slot</Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#download-certificate">Download Certificate</a>
+              <Link className="nav-link" to="/download-certificate">Download Certificate</Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#faq">FAQ</a>
+              <Link className="nav-link" to="/faq">FAQ</Link>
             </li>
 
             <li className="nav-item">
@@ -60,4 +62,4 @@ export default function LandingNavbar() {
       </div>
     </nav>
   );
-}
+}a
