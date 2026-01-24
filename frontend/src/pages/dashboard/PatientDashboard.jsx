@@ -10,12 +10,11 @@ export default function PatientDashboard() {
 
   return (
     <div className="dashboard-container">
-      {/* Header */}
       <div className="dashboard-header">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-8">
-              <h1>👤 Patient Dashboard</h1>
+              <h1>Patient Dashboard</h1>
               <p className="mb-0">Welcome back, <strong>{user?.username}</strong></p>
             </div>
             <div className="col-md-4 text-end">
@@ -28,7 +27,6 @@ export default function PatientDashboard() {
         </div>
       </div>
 
-      {/* Dashboard Content */}
       <div className="container">
         <div className="user-info-panel">
           <h5>Personal Information</h5>
@@ -45,7 +43,7 @@ export default function PatientDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card patient-card">
               <div className="card-header">
-                <h5 className="mb-0">📅 Book Vaccination</h5>
+                <h5 className="mb-0">Book Vaccination</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Schedule your vaccination appointment.</p>
@@ -57,7 +55,7 @@ export default function PatientDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card patient-card">
               <div className="card-header">
-                <h5 className="mb-0">📄 Vaccination Certificate</h5>
+                <h5 className="mb-0">Vaccination Certificate</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Download your vaccination certificate.</p>
@@ -69,7 +67,7 @@ export default function PatientDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card patient-card">
               <div className="card-header">
-                <h5 className="mb-0">📋 Appointment History</h5>
+                <h5 className="mb-0">Appointment History</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">View your vaccination history.</p>
@@ -81,7 +79,7 @@ export default function PatientDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card patient-card">
               <div className="card-header">
-                <h5 className="mb-0">📍 Find Centers</h5>
+                <h5 className="mb-0">Find Centers</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Search nearby vaccination centers.</p>
@@ -93,7 +91,7 @@ export default function PatientDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card patient-card">
               <div className="card-header">
-                <h5 className="mb-0">🔔 Dose Reminders</h5>
+                <h5 className="mb-0">Dose Reminders</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Get reminders for next dose.</p>
@@ -105,7 +103,7 @@ export default function PatientDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card patient-card">
               <div className="card-header">
-                <h5 className="mb-0">👨‍⚕️ Health Profile</h5>
+                <h5 className="mb-0">Health Profile</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Update your health information.</p>

@@ -3,14 +3,16 @@ package com.bharatteeka.auth.controller;
 import com.bharatteeka.auth.dto.*;
 import com.bharatteeka.auth.entity.User;
 import com.bharatteeka.auth.service.AuthService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +25,7 @@ public class AuthController {
     
     // Step 1: Create account
     @PostMapping("/create-account")
-    public ResponseEntity<Map<String, Object>> createAccount(@Valid @RequestBody CreateAccountRequest request) {
+    public ResponseEntity<Map<String, Object>> createAccount(@Validated @RequestBody CreateAccountRequest request) {
         try {
             System.out.println("📝 Creating account for: " + request.getUsername());
             
@@ -58,20 +60,19 @@ public class AuthController {
     @PostMapping("/complete-registration")
     public ResponseEntity<Map<String, Object>> completeRegistration(@Valid @RequestBody CompleteRegistrationRequest request) {
         try {
-            System.out.println("📝 Completing registration for user ID: " + request.getUserId());
-            
             User user = authService.completeRegistration(
                 request.getUserId(),
                 request.getFullName(),
                 LocalDate.parse(request.getDateOfBirth()),
                 request.getGender(),
                 request.getAadhaarNumber(),
+                request.getBloodGroup(), // ✅ pass blood group
                 request.getRemarks()
             );
-            
+
             String roleName = getRoleName(user.getRoleId());
             int age = calculateAge(LocalDate.parse(request.getDateOfBirth()));
-            
+
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Registration completed successfully!");
@@ -80,19 +81,16 @@ public class AuthController {
             response.put("roleId", user.getRoleId());
             response.put("roleName", roleName);
             response.put("age", age);
-            
-            System.out.println("✅ Registration completed. User ID: " + user.getUserId() + ", Role: " + roleName);
+
             return ResponseEntity.ok(response);
-            
         } catch (Exception e) {
-            System.out.println("❌ Registration completion error: " + e.getMessage());
-            
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+
     
     // Login
     @PostMapping("/login")

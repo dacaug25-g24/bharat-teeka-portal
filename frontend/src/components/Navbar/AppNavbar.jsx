@@ -48,9 +48,7 @@ export default function AppNavbar() {
                         </li>
 
                         <li className="nav-item">
-                            <Link className="nav-link" to="/download-certificate">
-                                Download Certificate
-                            </Link>
+                            <Link className="nav-link" to="/download-certificate">Download Certificate</Link>
                         </li>
 
                         <li className="nav-item">
@@ -63,12 +61,9 @@ export default function AppNavbar() {
 
                     </ul>
 
-                    <Link className="btn btn-register px-4 ms-2" to="/login">
-                        Sign In
-                    </Link>
-                    <Link className="btn btn-register px-4 ms-2" to="/register">
-                        Register
-                    </Link>
+                    <Link className="btn btn-register px-4 ms-2" to="/login">Sign In</Link>
+                    <Link className="btn btn-register px-4 ms-2" to="/register">Register</Link>
+                    
                 </div>
             </div>
         </nav>

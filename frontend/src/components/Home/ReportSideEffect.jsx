@@ -44,7 +44,7 @@ export default function SideEffectsInfo() {
                     Most side effects resolve within a few days. If you experience anything severe or unusual, consult a healthcare professional.
                 </p>
 
-                <div className="d-flex flex-wrap gap-2">
+                <div className="flex-wrap gap-2">
                     <button className="btn rounded-pill px-4 secondary-btn">
                         View Common Side Effects
                     </button>

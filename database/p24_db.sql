@@ -1,10 +1,10 @@
 CREATE DATABASE  IF NOT EXISTS `p24_bharat_teeka_portal` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `p24_bharat_teeka_portal`;
--- MySQL dump 10.13  Distrib 8.0.44, for macos15 (arm64)
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: p24_bharat_teeka_portal
+-- Host: localhost    Database: p24_bharat_teeka_portal
 -- ------------------------------------------------------
--- Server version	9.4.0
+-- Server version	8.0.42
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -213,7 +213,7 @@ CREATE TABLE `patient` (
   UNIQUE KEY `aadhar_number` (`aadhar_number`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `patient_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,7 +222,7 @@ CREATE TABLE `patient` (
 
 LOCK TABLES `patient` WRITE;
 /*!40000 ALTER TABLE `patient` DISABLE KEYS */;
-INSERT INTO `patient` VALUES (1,6,'Raj','Patel','1990-05-15','Male','123456789012','B+',1,1,'No allergies'),(2,7,'Priya','Sharma','1985-08-22','Female','234567890123','O+',1,1,'Hypertension patient'),(3,8,'Arun','Kumar','1978-12-10','Male','345678901234','A+',1,1,'Diabetes patient'),(4,9,'Meera','Shah','1992-03-18','Female','456789012345','AB+',1,1,'Regular checkups'),(5,NULL,'Rohan','Singh','2018-03-10','Male','567890123456','B+',0,1,'Child vaccination'),(6,NULL,'Ananya','Singh','2020-06-25','Female','678901234567','O+',0,1,'Infant vaccination'),(7,NULL,'Karan','Verma','2019-08-15','Male','789012345678','A+',0,1,'Toddler vaccination'),(8,NULL,'Sneha','Verma','2021-11-30','Female','890123456789','B-',0,1,'Newborn vaccination');
+INSERT INTO `patient` VALUES (1,6,'Raj','Patel','1990-05-15','Male','123456789012','B+',1,1,'No allergies'),(2,7,'Priya','Sharma','1985-08-22','Female','234567890123','O+',1,1,'Hypertension patient'),(3,8,'Arun','Kumar','1978-12-10','Male','345678901234','A+',1,1,'Diabetes patient'),(4,9,'Meera','Shah','1992-03-18','Female','456789012345','AB+',1,1,'Regular checkups'),(5,NULL,'Rohan','Singh','2018-03-10','Male','567890123456','B+',0,1,'Child vaccination'),(6,NULL,'Ananya','Singh','2020-06-25','Female','678901234567','O+',0,1,'Infant vaccination'),(7,NULL,'Karan','Verma','2019-08-15','Male','789012345678','A+',0,1,'Toddler vaccination'),(8,NULL,'Sneha','Verma','2021-11-30','Female','890123456789','B-',0,1,'Newborn vaccination'),(9,18,'sham','sunder','1994-05-24','Male','787845125689','A+',1,1,'aefea aef aef a'),(10,20,'amit','patil','1990-01-24','Male','359059164182','B+',1,1,'sbefhg e yefuyewfyew');
 /*!40000 ALTER TABLE `patient` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -261,7 +261,7 @@ CREATE TABLE `role` (
   `role_id` int NOT NULL AUTO_INCREMENT,
   `role_name` varchar(50) NOT NULL,
   PRIMARY KEY (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -270,7 +270,7 @@ CREATE TABLE `role` (
 
 LOCK TABLES `role` WRITE;
 /*!40000 ALTER TABLE `role` DISABLE KEYS */;
-INSERT INTO `role` VALUES (1,'Admin'),(2,'Hospital'),(3,'Patient'),(4,'Parent');
+INSERT INTO `role` VALUES (0,'Pending'),(1,'Admin'),(2,'Hospital'),(3,'Patient'),(4,'Parent');
 /*!40000 ALTER TABLE `role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -353,7 +353,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `phone` (`phone`),
   KEY `role_id` (`role_id`),
   CONSTRAINT `user_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -362,7 +362,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,1,'admin','admin123','admin@teeka.gov.in','9876543210','Government of India, New Delhi',1),(2,2,'aiims','hospital123','aiims@aiims.edu','9876543211','Ansari Nagar, New Delhi',1),(3,2,'kims','hospital123','contact@kims.com','9876543212','Andheri West, Mumbai',1),(4,2,'apollo','hospital123','info@apollo.com','9876543213','Greams Road, Chennai',1),(5,2,'civil','hospital123','civil@hospital.com','9876543220','Civil Lines, Ahmedabad',1),(6,3,'raj','patient123','raj.patel@gmail.com','9876543214','101, Shivaji Nagar, Pune',1),(7,3,'priya','patient123','priya.sharma@yahoo.com','9876543215','45, Rajpath, Delhi',1),(8,3,'arun','patient123','arun.k@gmail.com','9876543216','78, MG Road, Bangalore',1),(9,3,'meera','patient123','meera.shah@gmail.com','9876543217','22, Ellis Bridge, Ahmedabad',1),(10,4,'parent1','parent123','parent1@gmail.com','9876543218','22, Model Town, Jaipur',1),(11,4,'parent2','parent123','parent2@yahoo.com','9876543221','33, Saket, Delhi',1);
+INSERT INTO `user` VALUES (1,1,'admin','admin123','admin@teeka.gov.in','9876543210','Government of India, New Delhi',1),(2,2,'aiims','hospital123','aiims@aiims.edu','9876543211','Ansari Nagar, New Delhi',1),(3,2,'kims','hospital123','contact@kims.com','9876543212','Andheri West, Mumbai',1),(4,2,'apollo','hospital123','info@apollo.com','9876543213','Greams Road, Chennai',1),(5,2,'civil','hospital123','civil@hospital.com','9876543220','Civil Lines, Ahmedabad',1),(6,3,'raj','patient123','raj.patel@gmail.com','9876543214','101, Shivaji Nagar, Pune',1),(7,3,'priya','patient123','priya.sharma@yahoo.com','9876543215','45, Rajpath, Delhi',1),(8,3,'arun','patient123','arun.k@gmail.com','9876543216','78, MG Road, Bangalore',1),(9,3,'meera','patient123','meera.shah@gmail.com','9876543217','22, Ellis Bridge, Ahmedabad',1),(10,4,'parent1','parent123','parent1@gmail.com','9876543218','22, Model Town, Jaipur',1),(11,4,'parent2','parent123','parent2@yahoo.com','9876543221','33, Saket, Delhi',1),(16,3,'shubham','shubham123','shubham@gmail.com','8956895623','gsidf ggsdfgysdgfygsu gfysdyfsd f | Personal Info: Full Name: Shubham ch, DOB: 2000-01-24, Gender: Male, Aadhaar: 124578451245, Remarks: hello this is shub',1),(17,0,'ram','ram123','ram@gmail.com','7845122356','hfu sufsegfesu fuseu fusiegf isief ',0),(18,3,'sham','sham123','smham@gmail.com','8978455623','afjs fgysug fygsyf guysgfgesf',1),(19,0,'asasas','aaaaaa','aaa@gmail.com','8888888888','aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',0),(20,3,'amit','amit123','amit@gmail.com','7845124578','jagyfg yusg eyfsyef yuefyu',1);
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -410,4 +410,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-22  9:45:12
+-- Dump completed on 2026-01-24 12:01:20

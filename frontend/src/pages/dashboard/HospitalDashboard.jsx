@@ -10,12 +10,11 @@ export default function HospitalDashboard() {
 
   return (
     <div className="dashboard-container">
-      {/* Header */}
       <div className="dashboard-header">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-8">
-              <h1>🏥 Hospital Dashboard</h1>
+              <h1>Hospital Dashboard</h1>
               <p className="mb-0">Welcome, <strong>{user?.username}</strong> Hospital</p>
             </div>
             <div className="col-md-4 text-end">
@@ -28,7 +27,6 @@ export default function HospitalDashboard() {
         </div>
       </div>
 
-      {/* Dashboard Content */}
       <div className="container">
         <div className="user-info-panel">
           <h5>Hospital Information</h5>
@@ -45,7 +43,7 @@ export default function HospitalDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card hospital-card">
               <div className="card-header">
-                <h5 className="mb-0">💉 Vaccine Inventory</h5>
+                <h5 className="mb-0">Vaccine Inventory</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Manage vaccine stock and inventory levels.</p>
@@ -57,7 +55,7 @@ export default function HospitalDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card hospital-card">
               <div className="card-header">
-                <h5 className="mb-0">📅 Appointments</h5>
+                <h5 className="mb-0">Appointments</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">View and manage vaccination appointments.</p>
@@ -69,7 +67,7 @@ export default function HospitalDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card hospital-card">
               <div className="card-header">
-                <h5 className="mb-0">👤 Patient Records</h5>
+                <h5 className="mb-0">Patient Records</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Access patient vaccination records.</p>
@@ -81,7 +79,7 @@ export default function HospitalDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card hospital-card">
               <div className="card-header">
-                <h5 className="mb-0">🏥 Staff Management</h5>
+                <h5 className="mb-0">Staff Management</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Manage hospital staff and schedules.</p>
@@ -93,7 +91,7 @@ export default function HospitalDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card hospital-card">
               <div className="card-header">
-                <h5 className="mb-0">📈 Daily Reports</h5>
+                <h5 className="mb-0">Daily Reports</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Generate daily vaccination reports.</p>
@@ -105,7 +103,7 @@ export default function HospitalDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card hospital-card">
               <div className="card-header">
-                <h5 className="mb-0">🔔 Notifications</h5>
+                <h5 className="mb-0">Notifications</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Send notifications to patients.</p>

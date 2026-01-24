@@ -56,12 +56,8 @@ export default function Navbar() {
             </li>
           </ul>
 
-          <Link className="btn btn-register px-4 ms-2" to="/login">
-            Sign In
-          </Link>
-          <Link className="btn btn-register px-4 ms-2" to="/register">
-            Register
-          </Link>
+          <a className="btn btn-register px-4 ms-2" href="/login">Sign In</a>
+          <a className="btn btn-register px-4 ms-2" href="/register">Register</a>
         </div>
       </div>
     </nav>

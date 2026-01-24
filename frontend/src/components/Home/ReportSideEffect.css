@@ -15,12 +15,25 @@
 }
 
 .secondary-btn {
-  border-color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(0, 0, 0, 0.7);
   background-color: #ffffff;
   color: #026b6c;
   transition: 0.2s ease;
-  border-color: #000 !important;
+  padding: 0.5rem 1.2rem;
+  border-radius: 50px;     
+  display: inline-block;    
+  width: auto;             
+  text-align: center;
+  white-space: nowrap;      
 }
+
+.secondary-btn:hover {
+  background-color: #f0f0f0;
+  color: #024c4d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 
 .btn-teal {
   background-color: #008c8c;

@@ -1,6 +1,6 @@
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 65px; /* adjust to navbar height */
+  scroll-padding-top: 65px;
 }
 
 * {

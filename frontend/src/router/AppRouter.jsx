@@ -7,17 +7,21 @@ import PersonalInfo from "../pages/registration/PersonalInfo";
 import About from "../components/Footer/About";
 import PrivacyPolicy from "../components/Footer/PrivacyPolicy";
 import Help from "../components/Footer/Help";
-import Contact from "../pages/Contact";
-import RaiseIssue from "../pages/RaiseIssue";
-import Support from "../pages/Support";
-import BookSlot from "../pages/BookSlot";
+
+import LandingNavbar from "../components/Navbar/LandingNavbar";
+import AppNavbar from "../components/Navbar/AppNavbar";
+
+import HeroSearch from "../components/Home/HeroSearch";
+import DownloadCertificate from "../components/Home/DownloadCertificate";
+import Faq from "../components/Home/Faq";
+import ProtectedRoute from "../components/ProtectedRoute";
 import AdminDashboard from "../pages/dashboard/AdminDashboard";
 import HospitalDashboard from "../pages/dashboard/HospitalDashboard";
 import PatientDashboard from "../pages/dashboard/PatientDashboard";
 import ParentDashboard from "../pages/dashboard/ParentDashboard";
-import ProtectedRoute from "../components/ProtectedRoute";
-import Navbar from "../components/Navbar/Navbar";
-import Footer from "../components/Footer/Footer";
+import CreateAccount from "../pages/registration/CreateAccount";
+import PersonalInfo from "../pages/registration/PersonalInfo";
+
 
 const AppRoutes = () => {
   const location = useLocation();
@@ -30,26 +34,28 @@ const AppRoutes = () => {
 
   return (
     <>
-      {!hideNavbar && <Navbar />}
+      {pathname === "/" ? <LandingNavbar /> : <AppNavbar />}
+
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/create-account" element={<CreateAccount />} />
-        <Route path="/personal-info" element={<PersonalInfo />} />
+        <Route path="/find-center" element={<HeroSearch showFooter />} />
+        <Route path="/book-slot" element={<BookSlot />} />
+        <Route path="/download-certificate" element={<DownloadCertificate showFooter />} />
+        <Route path="/faq" element={<Faq showFooter />} />
+
         <Route path="/about" element={<About />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/help" element={<Help />} />
-        <Route path="/contact" element={<Contact />} />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/registration/create-account" element={<CreateAccount />} />
+        <Route path="/registration/personal-info" element={<PersonalInfo />}/>
+
         <Route path="/raise-issue" element={<RaiseIssue />} />
         <Route path="/support" element={<Support />} />
-        <Route path="/book-slot" element={<BookSlot />} />
-        <Route path="/download-certificate" element={<Home />} />
-        <Route path="/find-center" element={<Home />} />
-        <Route path="/faq" element={<Home />} />
-        
-        {/* Protected Dashboard Routes */}
+
         <Route path="/admin-dashboard" element={
           <ProtectedRoute>
             <AdminDashboard />
@@ -71,7 +77,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } />
       </Routes>
-      {!hideFooter && <Footer />}
+
     </>
   );
 }

@@ -10,12 +10,11 @@ export default function ParentDashboard() {
 
   return (
     <div className="dashboard-container">
-      {/* Header */}
       <div className="dashboard-header">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-8">
-              <h1>👪 Parent Dashboard</h1>
+              <h1>Parent Dashboard</h1>
               <p className="mb-0">Welcome, <strong>{user?.username}</strong></p>
             </div>
             <div className="col-md-4 text-end">
@@ -28,7 +27,6 @@ export default function ParentDashboard() {
         </div>
       </div>
 
-      {/* Dashboard Content */}
       <div className="container">
         <div className="user-info-panel">
           <h5>Parent Information</h5>
@@ -45,7 +43,7 @@ export default function ParentDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card parent-card">
               <div className="card-header">
-                <h5 className="mb-0">👶 Child Registration</h5>
+                <h5 className="mb-0">Child Registration</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Register your child for vaccination.</p>
@@ -57,7 +55,7 @@ export default function ParentDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card parent-card">
               <div className="card-header">
-                <h5 className="mb-0">📋 Child Vaccination Schedule</h5>
+                <h5 className="mb-0">Child Vaccination Schedule</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">View and manage child vaccination schedule.</p>
@@ -69,7 +67,7 @@ export default function ParentDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card parent-card">
               <div className="card-header">
-                <h5 className="mb-0">📄 Vaccination History</h5>
+                <h5 className="mb-0">Vaccination History</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Track your child's vaccination history.</p>
@@ -81,7 +79,7 @@ export default function ParentDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card parent-card">
               <div className="card-header">
-                <h5 className="mb-0">📅 Book Child Appointment</h5>
+                <h5 className="mb-0">Book Child Appointment</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Schedule vaccination for your child.</p>
@@ -93,7 +91,7 @@ export default function ParentDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card parent-card">
               <div className="card-header">
-                <h5 className="mb-0">📑 Download Certificates</h5>
+                <h5 className="mb-0">Download Certificates</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Download child vaccination certificates.</p>
@@ -105,7 +103,7 @@ export default function ParentDashboard() {
           <div className="col-md-4">
             <div className="dashboard-card parent-card">
               <div className="card-header">
-                <h5 className="mb-0">🔔 Vaccination Reminders</h5>
+                <h5 className="mb-0">Vaccination Reminders</h5>
               </div>
               <div className="card-body">
                 <p className="card-text">Set reminders for upcoming vaccinations.</p>

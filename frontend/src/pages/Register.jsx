@@ -5,16 +5,15 @@ export default function Register() {
   const navigate = useNavigate();
   
   useEffect(() => {
-    // Redirect to the new create-account page
-    navigate('/create-account');
+    navigate('/registration/create-account');
   }, [navigate]);
   
   return (
-    <div className="text-center p-5">
-      <div className="spinner-border text-primary" role="status">
+    <div className="register-redirect d-flex flex-column justify-content-center align-items-center vh-100 bg-light">
+      <div className="spinner-border text-teal" role="status">
         <span className="visually-hidden">Loading...</span>
       </div>
-      <p className="mt-3">Redirecting to registration page...</p>
+      <p className="mt-3 text-teal fw-semibold">Redirecting to registration page...</p>
     </div>
   );
 }

@@ -46,6 +46,7 @@ out/
 .idea/
 .vscode/
 *.iml
+.metadata/
 
 ############################
 # OS-specific

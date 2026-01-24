@@ -22,6 +22,8 @@ public class CompleteRegistrationRequest {
     // Make Aadhaar truly optional - remove @Size and use custom validation
     private String aadhaarNumber;
     
+    private String bloodGroup;
+    
     @Size(max = 500, message = "Remarks cannot exceed 500 characters")
     private String remarks;
 }
