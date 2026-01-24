@@ -74,7 +74,7 @@ export default function CreateAccount() {
   return (
     <>
       <div className="create-account-container">
-        <div className="card create-account-card shadow-lg">
+        <div className="card create-account-card shadow-lg h-100">
           <div className="row g-0">
 
             <div className="col-md-6 d-none d-md-flex create-account-left flex-column justify-content-center p-5">
@@ -109,7 +109,7 @@ export default function CreateAccount() {
               </div>
             </div>
 
-            <div className="col-md-6 p-4 create-account-form-container">
+            <div className="col-md-6 p-4 create-account-form-container h-100 overflow-auto">
               <h2 className="text-center text-teal mb-2">Create Account</h2>
 
               {error && <div className="alert alert-danger">{error}</div>}
