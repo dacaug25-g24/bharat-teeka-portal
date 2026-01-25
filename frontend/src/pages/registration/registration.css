@@ -1,11 +1,19 @@
-body,
-html {
+/* ===============================
+   GLOBAL
+   =============================== */
+
+html,
+body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
   padding: 0;
   height: 100%;
   background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
 }
+
+/* ===============================
+   PAGE CONTAINERS
+   =============================== */
 
 .create-account-container,
 .personal-info-container {
@@ -15,6 +23,10 @@ html {
   align-items: center;
   padding: 20px;
 }
+
+/* ===============================
+   CARDS
+   =============================== */
 
 .card.create-account-card,
 .card.personal-info-card {
@@ -28,6 +40,21 @@ html {
   background: white;
 }
 
+/* Create Account height fix only */
+.create-account-card {
+  min-height: 90vh;
+  height: auto;
+}
+
+.create-account-card > .row {
+  height: 100%;
+  align-items: stretch;
+}
+
+/* ===============================
+   LEFT PANELS (MERGED)
+   =============================== */
+
 .create-account-left,
 .personal-info-left {
   flex: 1;
@@ -37,22 +64,25 @@ html {
   padding: 40px;
   color: white;
   min-height: 100%;
-}
-
-.create-account-left {
   background: linear-gradient(135deg, #012b2c, #024c4d);
 }
 
-.personal-info-left {
-  background: linear-gradient(135deg, #012b2c, #024c4d); /* same as create-account-left */
+/* Create Account specific override */
+.create-account-left {
+  padding: 0;
+}
+
+.create-account-left .left-inner {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 40px;
-  color: white;
-  min-height: 100%;
 }
+
+/* ===============================
+   LEFT PANEL TEXT
+   =============================== */
 
 .create-account-left h2,
 .personal-info-left h2 {
@@ -67,6 +97,25 @@ html {
   margin-bottom: 30px;
   font-size: 14px;
 }
+
+.personal-info-card {
+  min-height: 90vh;
+  height: auto;
+}
+
+.personal-info-card > .row {
+  height: 100%;
+  align-items: stretch;
+}
+
+.personal-info-left,
+.personal-info-form-container {
+  height: 100%;
+}
+
+/* ===============================
+   STEPS
+   =============================== */
 
 .steps {
   margin-bottom: 30px;
@@ -119,6 +168,10 @@ html {
   opacity: 0.8;
 }
 
+/* ===============================
+   INFO BOXES
+   =============================== */
+
 .requirements,
 .role-info,
 .account-info {
@@ -145,6 +198,10 @@ html {
   margin-bottom: 5px;
 }
 
+/* ===============================
+   FORM CONTAINERS
+   =============================== */
+
 .create-account-form-container,
 .personal-info-form-container {
   flex: 1;
@@ -155,6 +212,14 @@ html {
   flex-direction: column;
   justify-content: center;
 }
+
+.create-account-form-container {
+  height: 100%;
+}
+
+/* ===============================
+   FORM HEADINGS
+   =============================== */
 
 .create-account-form-container h2,
 .personal-info-form-container h2 {
@@ -171,6 +236,10 @@ html {
   margin-bottom: 30px;
   font-size: 14px;
 }
+
+/* ===============================
+   FORM ELEMENTS
+   =============================== */
 
 .form-label {
   color: #444;
@@ -192,7 +261,12 @@ html {
   box-shadow: 0 0 0 0.2rem rgba(2, 76, 77, 0.15);
 }
 
-.btn-teal {
+/* ===============================
+   BUTTONS
+   =============================== */
+
+.btn-teal,
+.btn-modern {
   background: linear-gradient(135deg, #012b2c, #024c4d);
   border: none;
   border-radius: 8px;
@@ -204,7 +278,8 @@ html {
   transition: all 0.3s ease;
 }
 
-.btn-teal:hover {
+.btn-teal:hover,
+.btn-modern:hover {
   background: linear-gradient(135deg, #024c4d, #026b6c);
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(2, 76, 77, 0.3);
@@ -219,23 +294,9 @@ html {
   width: 100%;
 }
 
-.btn-modern {
-  background-color: #024c4d;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  width: 100%;
-  transition: all 0.3s ease;
-}
-
-.btn-modern:hover {
-  background-color: #0c797b;
-  transform: translateY(-2px);
-  color: #fff;
-}
+/* ===============================
+   UTILITIES
+   =============================== */
 
 .alert {
   font-size: 14px;
@@ -262,8 +323,11 @@ html {
   text-decoration: underline;
 }
 
-@media (max-width: 768px) {
+/* ===============================
+   MOBILE
+   =============================== */
 
+@media (max-width: 768px) {
   .create-account-left,
   .personal-info-left {
     display: none;

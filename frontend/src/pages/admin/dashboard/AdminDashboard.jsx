@@ -1,8 +1,11 @@
 import "./Dashboard.css";
 import Footer from "../../../components/Footer/Footer";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
 export default function AdminDashboard() {
   const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -10,54 +13,64 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <div className="d-flex flex-grow-1">
+    <div className="admin-page">
+      <div className="admin-body">
+
         {/* SIDEBAR */}
-        <aside className="admin-sidebar shadow">
-          <h3 className="sidebar-title">BharatTeeka</h3>
+        <aside className="admin-sidebar">
+          <h3 className="sidebar-title">
+            Bharat<span className="text-warning">Teeka</span>
+          </h3>
 
           <ul className="sidebar-menu list-unstyled">
-            <li className="active">Dashboard</li>
-            <li>User Management</li>
-            <li>Hospital Management</li>
-            <li>Reports</li>
-            <li>Settings</li>
-            <li>Access Control</li>
+            <li
+              className={
+                location.pathname === "/admin" ||
+                location.pathname === "/admin/dashboard"
+                  ? "active"
+                  : ""
+              }
+              onClick={() => navigate("/admin/dashboard")}
+            >
+              Dashboard
+            </li>
+
+            <li
+              className={
+                location.pathname === "/admin/hospitals" ? "active" : ""
+              }
+              onClick={() => navigate("/admin/hospitals")}
+            >
+              Hospital Management
+            </li>
           </ul>
         </aside>
 
-        {/* MAIN CONTENT */}
-        <div className="admin-main flex-grow-1 d-flex flex-column">
-          {/* TOP BAR */}
-          <header className="admin-topbar d-flex justify-content-between align-items-center px-4 py-2 shadow-sm">
-            <div>
-              <small>
-                Welcome, <span className="admin-name text-warning">{user?.username}</span>
-              </small>
-            </div>
+        {/* MAIN */}
+        <div className="admin-main">
+          <header className="admin-topbar">
+            <small>
+              Welcome,{" "}
+              <span className="admin-name text-warning">
+                {user?.username}
+              </span>
+            </small>
 
-            <button className="logout-btn btn btn-sm" onClick={handleLogout}>
+            <button
+              className="logout-btn btn btn-sm"
+              onClick={handleLogout}
+            >
               Logout
             </button>
           </header>
 
-          {/* CONTENT */}
-          <div className="admin-content flex-grow-1 container-fluid py-4">
-            {/* USER INFO */}
-            <div className="user-info-panel mb-4 p-3 shadow-sm rounded">
-              <h5>Your Information</h5>
-              <p><strong>Email:</strong> {user?.email}</p>
-              <p><strong>Phone:</strong> {user?.phone}</p>
-              <p><strong>Address:</strong> {user?.address}</p>
-              <p><strong>Role:</strong> Administrator</p>
-            </div>
-
+          <div className="admin-content container-fluid py-4">
+            <Outlet />
           </div>
-
-          {/* FOOTER */}
-          <Footer />
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

@@ -166,7 +166,14 @@ export default function PersonalInfo() {
 
               <div className="d-grid gap-2">
                 <button type="submit" className="btn btn-teal" disabled={loading}>
-                  {loading ? <> <span className="spinner-border spinner-border-sm me-2"></span> Completing...</> : "Complete Registration →"}
+                  {loading ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2"></span>
+                      Completing...
+                    </>
+                  ) : (
+                    "Complete Registration →"
+                  )}
                 </button>
               </div>
             </form>

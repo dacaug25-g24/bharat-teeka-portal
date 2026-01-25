@@ -26,6 +26,12 @@ import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
 import HospitalDashboard from "../pages/hospital/dashboard/HospitalDashboard";
 import PatientDashboard from "../pages/patient/dashboard/PatientDashboard";
 import ParentDashboard from "../pages/patient/dashboard/ParentDashboard";
+import AdminRoutes from "../pages/admin/AdminRoutes";
+import HospitalRoutes from "../pages/hospital/HospitalRoutes";
+import PatientRoutes from "../pages/patient/PatientRoutes";
+import ParentRoutes from "../pages/patient/ParentRoutes";
+import SideEffects from "../components/Home/SideEffects";
+import GetCertificate from "../components/Home/GetCertificate";
 
 
 const AppRoutes = () => {
@@ -50,10 +56,12 @@ const AppRoutes = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/registration/create-account" element={<CreateAccount />} />
-        <Route path="/registration/personal-info" element={<PersonalInfo />}/>
+        <Route path="/registration/personal-info" element={<PersonalInfo />} />
 
         <Route path="/raise-issue" element={<RaiseIssue />} />
         <Route path="/support" element={<Support />} />
+        <Route path="/side-effects" element={<SideEffects />} />
+        <Route path="/get-certificate" element={<GetCertificate />} />
 
         <Route path="/admin-dashboard" element={
           <ProtectedRoute>
@@ -75,6 +83,12 @@ const AppRoutes = () => {
             <ParentDashboard />
           </ProtectedRoute>
         } />
+
+        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/hospital/*" element={<HospitalRoutes />} />
+        <Route path="/patient/*" element={<PatientRoutes />} />
+        <Route path="/parent/*" element={<ParentRoutes />} />
+
       </Routes>
 
     </>

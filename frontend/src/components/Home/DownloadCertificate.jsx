@@ -3,6 +3,7 @@ import "./DownloadCertificate.css";
 
 import CertificateImg from "../../assets/Date_Correction.svg";
 import Footer from "../Footer/Footer";
+import { Link } from "react-router-dom";
 
 export default function DownloadCertificate({ showFooter = false }) {
     return (
@@ -59,13 +60,18 @@ export default function DownloadCertificate({ showFooter = false }) {
                     </div>
 
                     {/* Buttons like PrecautionDose */}
-                    <div className="d-flex gap-2 flex-wrap">
-                        <button className="btn btn-precaution rounded-pill px-4">
-                            Download Now
-                        </button>
-                        <button className="btn rounded-pill px-4 secondary-btn">
-                            View FAQ
-                        </button>
+                    <div className="d-flex gap-3 w-100">
+                        <Link to="/get-certificate" className="flex-fill text-decoration-none">
+                            <button className="btn btn-precaution rounded-pill w-100">
+                                Download Now
+                            </button>
+                        </Link>
+
+                        <Link to="/faq" className="flex-fill text-decoration-none">
+                            <button className="btn secondary-btn rounded-pill w-100">
+                                View FAQ
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </SectionWrapper>

@@ -1,11 +1,34 @@
-/* SIDEBAR */
+/* =========================
+   PAGE LAYOUT
+========================= */
+.admin-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  /* 🔥 SIDEBAR BACKGROUND PAINT (KEY FIX) */
+  background: linear-gradient(
+    to right,
+    #0a9092 0,
+    #06676a 250px,
+    #f4f6f8 250px,
+    #f4f6f8 100%
+  );
+}
+
+.admin-body {
+  display: flex;
+  flex: 1;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
 .admin-sidebar {
   width: 250px;
-  background: linear-gradient(180deg, #0a9092, #012223);
-  color: white;
   padding: 1.5rem 1rem;
+  color: white;
   flex-shrink: 0;
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
 }
 
 .sidebar-title {
@@ -16,7 +39,7 @@
 }
 
 .sidebar-menu li {
-  padding: 1rem 1rem;
+  padding: 1rem;
   border-radius: 0.5rem;
   cursor: pointer;
   margin-bottom: 0.75rem;
@@ -30,27 +53,38 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* =========================
+   MAIN CONTENT
+========================= */
+.admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 /* TOP BAR */
 .admin-topbar {
-  border-bottom: 1px solid #e0e0e0;
   background: linear-gradient(to right, #169c9e, #1b8a8e);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 0.75rem 1.5rem;
   font-size: 1.25rem;
   font-weight: 600;
   color: white;
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .admin-topbar small {
-  color: white;
   font-size: 1.6rem;
 }
 
 .admin-topbar .admin-name {
   font-weight: 700;
+}
+
+/* CONTENT */
+.admin-content {
+  flex: 1;
 }
 
 /* USER INFO PANEL */
@@ -64,28 +98,15 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-/* BUTTONS */
-.dashboard-btn {
-  background: linear-gradient(135deg, #026b6c, #008c8c);
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  font-weight: 600;
-}
 
-.dashboard-btn:hover {
-  background: linear-gradient(135deg, #024c4d, #026b6c);
-}
-
-/* LOGOUT BUTTON */
+/* =========================
+   BUTTONS
+========================= */
 .logout-btn {
   background: #dc3545;
   color: white;
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
-  font-size: 1rem;
   font-weight: 600;
 }
 

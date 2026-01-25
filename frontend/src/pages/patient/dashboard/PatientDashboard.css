@@ -1,10 +1,36 @@
+/* =========================
+   PAGE LAYOUT
+========================= */
+.patient-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  /* SAME BACKGROUND STRATEGY AS ADMIN */
+  background: linear-gradient(
+    to right,
+    #0a9092 0,
+    #06676a 250px,
+    #f4f6f8 250px,
+    #f4f6f8 100%
+  );
+}
+
+.patient-body {
+  display: flex;
+  flex: 1;
+  align-items: stretch; /* 🔥 FIXES SIDEBAR GAP */
+}
+
+/* =========================
+   SIDEBAR
+========================= */
 .patient-sidebar {
   width: 250px;
-  background: linear-gradient(180deg, #0a9092, #012223);
-  color: white;
   padding: 1.5rem 1rem;
+  color: white;
   flex-shrink: 0;
-  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+  height: 100%;
 }
 
 .sidebar-title {
@@ -29,29 +55,41 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* =========================
+   MAIN CONTENT
+========================= */
+.patient-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOP BAR */
 .patient-topbar {
   background: linear-gradient(to right, #169c9e, #1b8a8e);
-  border-bottom: 1px solid #e0e0e0;
   padding: 0.75rem 1.5rem;
   font-size: 1.25rem;
   font-weight: 600;
   color: white;
-  box-shadow: 0 2px 6px rgba(255, 255, 255, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .patient-topbar small {
   font-size: 1.6rem;
-  color: white;
 }
 
 .patient-name {
   font-weight: 700;
 }
 
+/* CONTENT */
 .patient-content {
-  background: #f4f6f9;
+  flex: 1;
 }
 
+/* INFO PANEL */
 .patient-info-panel {
   background: white;
   border-radius: 0.75rem;
@@ -62,12 +100,14 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
+/* =========================
+   BUTTONS
+========================= */
 .logout-btn {
   background: #dc3545;
   color: white;
   border-radius: 0.5rem;
   padding: 0.5rem 1rem;
-  font-size: 1rem;
   font-weight: 600;
 }
 
