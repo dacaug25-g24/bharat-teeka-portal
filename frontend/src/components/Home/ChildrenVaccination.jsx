@@ -56,9 +56,13 @@ export default function ChildrenVaccination() {
                     <button className="btn btn-precaution rounded-pill px-4">
                         Book Your Slot
                     </button>
-                    <button className="btn rounded-pill px-4 secondary-btn">
+
+                    <a
+                        href="#find-center"
+                        className="btn secondary-btn rounded-pill px-4"
+                    >
                         Find Nearby Centers
-                    </button>
+                    </a>
                 </div>
 
             </div>

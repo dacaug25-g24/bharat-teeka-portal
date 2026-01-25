@@ -32,13 +32,17 @@ export default function PrecautionDose() {
                     </li>
                 </ul>
 
-                <div className="d-flex flex-wrap gap-2">
+                <div className="d-flex gap-2 flex-wrap">
                     <button className="btn btn-precaution rounded-pill px-4">
                         Book Your Slot
                     </button>
-                    <button className="btn rounded-pill px-4 secondary-btn">
+
+                    <a
+                        href="#find-center"
+                        className="btn secondary-btn rounded-pill px-4"
+                    >
                         Find Nearby Centers
-                    </button>
+                    </a>
                 </div>
 
             </div>

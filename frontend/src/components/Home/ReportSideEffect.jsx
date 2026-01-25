@@ -1,6 +1,7 @@
 import SectionWrapper from "./SectionWrapper";
 import "./ReportSideEffect.css";
 import reportsaefi from "../../assets/reports-aefi.svg";
+import { Link } from "react-router-dom";
 
 export default function SideEffectsInfo() {
     const commonSideEffects = [
@@ -45,9 +46,11 @@ export default function SideEffectsInfo() {
                 </p>
 
                 <div className="flex-wrap gap-2">
-                    <button className="btn rounded-pill px-4 secondary-btn">
-                        View Common Side Effects
-                    </button>
+                    <Link to="/side-effects">
+                        <button className="btn rounded-pill px-4 secondary-btn">
+                            View Common Side Effects
+                        </button>
+                    </Link>
                 </div>
 
             </div>
