@@ -29,4 +29,15 @@ public class SlotServiceImpl implements SlotService {
                 hospitalId, date, time, time
         );
     }
+
+    @Override
+    public List<Slot> getAvailableSlots(Integer hospitalId, LocalDate date) {
+        return repo.findAvailableSlots(hospitalId, date);
+    }
+
+
+    @Override
+    public List<Slot> getSlotsByVaccine(Integer hospitalId, Integer vaccineId, LocalDate date) {
+        return repo.findByHospital_HospitalIdAndVaccine_VaccineIdAndDate(hospitalId, vaccineId, date);
+    }
 }

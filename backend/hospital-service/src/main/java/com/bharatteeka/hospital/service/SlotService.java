@@ -11,4 +11,8 @@ public interface SlotService {
     List<Slot> getSlotsByDateAndHospital(LocalDate date, Integer hospitalId);
 
     List<Slot> getSlotsByDateAndTime(Integer hospitalId, LocalDate date, LocalTime time);
+
+    List<Slot> getAvailableSlots(Integer hospitalId, LocalDate date);
+
+    List<Slot> getSlotsByVaccine(Integer hospitalId, Integer vaccineId, LocalDate date);
 }

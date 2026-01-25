@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/hospital/slots")
@@ -19,30 +20,49 @@ public class SlotController {
         this.service = service;
     }
 
-    // Search slots by date and hospital
-    @GetMapping("/date/{date}/hospital/{hospitalId}")
-    public List<Slot> slotsByDateAndHospital(@PathVariable String date, @PathVariable Integer hospitalId) {
-        LocalDate d = LocalDate.parse(date);
-        List<Slot> slots = service.getSlotsByDateAndHospital(d, hospitalId);
-        if (slots.isEmpty()) {
-            throw new RuntimeException("No slots available for this hospital on this date");
-        }
-        return slots;
+    // ✅ Get slots by hospital + date
+    @GetMapping
+    public List<Slot> getSlotsByDate(
+            @RequestParam Integer hospitalId,
+            @RequestParam String date
+    ) {
+        return service.getSlotsByDateAndHospital(
+                LocalDate.parse(date),
+                hospitalId
+        );
     }
 
-    // Search slot by date, time, and hospital
-    @GetMapping("/search")
-    public List<Slot> slotsByDateAndTime(
+    // ✅ Get slots by hospital + date + time
+    @GetMapping("/by-time")
+    public List<Slot> getSlotsByDateAndTime(
             @RequestParam Integer hospitalId,
             @RequestParam String date,
             @RequestParam String time
     ) {
-        LocalDate d = LocalDate.parse(date);
-        LocalTime t = LocalTime.parse(time);
-        List<Slot> slots = service.getSlotsByDateAndTime(hospitalId, d, t);
-        if (slots.isEmpty()) {
-            throw new RuntimeException("No slot available at this date and time");
-        }
-        return slots;
+        return service.getSlotsByDateAndTime(
+                hospitalId,
+                LocalDate.parse(date),
+                LocalTime.parse(time)
+        );
+    }
+
+    // ✅ Get available slots (filtered by capacity > bookedCount)
+    @GetMapping("/available")
+    public List<Slot> getAvailableSlots(
+            @RequestParam Integer hospitalId,
+            @RequestParam String date
+    ) {
+        return service.getAvailableSlots(hospitalId, LocalDate.parse(date));
+    }
+
+
+    // ✅ Get slots by hospital + vaccine + date
+    @GetMapping("/by-vaccine")
+    public List<Slot> getSlotsByVaccine(
+            @RequestParam Integer hospitalId,
+            @RequestParam Integer vaccineId,
+            @RequestParam String date
+    ) {
+        return service.getSlotsByVaccine(hospitalId, vaccineId, LocalDate.parse(date));
     }
 }

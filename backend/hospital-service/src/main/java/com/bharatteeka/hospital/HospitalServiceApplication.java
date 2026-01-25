@@ -25,8 +25,10 @@ public class HospitalServiceApplication {
 
         // ================= SLOT APIs =================
         System.out.println("SLOT APIs:");
-        System.out.println("GET  " + baseUrl + "/hospital/slots/date/{date}/hospital/{hospitalId}");
-        System.out.println("GET  " + baseUrl + "/hospital/slots/search?hospitalId=1&date=YYYY-MM-DD&time=HH:mm");
+        System.out.println("GET  " + baseUrl + "/hospital/slots?hospitalId=1&date=YYYY-MM-DD");
+        System.out.println("GET  " + baseUrl + "/hospital/slots/by-time?hospitalId=1&date=YYYY-MM-DD&time=HH:mm");
+        System.out.println("GET  " + baseUrl + "/hospital/slots/available?hospitalId=1&date=YYYY-MM-DD");
+        System.out.println("GET  " + baseUrl + "/hospital/slots/by-vaccine?hospitalId=1&vaccineId=1&date=YYYY-MM-DD");
 
         System.out.println();
 
