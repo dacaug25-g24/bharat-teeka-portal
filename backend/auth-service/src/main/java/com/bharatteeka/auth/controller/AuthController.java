@@ -23,12 +23,12 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     
-    // Step 1: Create account
+    // --------------------------
+    // Create account
+    // --------------------------
     @PostMapping("/create-account")
     public ResponseEntity<Map<String, Object>> createAccount(@Validated @RequestBody CreateAccountRequest request) {
         try {
-            System.out.println("📝 Creating account for: " + request.getUsername());
-            
             User user = authService.createAccount(
                 request.getUsername(),
                 request.getPassword(),
@@ -43,20 +43,19 @@ public class AuthController {
             response.put("userId", user.getUserId());
             response.put("username", user.getUsername());
             
-            System.out.println("✅ Account created with ID: " + user.getUserId());
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            System.out.println("❌ Account creation error: " + e.getMessage());
-            
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
-    
-    // Step 2: Complete registration
+
+    // --------------------------
+    // Complete registration
+    // --------------------------
     @PostMapping("/complete-registration")
     public ResponseEntity<Map<String, Object>> completeRegistration(@Valid @RequestBody CompleteRegistrationRequest request) {
         try {
@@ -66,7 +65,7 @@ public class AuthController {
                 LocalDate.parse(request.getDateOfBirth()),
                 request.getGender(),
                 request.getAadhaarNumber(),
-                request.getBloodGroup(), // ✅ pass blood group
+                request.getBloodGroup(),
                 request.getRemarks()
             );
 
@@ -80,6 +79,7 @@ public class AuthController {
             response.put("username", user.getUsername());
             response.put("roleId", user.getRoleId());
             response.put("roleName", roleName);
+            response.put("hospitalId", user.getRoleId() == 2 ? user.getUserId() : null); // hospitalId if role = Hospital
             response.put("age", age);
 
             return ResponseEntity.ok(response);
@@ -91,13 +91,12 @@ public class AuthController {
         }
     }
 
-    
+    // --------------------------
     // Login
+    // --------------------------
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {
         try {
-            System.out.println("🔐 Login attempt for user: " + request.getUsername());
-            
             User user = authService.authenticate(request.getUsername(), request.getPassword());
             
             String roleName = getRoleName(user.getRoleId());
@@ -111,26 +110,27 @@ public class AuthController {
             userData.put("phone", user.getPhone());
             userData.put("address", user.getAddress());
             userData.put("isActive", user.getIsActive());
+            // ✅ Add hospitalId for hospital users
+            userData.put("hospitalId", user.getRoleId() == 2 ? user.getUserId() : null);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Login successful!");
             response.put("user", userData);
             
-            System.out.println("✅ Login successful for user: " + user.getUsername() + " (Role: " + roleName + ")");
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            System.out.println("❌ Login failed: " + e.getMessage());
-            
             Map<String, Object> response = new HashMap<>();
             response.put("success", false);
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
-    
-    // Helper method to get role name
+
+    // --------------------------
+    // Helper: Get role name
+    // --------------------------
     private String getRoleName(Integer roleId) {
         if (roleId == null) return "Unknown";
         switch(roleId) {
@@ -142,8 +142,10 @@ public class AuthController {
             default: return "Unknown";
         }
     }
-    
-    // Helper method to calculate age
+
+    // --------------------------
+    // Helper: Calculate age
+    // --------------------------
     private int calculateAge(LocalDate dob) {
         return java.time.Period.between(dob, LocalDate.now()).getYears();
     }
