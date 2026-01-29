@@ -6,138 +6,119 @@ import com.bharatteeka.auth.repository.PatientRepository;
 import com.bharatteeka.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.Period;
-import java.util.Optional;
 
 @Service
 public class AuthService {
 
-    @Autowired
-    private UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-    @Autowired
-    private PatientRepository patientRepository;
+	@Autowired
+	private PatientRepository patientRepository;
 
-    // --------------------------
-    // Step 1: Create account
-    // --------------------------
-    public User createAccount(String username, String password, String email, String phone, String address) {
-        // Check if username exists
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new RuntimeException("Username already exists");
-        }
-        // Check if email exists
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new RuntimeException("Email already exists");
-        }
-        // Check if phone exists
-        if (userRepository.findByPhone(phone).isPresent()) {
-            throw new RuntimeException("Phone number already exists");
-        }
+	@Transactional
+	public User registerPatient(String username, String password, String email, String phone, String address,
+			String firstName, String lastName, LocalDate dateOfBirth, String gender, String aadhaarNumber,
+			String bloodGroup, String remarks) {
 
-        // Create user
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password); // TODO: encrypt password
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setAddress(address);
-        user.setRoleId(0); // pending registration
-        user.setIsActive(false);
+		if (isBlank(username) || username.trim().length() < 3) {
+			throw new RuntimeException("Username must be at least 3 characters");
+		}
+		if (isBlank(password) || password.length() < 6) {
+			throw new RuntimeException("Password must be at least 6 characters");
+		}
+		if (isBlank(email)) {
+			throw new RuntimeException("Email is required");
+		}
+		if (isBlank(phone)) {
+			throw new RuntimeException("Phone is required");
+		}
+		if (isBlank(address)) {
+			throw new RuntimeException("Address is required");
+		}
+		if (isBlank(firstName)) {
+			throw new RuntimeException("First name is required");
+		}
+		if (isBlank(lastName)) {
+			throw new RuntimeException("Last name is required");
+		}
+		if (dateOfBirth == null) {
+			throw new RuntimeException("Date of birth is required");
+		}
+		if (isBlank(gender)) {
+			throw new RuntimeException("Gender is required");
+		}
 
-        return userRepository.save(user);
-    }
+		if (isBlank(aadhaarNumber) || !aadhaarNumber.matches("^\\d{12}$")) {
+			throw new RuntimeException("Aadhaar must be exactly 12 digits");
+		}
+		if (isBlank(bloodGroup)) {
+			throw new RuntimeException("Blood group is required");
+		}
 
-    // --------------------------
-    // Step 2: Complete registration
-    // --------------------------
-    public User completeRegistration(
-            Integer userId,
-            String fullName,
-            LocalDate dob,
-            String gender,
-            String aadhaar,
-            String bloodGroup,
-            String remarks
-    ) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+		if (userRepository.existsByUsername(username.trim())) {
+			throw new RuntimeException("Username already exists");
+		}
+		if (userRepository.existsByEmail(email.trim())) {
+			throw new RuntimeException("Email already exists");
+		}
+		if (userRepository.existsByPhone(phone.trim())) {
+			throw new RuntimeException("Phone number already exists");
+		}
 
-        if (patientRepository.existsByUser_UserId(userId)) {
-            throw new RuntimeException("Patient profile already exists");
-        }
+		User user = new User();
 
-        // Split full name
-        String[] nameParts = fullName.trim().split("\\s+", 2);
-        String firstName = nameParts[0];
-        String lastName = (nameParts.length > 1) ? nameParts[1] : "NA";
+		user.setRoleId(4);
 
-        // Calculate age & role
-        int age = calculateAge(dob);
-        boolean isAdult = age >= 18;
-        int roleId = isAdult ? 3 : 4; // Patient / Parent
+		user.setUsername(username.trim());
+		user.setPassword(password);
+		user.setEmail(email.trim());
+		user.setPhone(phone.trim());
+		user.setAddress(address.trim());
+		user.setIsActive(true);
 
-        // Create patient
-        Patient patient = new Patient();
-        patient.setUser(user);
-        patient.setFirstName(firstName);
-        patient.setLastName(lastName);
-        patient.setDateOfBirth(dob);
-        patient.setGender(gender);
-        patient.setAadhaarNumber(aadhaar);
-        patient.setBloodGroup(bloodGroup); // ✅ new field
-        patient.setIsAdult(isAdult);
-        patient.setIsActive(true);
-        patient.setRemarks(remarks);
+		User savedUser = userRepository.save(user);
 
-        patientRepository.save(patient);
+		Patient patient = new Patient();
+		patient.setUser(savedUser);
+		patient.setFirstName(firstName.trim());
+		patient.setLastName(lastName.trim());
+		patient.setDateOfBirth(dateOfBirth);
+		patient.setGender(gender);
+		patient.setAadhaarNumber(aadhaarNumber.trim());
+		patient.setBloodGroup(bloodGroup);
+		patient.setIsAdult(true);
+		patient.setIsActive(true);
+		patient.setRemarks(isBlank(remarks) ? null : remarks.trim());
 
-        // Update user
-        user.setRoleId(roleId);
-        user.setIsActive(true);
+		patientRepository.save(patient);
 
-        return userRepository.save(user);
-    }
+		return savedUser;
+	}
 
-    // --------------------------
-    // Authenticate user
-    // --------------------------
-    public User authenticate(String username, String password) {
-        Optional<User> userOpt = userRepository.findByUsernameAndPassword(username, password);
+	public User login(String username, String password) {
+		if (isBlank(username) || isBlank(password)) {
+			throw new RuntimeException("Username and password are required");
+		}
 
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (!user.getIsActive()) {
-                throw new RuntimeException("Account not activated. Please complete registration.");
-            }
-            return user;
-        }
+		User user = userRepository.findByUsername(username.trim())
+				.orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new RuntimeException("Incorrect password");
-        }
+		if (Boolean.FALSE.equals(user.getIsActive())) {
+			throw new RuntimeException("Account is inactive");
+		}
 
-        throw new RuntimeException("User not found");
-    }
+		if (!user.getPassword().equals(password)) {
+			throw new RuntimeException("Incorrect password");
+		}
 
-    // --------------------------
-    // Helper: calculate age
-    // --------------------------
-    private int calculateAge(LocalDate dob) {
-        if (dob == null) throw new RuntimeException("Date of birth is required");
+		return user;
+	}
 
-        LocalDate today = LocalDate.now();
-        if (dob.isAfter(today)) throw new RuntimeException("Date of birth cannot be in the future");
-
-        return Period.between(dob, today).getYears();
-    }
-
-    // --------------------------
-    // Optional: check if user exists
-    // --------------------------
-    public boolean userExists(Integer userId) {
-        return userRepository.existsById(userId);
-    }
+	private boolean isBlank(String s) {
+		return s == null || s.trim().isEmpty();
+	}
 }

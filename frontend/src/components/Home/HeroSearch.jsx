@@ -8,7 +8,7 @@ export default function HeroSearch({ showFooter = false }) {
             <SectionWrapper>
                 <div id="find-center" className="col-12">
                     <div className="hero-search-card w-100 bg-white shadow-lg rounded-4 p-4 p-md-5">
-                        <h1 className="section-title mb-3 text-center fw-bold">
+                        <h1 className="section-title2 mb-3 text-center fw-bold display-6">
                             Search Your Nearest Vaccination Center
                         </h1>
 

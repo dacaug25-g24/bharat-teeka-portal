@@ -5,17 +5,34 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class AuthServiceApplication {
+
     public static void main(String[] args) {
+
         SpringApplication.run(AuthServiceApplication.class, args);
-        System.out.println("==============================================");
-        System.out.println(" Bharat Teeka Portal - Auth Service Started");
-        System.out.println("==============================================");
-        System.out.println("API Endpoints:");
-        System.out.println("1. Test Connection: http://localhost:8080/api/auth/test");
-        System.out.println("2. Login: POST http://localhost:8080/api/auth/login");
-        System.out.println("3. Get all test users: http://localhost:8080/api/auth/test-users");
-        System.out.println("==============================================");
-        System.out.println("Frontend URL: http://localhost:5173/login");
-        System.out.println("==============================================");
+
+        String baseUrl = "http://localhost:8080";
+
+        System.out.println("\n========= AUTH SERVICE ENDPOINTS =========\n");
+
+        // ================= AUTH APIs =================
+        System.out.println("AUTH APIs:");
+        System.out.println("POST " + baseUrl + "/api/auth/create-account");
+        System.out.println("POST " + baseUrl + "/api/auth/complete-registration");
+        System.out.println("POST " + baseUrl + "/api/auth/login");
+
+        System.out.println();
+
+        // ================= PATIENT APIs =================
+        System.out.println("PATIENT APIs:");
+        System.out.println("GET  " + baseUrl + "/auth/patients/{patientId}/basic");
+
+        System.out.println();
+
+        // ================= INFO =================
+        System.out.println("SERVICE INFO:");
+        System.out.println("Auth Service Running on : " + baseUrl);
+        System.out.println("Frontend Login URL     : http://localhost:5173/login");
+
+        System.out.println("\n=========================================\n");
     }
 }

@@ -22,9 +22,23 @@ public class VaccineController {
         return service.getAllVaccines();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/search")
+    public List<Vaccine> searchByName(@RequestParam String name) {
+        return service.searchByName(name);
+    }
+
+    @GetMapping("/expiring")
+    public List<Vaccine> expiringSoon(@RequestParam(defaultValue = "30") int days) {
+        return service.getExpiring(days);
+    }
+
+    @GetMapping("/hospital/{hospitalId}")
+    public List<Vaccine> getByHospital(@PathVariable Integer hospitalId) {
+        return service.getByHospital(hospitalId);
+    }
+
+    @GetMapping("/{id:\\d+}")
     public Vaccine getVaccineById(@PathVariable Integer id) {
         return service.getVaccineById(id);
     }
 }
-

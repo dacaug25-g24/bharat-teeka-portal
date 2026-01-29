@@ -12,36 +12,59 @@ export default function AdminDashboard() {
     window.location.href = "/login";
   };
 
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
+
   return (
     <div className="admin-page">
       <div className="admin-body">
-
         {/* SIDEBAR */}
         <aside className="admin-sidebar">
           <h3 className="sidebar-title">
             Bharat<span className="text-warning">Teeka</span>
           </h3>
 
+          <div className="sidebar-subtitle">ADMIN PANEL</div>
+
           <ul className="sidebar-menu list-unstyled">
             <li
-              className={
-                location.pathname === "/admin" ||
-                location.pathname === "/admin/dashboard"
-                  ? "active"
-                  : ""
-              }
-              onClick={() => navigate("/admin/dashboard")}
+              className={isActive("/admin/profile") ? "active" : ""}
+              onClick={() => navigate("/admin/profile")}
             >
-              Dashboard
+              <span className="sidebar-ico">👤</span>
+              Manage Profile
             </li>
 
             <li
-              className={
-                location.pathname === "/admin/hospitals" ? "active" : ""
-              }
-              onClick={() => navigate("/admin/hospitals")}
+              className={isActive("/admin/manage-vaccines") ? "active" : ""}
+              onClick={() => navigate("/admin/manage-vaccines")}
             >
-              Hospital Management
+              <span className="sidebar-ico">💉</span>
+              Manage Vaccines
+            </li>
+
+            <li
+              className={isActive("/admin/manage-users") ? "active" : ""}
+              onClick={() => navigate("/admin/manage-users")}
+            >
+              <span className="sidebar-ico">👥</span>
+              Manage Users
+            </li>
+
+            <li
+              className={isActive("/admin/approved-hospitals") ? "active" : ""}
+              onClick={() => navigate("/admin/approved-hospitals")}
+            >
+              <span className="sidebar-ico">🏥</span>
+              Approved Hospitals
+            </li>
+
+            <li
+              className={isActive("/admin/reports") ? "active" : ""}
+              onClick={() => navigate("/admin/reports")}
+            >
+              <span className="sidebar-ico">📊</span>
+              Reports
             </li>
           </ul>
         </aside>
@@ -51,15 +74,10 @@ export default function AdminDashboard() {
           <header className="admin-topbar">
             <small>
               Welcome,{" "}
-              <span className="admin-name text-warning">
-                {user?.username}
-              </span>
+              <span className="admin-name text-warning">{user?.username}</span>
             </small>
 
-            <button
-              className="logout-btn btn btn-sm"
-              onClick={handleLogout}
-            >
+            <button className="logout-btn btn btn-sm" onClick={handleLogout}>
               Logout
             </button>
           </header>

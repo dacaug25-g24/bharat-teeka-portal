@@ -21,11 +21,19 @@ public class Appointment {
     @Column(name = "booking_date")
     private LocalDate bookingDate;
 
-    private String status;
+    @Column(name = "status")
+    @Convert(converter = com.bharatteeka.hospital.entity.converter.AppointmentStatusConverter.class)
+    private AppointmentStatus status;
 
     private String remarks;
 
     @ManyToOne
     @JoinColumn(name = "hospital_id")
     private Hospital hospital;
+    
+    @ManyToOne
+    @JoinColumn(name = "slot_id")
+    private Slot slot;
+
+    
 }
