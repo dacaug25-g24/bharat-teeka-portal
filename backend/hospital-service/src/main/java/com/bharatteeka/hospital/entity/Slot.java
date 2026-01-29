@@ -47,4 +47,8 @@ public class Slot {
         if (capacity == null || bookedCount == null) return 0;
         return capacity - bookedCount;
     }
+    
+    @Column(name = "is_active",nullable = false)
+    private Boolean isActive = true;
+
 }

@@ -1,5 +1,6 @@
 package com.bharatteeka.hospital.service;
 
+import com.bharatteeka.hospital.dto.SlotRequest;
 import com.bharatteeka.hospital.entity.Slot;
 
 import java.time.LocalDate;
@@ -15,4 +16,11 @@ public interface SlotService {
     List<Slot> getAvailableSlots(Integer hospitalId, LocalDate date);
 
     List<Slot> getSlotsByVaccine(Integer hospitalId, Integer vaccineId, LocalDate date);
+    
+    Slot createSlot(SlotRequest request);
+
+    Slot updateSlot(Integer slotId, SlotRequest request);
+
+    void deleteSlot(Integer slotId);
+
 }

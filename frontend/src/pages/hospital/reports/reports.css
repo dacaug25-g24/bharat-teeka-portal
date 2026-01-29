@@ -1,0 +1,106 @@
+/* Top bar: actions left + export right */
+.btp-reports-topbar {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Actions group (Today/Show/Clear) */
+.btp-reports-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    align-items: stretch;
+    flex: 1 1 auto;
+}
+
+.btp-reports-actions .btn {
+    border-radius: 10px;
+    padding: 10px 14px;
+    white-space: nowrap;
+}
+
+/* Export dropdown wrapper */
+.btp-export {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.btp-export-btn {
+    border-radius: 10px;
+    padding: 10px 14px;
+    white-space: nowrap;
+    min-width: 130px;
+}
+
+.btp-caret {
+    margin-left: 6px;
+    font-size: 12px;
+}
+
+/* Dropdown menu */
+.btp-export-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 190px;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(16, 24, 40, 0.14);
+    overflow: hidden;
+    z-index: 50;
+}
+
+.btp-export-item {
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    background: #fff;
+    border: 0;
+    font-weight: 700;
+    font-size: 14px;
+    color: #212529;
+}
+
+.btp-export-item:hover {
+    background: #f6f8fb;
+}
+
+.btp-export-item:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+    .btp-reports-actions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .btp-export-menu {
+        right: 0;
+    }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    .btp-reports-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .btp-export-btn {
+        width: 100%;
+    }
+
+    .btp-export {
+        width: 100%;
+    }
+
+    .btp-export-menu {
+        width: 100%;
+        right: 0;
+    }
+}

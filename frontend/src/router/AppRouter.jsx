@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 
 import Home from "../pages/Home";
 import Login from "../pages/Login";
@@ -18,21 +24,15 @@ import AppNavbar from "../components/Navbar/AppNavbar";
 import HeroSearch from "../components/Home/HeroSearch";
 import DownloadCertificate from "../components/Home/DownloadCertificate";
 import Faq from "../components/Home/Faq";
-import ProtectedRoute from "../components/ProtectedRoute";
-
-import CreateAccount from "../pages/registration/CreateAccount";
-import PersonalInfo from "../pages/registration/PersonalInfo";
-import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
-import HospitalDashboard from "../pages/hospital/dashboard/HospitalDashboard";
-import PatientDashboard from "../pages/patient/dashboard/PatientDashboard";
-import ParentDashboard from "../pages/patient/dashboard/ParentDashboard";
-import AdminRoutes from "../pages/admin/AdminRoutes";
-import HospitalRoutes from "../pages/hospital/HospitalRoutes";
-import PatientRoutes from "../pages/patient/PatientRoutes";
-import ParentRoutes from "../pages/patient/ParentRoutes";
 import SideEffects from "../components/Home/SideEffects";
 import GetCertificate from "../components/Home/GetCertificate";
 
+import ProtectedRoute from "../components/ProtectedRoute";
+import HospitalRoutes from "../pages/hospital/HospitalRoutes";
+import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
+import AdminRoutes from "../pages/admin/AdminRoutes";
+
+import UserRoutes from "../pages/user/UserRoutes";
 
 const AppRoutes = () => {
   const { pathname } = useLocation();
@@ -45,7 +45,10 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/find-center" element={<HeroSearch showFooter />} />
         <Route path="/book-slot" element={<BookSlot />} />
-        <Route path="/download-certificate" element={<DownloadCertificate showFooter />} />
+        <Route
+          path="/download-certificate"
+          element={<DownloadCertificate showFooter />}
+        />
         <Route path="/faq" element={<Faq showFooter />} />
 
         <Route path="/about" element={<About />} />
@@ -55,50 +58,66 @@ const AppRoutes = () => {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/registration/create-account" element={<CreateAccount />} />
-        <Route path="/registration/personal-info" element={<PersonalInfo />} />
 
         <Route path="/raise-issue" element={<RaiseIssue />} />
         <Route path="/support" element={<Support />} />
         <Route path="/side-effects" element={<SideEffects />} />
         <Route path="/get-certificate" element={<GetCertificate />} />
 
-        <Route path="/admin-dashboard" element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        } />
-        <Route path="/hospital-dashboard" element={
-          <ProtectedRoute>
-            <HospitalDashboard />
-          </ProtectedRoute>
-        } />
-        <Route path="/patient-dashboard" element={
-          <ProtectedRoute>
-            <PatientDashboard />
-          </ProtectedRoute>
-        } />
-        <Route path="/parent-dashboard" element={
-          <ProtectedRoute>
-            <ParentDashboard />
-          </ProtectedRoute>
-        } />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/hospital/*"
+          element={
+            <ProtectedRoute>
+              <HospitalRoutes />
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/admin/*" element={<AdminRoutes />} />
-        <Route path="/hospital/*" element={<HospitalRoutes />} />
-        <Route path="/patient/*" element={<PatientRoutes />} />
-        <Route path="/parent/*" element={<ParentRoutes />} />
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute>
+              <AdminRoutes />
+            </ProtectedRoute>
+          }
+        />
+        {/* <Route
+          path="/hospital/*"
+          element={
+            <ProtectedRoute>
+              <HospitalRoutes />
+            </ProtectedRoute>
+          }
+        /> */}
 
+        <Route
+          path="/user/*"
+          element={
+            <ProtectedRoute>
+              <UserRoutes />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
-
     </>
   );
 };
 
-const AppRouter = () => (
-  <BrowserRouter>
-    <AppRoutes />
-  </BrowserRouter>
-);
-
-export default AppRouter;
+export default function AppRouter() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+  );
+}

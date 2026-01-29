@@ -1,0 +1,99 @@
+/* ===============================
+   Vaccination Records UI (scoped)
+   same vibe as slots/vaccines
+   =============================== */
+
+.btp-page-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.btp-page-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 10px 0 2px;
+}
+
+.btp-page-sub {
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/* Filters */
+.btp-filters {
+    padding: 14px;
+}
+
+.btp-filter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.btp-filter-grid-3 {
+    grid-template-columns: 1.2fr 0.8fr 0.6fr;
+}
+
+.btp-filter-group label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #495057;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.btp-filter-group input[type="date"],
+.btp-filter-group input[type="text"],
+.btp-filter-group input {
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    padding: 0 12px;
+    width: 100%;
+}
+
+/* Buttons never full width */
+.btp-filter-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.btp-filter-actions .btn {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    border-radius: 10px;
+    padding: 8px 14px;
+    white-space: nowrap;
+}
+
+/* Table wrapper */
+.btp-table-wrap {
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.btp-table-wrap .table {
+    margin: 0;
+}
+
+/* Mobile */
+@media (max-width: 992px) {
+
+    .btp-filter-grid,
+    .btp-filter-grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .btp-filter-actions {
+        justify-content: flex-start;
+    }
+}
