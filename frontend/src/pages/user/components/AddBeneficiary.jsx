@@ -238,9 +238,11 @@ export default function AddBeneficiary() {
                       className="form-control"
                       name="dateOfBirth"
                       value={form.dateOfBirth}
+                      max={new Date().toISOString().split("T")[0]}
                       onChange={onChange}
                       disabled={!isParent}
                     />
+
                   </div>
 
                   <div className="col-md-6">

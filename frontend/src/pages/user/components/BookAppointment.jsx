@@ -8,6 +8,7 @@ import {
   getParentChildren,
   getProfile,
   bookAppointment,
+  getSlotsAvailabilityRange,
 } from "../../../services/patientService";
 import { getApiErrorMessage } from "../../../services/apiClients";
 
@@ -16,7 +17,7 @@ export default function BookAppointment() {
   const roleId = Number(user?.roleId || 0);
   const isParent = roleId === 4;
 
-  const [bookingFor, setBookingFor] = useState("self"); 
+  const [bookingFor, setBookingFor] = useState("self"); // self | beneficiary
   const [selectedBeneficiary, setSelectedBeneficiary] = useState("");
 
   // self patient
@@ -58,10 +59,32 @@ export default function BookAppointment() {
 
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
+  const [slotsInfo, setSlotsInfo] = useState("");
 
-  
+  // availability summary state
+  const [availability, setAvailability] = useState([]); // [{date, count}]
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
+  const [earliestInfo, setEarliestInfo] = useState(""); // info msg
+
+  // helpers
+  const todayStr = useMemo(
+    () => new Date().toISOString().split("T")[0],
+    []
+  );
+
+  const formatChipDate = (iso) => {
+    try {
+      const d = new Date(iso);
+      return d.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+      });
+    } catch {
+      return iso;
+    }
+  };
+
   // for snake_case / camelCase
-  
   const getStateKey = (s) => s.stateId ?? s.state_id;
   const getStateLabel = (s) => s.stateName ?? s.state_name;
 
@@ -72,9 +95,43 @@ export default function BookAppointment() {
   const getHospitalLabel = (h) => h.hospitalName ?? h.hospital_name;
   const getHospitalType = (h) => h.hospitalType ?? h.hospital_type;
 
-  
-  // Load States on mount
+  // -------- Reset helpers --------
+  const resetAfterState = () => {
+    setCities([]);
+    setCityId("");
+    resetAfterCity();
+  };
 
+  const resetAfterCity = () => {
+    setHospitals([]);
+    setHospitalId("");
+    resetAfterHospital();
+  };
+
+  const resetAfterHospital = () => {
+    setVaccines([]);
+    setVaccineId("");
+    setDate("");
+    setSlots([]);
+    setSlotId("");
+    setSlotsInfo("");
+    setAvailability([]);
+    setEarliestInfo("");
+  };
+
+  const resetAll = () => {
+    setStateId("");
+    resetAfterState();
+    setDoseNumber("1");
+    setRemarks("");
+    setError("");
+    setSuccessMsg("");
+    setSlotsInfo("");
+    setAvailability([]);
+    setEarliestInfo("");
+  };
+
+  // -------- Load States on mount --------
   useEffect(() => {
     const loadStates = async () => {
       try {
@@ -92,8 +149,7 @@ export default function BookAppointment() {
     loadStates();
   }, []);
 
-  // Load Self PatientId (for ALL roles)
- 
+  // -------- Load Self PatientId --------
   useEffect(() => {
     const loadProfile = async () => {
       try {
@@ -110,8 +166,7 @@ export default function BookAppointment() {
     loadProfile();
   }, [user?.userId]);
 
-  // Load Beneficiaries (only if Parent)
-
+  // -------- Load Beneficiaries --------
   useEffect(() => {
     const loadChildren = async () => {
       try {
@@ -125,25 +180,17 @@ export default function BookAppointment() {
     loadChildren();
   }, [isParent, user?.userId]);
 
-  // When state changes -> load cities
-
+  // -------- When state changes -> load cities --------
   useEffect(() => {
     const loadCities = async () => {
-      setCities([]);
-      setCityId("");
-      setHospitals([]);
-      setHospitalId("");
-
-      setVaccines([]);
-      setVaccineId("");
-
-      setSlots([]);
-      setSlotId("");
+      resetAfterState();
+      setError("");
+      setSuccessMsg("");
+      setSlotsInfo("");
 
       if (!stateId) return;
 
       try {
-        setError("");
         setLoadingCities(true);
         const data = await getCitiesByState(stateId);
         setCities(Array.isArray(data) ? data : []);
@@ -155,25 +202,20 @@ export default function BookAppointment() {
     };
 
     loadCities();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateId]);
 
-  // When city changes -> load hospitals
-
+  // -------- When city changes -> load hospitals --------
   useEffect(() => {
     const loadHospitals = async () => {
-      setHospitals([]);
-      setHospitalId("");
-
-      setVaccines([]);
-      setVaccineId("");
-
-      setSlots([]);
-      setSlotId("");
+      resetAfterCity();
+      setError("");
+      setSuccessMsg("");
+      setSlotsInfo("");
 
       if (!cityId) return;
 
       try {
-        setError("");
         setLoadingHospitals(true);
         const data = await getHospitalsByCity({ cityId });
         setHospitals(Array.isArray(data) ? data : []);
@@ -185,26 +227,45 @@ export default function BookAppointment() {
     };
 
     loadHospitals();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cityId]);
 
-  // Load Vaccines when hospital changes (date optional)
-
+  // Load Vaccines ONLY when hospital changes
   useEffect(() => {
     const loadVaccines = async () => {
       setVaccines([]);
-      setVaccineId("");
       setSlots([]);
       setSlotId("");
+      setSlotsInfo("");
+      setError("");
+      setSuccessMsg("");
 
-      if (!hospitalId) return;
+      setDate("");
+      setAvailability([]);
+      setEarliestInfo("");
+
+      if (!hospitalId) {
+        setVaccineId("");
+        return;
+      }
 
       try {
         setLoadingVaccines(true);
+
         const data = await getVaccinesByHospital({
           hospitalId: Number(hospitalId),
-          date: date || null,
+          date: null,
         });
-        setVaccines(Array.isArray(data) ? data : []);
+
+        const list = Array.isArray(data) ? data : [];
+        setVaccines(list);
+
+        if (
+          vaccineId &&
+          !list.some((v) => String(v.vaccineId) === String(vaccineId))
+        ) {
+          setVaccineId("");
+        }
       } catch {
         setVaccines([]);
       } finally {
@@ -213,23 +274,51 @@ export default function BookAppointment() {
     };
 
     loadVaccines();
-  }, [hospitalId, date]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hospitalId]);
 
- 
-  // Auto-load slots when hospital/date/vaccine changes
- 
+  //  NEW: Load next 7 days availability when hospital or vaccine changes
+  useEffect(() => {
+    const loadAvailability = async () => {
+      setAvailability([]);
+      setEarliestInfo("");
+
+      if (!hospitalId) return;
+
+      try {
+        setLoadingAvailability(true);
+
+        const summary = await getSlotsAvailabilityRange({
+          hospitalId: Number(hospitalId),
+          vaccineId: vaccineId ? Number(vaccineId) : null,
+          days: 7,
+        });
+
+        setAvailability(Array.isArray(summary) ? summary : []);
+      } catch (e) {
+        // don't hard fail
+        setAvailability([]);
+      } finally {
+        setLoadingAvailability(false);
+      }
+    };
+
+    loadAvailability();
+  }, [hospitalId, vaccineId]);
+
+  // -------- Load slots when hospital/date/vaccine changes --------
   useEffect(() => {
     const loadSlots = async () => {
       setSlots([]);
       setSlotId("");
+      setError("");
+      setSuccessMsg("");
+      setSlotsInfo("");
 
-      // Don’t show error while user is selecting filters
       if (!hospitalId || !date) return;
 
       try {
         setLoadingSlots(true);
-        setError("");
-        setSuccessMsg("");
 
         const data = await getAvailableSlots({
           hospitalId: Number(hospitalId),
@@ -237,9 +326,13 @@ export default function BookAppointment() {
           vaccineId: vaccineId ? Number(vaccineId) : null,
         });
 
-        setSlots(Array.isArray(data) ? data : []);
-        if (!data || data.length === 0) {
-          setError("No available slots found for selected filters");
+        const list = Array.isArray(data) ? data : [];
+        setSlots(list);
+
+        if (list.length === 0) {
+          setSlotsInfo(
+            "No slots found for the selected date/vaccine. Try another date or use the availability chips."
+          );
         }
       } catch (e) {
         setError(getApiErrorMessage(e) || "Failed to load slots");
@@ -263,8 +356,7 @@ export default function BookAppointment() {
     return cap - booked;
   }, [selectedSlot]);
 
-  // Booking
-
+  // booking patientId
   const getPatientIdForBooking = () => {
     if (bookingFor === "beneficiary") {
       return selectedBeneficiary ? Number(selectedBeneficiary) : null;
@@ -274,7 +366,7 @@ export default function BookAppointment() {
 
   const beneficiaryLabel = (b) => {
     const fullName = [b.firstName, b.lastName].filter(Boolean).join(" ");
-    return fullName ? `${fullName} (Child)` : `Child PatientId: ${b.patientId}`;
+    return fullName ? `${fullName} ` : `PatientId: ${b.patientId}`;
   };
 
   const disableBook =
@@ -283,24 +375,70 @@ export default function BookAppointment() {
     (bookingFor === "self" && !selfPatientId) ||
     (bookingFor === "beneficiary" && !selectedBeneficiary);
 
+  //  NEW: Find earliest slot (within next 7 days)
+  const handleFindEarliest = async () => {
+    if (!hospitalId) {
+      setError("Please select hospital first.");
+      return;
+    }
+
+    try {
+      setError("");
+      setSuccessMsg("");
+      setSlotsInfo("");
+      setEarliestInfo("");
+      setLoadingAvailability(true);
+
+      const summary = await getSlotsAvailabilityRange({
+        hospitalId: Number(hospitalId),
+        vaccineId: vaccineId ? Number(vaccineId) : null,
+        days: 7,
+      });
+
+      setAvailability(Array.isArray(summary) ? summary : []);
+
+      const first = (summary || []).find((x) => Number(x.count || 0) > 0);
+      if (!first) {
+        setSlotsInfo("No slots available in the next 7 days. Try another hospital.");
+        return;
+      }
+
+      // set date -> slot loader effect will run
+      setDate(first.date);
+
+      // fetch slots for that date and auto-select first slot
+      const data = await getAvailableSlots({
+        hospitalId: Number(hospitalId),
+        date: first.date,
+        vaccineId: vaccineId ? Number(vaccineId) : null,
+      });
+
+      const list = Array.isArray(data) ? data : [];
+      setSlots(list);
+
+      if (list.length > 0) {
+        setSlotId(String(list[0].slotId));
+        const s0 = list[0];
+        setEarliestInfo(
+          `Earliest available: ${first.date} (${s0.startTime} - ${s0.endTime})`
+        );
+      }
+    } catch (e) {
+      setError(getApiErrorMessage(e) || "Failed to find earliest slot");
+    } finally {
+      setLoadingAvailability(false);
+    }
+  };
+
   const handleBook = async () => {
     setError("");
     setSuccessMsg("");
 
-    if (!slotId) {
-      setError("Please select a slot");
-      return;
-    }
-
-    if (bookingFor === "beneficiary" && !selectedBeneficiary) {
-      setError("Please select Beneficiary");
-      return;
-    }
-
-    if (bookingFor === "self" && !selfPatientId) {
-      setError("Your Patient ID is not loaded yet. Please wait.");
-      return;
-    }
+    if (!slotId) return setError("Please select a slot");
+    if (bookingFor === "beneficiary" && !selectedBeneficiary)
+      return setError("Please select Beneficiary");
+    if (bookingFor === "self" && !selfPatientId)
+      return setError("Your Patient ID is not loaded yet. Please wait.");
 
     const patientId = getPatientIdForBooking();
 
@@ -309,7 +447,7 @@ export default function BookAppointment() {
       parentUserId: bookingFor === "beneficiary" ? Number(user.userId) : null,
       slotId: Number(slotId),
       doseNumber: Number(doseNumber),
-      vaccineId: vaccineId ? Number(vaccineId) : null, 
+      vaccineId: vaccineId ? Number(vaccineId) : null,
       remarks: remarks?.trim() || null,
     };
 
@@ -317,14 +455,11 @@ export default function BookAppointment() {
       setBooking(true);
       const data = await bookAppointment(payload);
 
-      if (data?.appointmentId) {
-        setSuccessMsg(
-          `Appointment booked successfully! Appointment ID: ${data.appointmentId}`
-        );
-      } else {
-        setSuccessMsg("Appointment booked successfully!");
-      }
-
+      setSuccessMsg(
+        data?.appointmentId
+          ? `Appointment booked successfully! Appointment ID: ${data.appointmentId}`
+          : "Appointment booked successfully!"
+      );
     } catch (e) {
       setError(getApiErrorMessage(e) || "Booking failed");
     } finally {
@@ -332,7 +467,28 @@ export default function BookAppointment() {
     }
   };
 
-  // UI
+  // labels for summary
+  const selectedStateName = useMemo(() => {
+    const s = states.find((x) => String(getStateKey(x)) === String(stateId));
+    return s ? getStateLabel(s) : "-";
+  }, [states, stateId]);
+
+  const selectedCityName = useMemo(() => {
+    const c = cities.find((x) => String(getCityKey(x)) === String(cityId));
+    return c ? getCityLabel(c) : "-";
+  }, [cities, cityId]);
+
+  const selectedHospitalName = useMemo(() => {
+    const h = hospitals.find(
+      (x) => String(getHospitalKey(x)) === String(hospitalId)
+    );
+    return h ? getHospitalLabel(h) : "-";
+  }, [hospitals, hospitalId]);
+
+  const selectedVaccineName = useMemo(() => {
+    const v = vaccines.find((x) => String(x.vaccineId) === String(vaccineId));
+    return v ? v.vaccineName : "All";
+  }, [vaccines, vaccineId]);
 
   return (
     <div className="container-fluid p-0">
@@ -342,16 +498,33 @@ export default function BookAppointment() {
             <div>
               <h5 className="mb-1">Book Appointment</h5>
               <div className="text-muted small">
-                Select location → vaccine → slot → book.
+                Step 1: Choose person • Step 2: Select location • Step 3: Select
+                vaccine • Step 4: Pick date/slot • Book
               </div>
+            </div>
+
+            <div className="d-flex gap-2">
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={resetAll}
+              >
+                Reset All
+              </button>
             </div>
           </div>
 
           {error && (
-            <div className="alert alert-danger py-2">{String(error)}</div>
+            <div className="alert alert-danger py-2 mb-3">{String(error)}</div>
           )}
           {successMsg && (
-            <div className="alert alert-success py-2">{successMsg}</div>
+            <div className="alert alert-success py-2 mb-3">{successMsg}</div>
+          )}
+          {slotsInfo && (
+            <div className="alert alert-info py-2 mb-3">{slotsInfo}</div>
+          )}
+          {earliestInfo && (
+            <div className="alert alert-success py-2 mb-3">{earliestInfo}</div>
           )}
 
           <div className="row g-3">
@@ -362,15 +535,12 @@ export default function BookAppointment() {
                 <button
                   type="button"
                   className={`btn ${
-                    bookingFor === "self"
-                      ? "btn-primary"
-                      : "btn-outline-primary"
+                    bookingFor === "self" ? "btn-primary" : "btn-outline-primary"
                   }`}
                   onClick={() => {
                     setBookingFor("self");
                     setSelectedBeneficiary("");
-                    setSuccessMsg("");
-                    setError("");
+                    resetAll();
                   }}
                 >
                   Self
@@ -385,8 +555,7 @@ export default function BookAppointment() {
                   }`}
                   onClick={() => {
                     setBookingFor("beneficiary");
-                    setSuccessMsg("");
-                    setError("");
+                    resetAll();
                   }}
                   disabled={!isParent}
                   title={!isParent ? "Only Parent can book for beneficiaries" : ""}
@@ -420,7 +589,11 @@ export default function BookAppointment() {
                 <select
                   className="form-select"
                   value={selectedBeneficiary}
-                  onChange={(e) => setSelectedBeneficiary(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedBeneficiary(e.target.value);
+                    setError("");
+                    setSuccessMsg("");
+                  }}
                 >
                   <option value="">Select</option>
                   {beneficiaries.map((b) => (
@@ -429,11 +602,10 @@ export default function BookAppointment() {
                     </option>
                   ))}
                 </select>
-                <div className="form-text">
-                  Beneficiary booking sends parentUserId to backend.
-                </div>
               </div>
             )}
+
+            <hr className="my-2" />
 
             {/* State */}
             <div className="col-12 col-md-4">
@@ -510,7 +682,14 @@ export default function BookAppointment() {
               <select
                 className="form-select"
                 value={vaccineId}
-                onChange={(e) => setVaccineId(e.target.value)}
+                onChange={(e) => {
+                  setVaccineId(e.target.value);
+                  setSlots([]);
+                  setSlotId("");
+                  setSlotsInfo("");
+                  setDate("");
+                  setEarliestInfo("");
+                }}
                 disabled={!hospitalId || loadingVaccines}
               >
                 <option value="">
@@ -527,8 +706,72 @@ export default function BookAppointment() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/*  Availability Chips */}
+            <div className="col-12 col-md-8">
+              <label className="form-label fw-semibold d-flex justify-content-between align-items-center">
+                <span>Next 7 Days Availability</span>
+                <button
+                  type="button"
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={handleFindEarliest}
+                  disabled={!hospitalId || loadingAvailability}
+                >
+                  {loadingAvailability ? "Finding..." : "Find Earliest Slot"}
+                </button>
+              </label>
+
+              {!hospitalId ? (
+                <div className="text-muted small">
+                  Select hospital to see availability.
+                </div>
+              ) : loadingAvailability ? (
+                <div className="text-muted small">Loading availability...</div>
+              ) : availability.length === 0 ? (
+                <div className="text-muted small">
+                  No availability data. Select date manually.
+                </div>
+              ) : (
+                <div className="d-flex flex-wrap gap-2">
+                  {availability.map((a) => {
+                    const disabled = Number(a.count || 0) === 0;
+                    const active = date === a.date;
+                    return (
+                      <button
+                        key={a.date}
+                        type="button"
+                        className={`btn btn-sm ${
+                          active
+                            ? "btn-primary"
+                            : disabled
+                            ? "btn-outline-secondary"
+                            : "btn-outline-primary"
+                        }`}
+                        disabled={disabled}
+                        title={disabled ? "No slots" : "Click to select date"}
+                        onClick={() => {
+                          setDate(a.date);
+                          setSlots([]);
+                          setSlotId("");
+                          setSlotsInfo("");
+                          setError("");
+                          setSuccessMsg("");
+                          setEarliestInfo("");
+                        }}
+                      >
+                        {formatChipDate(a.date)}{" "}
+                        <span className="badge text-bg-light ms-1">
+                          {a.count}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               <div className="form-text">
-                Select vaccine to filter slots (optional).
+                Tip: Click a date with slots to avoid trial & error.
               </div>
             </div>
 
@@ -539,7 +782,25 @@ export default function BookAppointment() {
                 type="date"
                 className="form-control"
                 value={date}
-                onChange={(e) => setDate(e.target.value)}
+                min={todayStr}
+                onChange={(e) => {
+                  const val = e.target.value;
+
+                  // small guard for manual typing
+                  if (val && val < todayStr) {
+                    setError("You cannot select a past date.");
+                    return;
+                  }
+
+                  setDate(val);
+                  setSlots([]);
+                  setSlotId("");
+                  setSlotsInfo("");
+                  setError("");
+                  setSuccessMsg("");
+                  setEarliestInfo("");
+                }}
+                disabled={!hospitalId}
               />
             </div>
 
@@ -563,6 +824,7 @@ export default function BookAppointment() {
                     ? "No slots available"
                     : "Select Slot"}
                 </option>
+
                 {slots.map((s) => {
                   const available =
                     Number(s.capacity || 0) - Number(s.bookedCount || 0);
@@ -592,6 +854,8 @@ export default function BookAppointment() {
               )}
             </div>
 
+            <hr className="my-2" />
+
             {/* Dose */}
             <div className="col-12 col-md-6">
               <label className="form-label fw-semibold">Dose Number</label>
@@ -606,17 +870,6 @@ export default function BookAppointment() {
               </select>
             </div>
 
-            {/* Remarks (optional) */}
-            {/* <div className="col-12 col-md-6">
-              <label className="form-label fw-semibold">Remarks (optional)</label>
-              <input
-                className="form-control"
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
-                placeholder="e.g. Prefer morning slot"
-              />
-            </div> */}
-
             {/* Book */}
             <div className="col-12">
               <button
@@ -628,13 +881,11 @@ export default function BookAppointment() {
                 {booking ? "Booking..." : "Book Appointment"}
               </button>
 
-              {bookingFor === "beneficiary" &&
-                isParent &&
-                !selectedBeneficiary && (
-                  <div className="text-muted small mt-2">
-                    Select beneficiary to enable booking.
-                  </div>
-                )}
+              {bookingFor === "beneficiary" && isParent && !selectedBeneficiary && (
+                <div className="text-muted small mt-2">
+                  Select beneficiary to enable booking.
+                </div>
+              )}
 
               {bookingFor === "self" && !selfPatientId && (
                 <div className="text-muted small mt-2">
@@ -666,8 +917,25 @@ export default function BookAppointment() {
             </div>
 
             <div className="col-md-3">
+              <div className="text-muted">Location</div>
+              <div className="fw-semibold">
+                {selectedStateName} / {selectedCityName}
+              </div>
+            </div>
+
+            <div className="col-md-3">
               <div className="text-muted">Hospital</div>
-              <div className="fw-semibold">{hospitalId || "-"}</div>
+              <div className="fw-semibold">{selectedHospitalName}</div>
+            </div>
+
+            <div className="col-md-3">
+              <div className="text-muted">Vaccine</div>
+              <div className="fw-semibold">{selectedVaccineName}</div>
+            </div>
+
+            <div className="col-md-3">
+              <div className="text-muted">Date</div>
+              <div className="fw-semibold">{date || "-"}</div>
             </div>
 
             <div className="col-md-3">

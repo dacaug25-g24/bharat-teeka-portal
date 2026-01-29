@@ -1,0 +1,114 @@
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/
+.idea/
+*.iml
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# Node / React
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs
+dist/
+build/
+
+# Vite / CRA caches
+.vite/
+.cache/
+
+# Env files (keep sample if needed)
+.env
+.env.*
+!.env.example
+
+# =========================
+# Java / Spring Boot
+# =========================
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Gradle
+.gradle/
+build/
+
+# IDE
+.classpath
+.project
+.settings/
+.factorypath
+
+.vs/
+.metadata/
+metadata/
+
+# =========================
+# .NET / Visual Studio
+# =========================
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.swp
+
+# Build results
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+
+# Rider
+.idea/
+
+# =========================
+# Test / Coverage
+# =========================
+coverage/
+*.coverage
+*.coveragexml
+TestResults/
+
+# =========================
+# Misc
+# =========================
+*.tmp
+*.temp
+*.bak
+*.cache

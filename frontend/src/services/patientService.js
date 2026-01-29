@@ -120,4 +120,38 @@ export const deleteChild = async ({ parentUserId, patientId }) => {
   return res.data;
 };
 
+export const getSlotsAvailabilityRange = async ({
+  hospitalId,
+  vaccineId = null,
+  days = 7,
+}) => {
+  const today = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const toISODate = (d) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  const dates = Array.from({ length: days }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    return toISODate(d);
+  });
+
+  const result = [];
+  for (const dt of dates) {
+    const slots = await getAvailableSlots({
+      hospitalId: Number(hospitalId),
+      date: dt,
+      vaccineId: vaccineId ? Number(vaccineId) : null,
+    });
+
+    const list = Array.isArray(slots) ? slots : [];
+    result.push({
+      date: dt,
+      count: list.length,
+    });
+  }
+
+  return result;
+};
 
