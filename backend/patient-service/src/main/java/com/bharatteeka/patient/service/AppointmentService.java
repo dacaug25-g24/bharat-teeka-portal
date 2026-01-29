@@ -28,9 +28,9 @@ public class AppointmentService {
 	private final SlotRepository slotRepository;
 	private final SlotQueryService slotQueryService;
 
-	private static final String STATUS_PENDING = "Pending";
-	private static final String STATUS_COMPLETED = "Completed";
-	private static final String STATUS_CANCELLED = "Cancelled";
+	private static final String STATUS_PENDING = "BOOKED";
+	private static final String STATUS_COMPLETED = "COMPLETED";
+	private static final String STATUS_CANCELLED = "CANCELLED";
 
 	@Transactional
 	public Appointment bookAppointment(AppointmentRequestDto dto) {

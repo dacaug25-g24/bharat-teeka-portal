@@ -192,7 +192,7 @@ export default function History() {
 
       const time = start && end ? `${start} - ${end}` : "-";
 
-      const status = r?.status ?? "Pending";
+      const status = String(r?.status ?? "BOOKED").toUpperCase();
 
       return {
         key: id,
@@ -338,7 +338,7 @@ export default function History() {
                       </td>
 
                       <td>
-                        {r.status === "Pending" ? (
+                        {r.status === "BOOKED" ? (
                           <button
                             className="btn btn-sm btn-outline-danger"
                             onClick={() => handleCancel(r.id)}
