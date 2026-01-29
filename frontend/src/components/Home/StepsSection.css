@@ -1,0 +1,73 @@
+.steps-section {
+  margin: 4rem 0;
+}
+
+.steps-section h3 {
+  font-weight: 700;
+  margin-bottom: 2rem;
+  color: #008c8c;
+}
+
+.step-card {
+  background: linear-gradient(145deg, #ffffff, #f6fbff);
+  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  border: 1px solid rgba(0, 140, 140, 0.12);
+}
+
+.step-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top left, rgba(0, 140, 140, 0.12), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.step-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+  border-color: rgba(0, 140, 140, 0.35);
+}
+
+.step-card:hover::after {
+  opacity: 1;
+}
+
+.step-badge {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border-radius: 999px;
+  border: 1.5px solid #009688;
+  color: #009688;
+  padding: 4px 18px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.step-image img {
+  width: 110px;
+  height: auto;
+  margin-top: 40px;
+}
+
+.step-body {
+  margin-top: 14px;
+}
+
+.step-body h5 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.step-body p {
+  color: #6c757d;
+  margin-bottom: 0;
+}

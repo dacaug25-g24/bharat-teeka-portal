@@ -1,0 +1,92 @@
+.bg-teal {
+  background-color: #026b6c !important;
+}
+
+.navbar-brand {
+  font-size: 1rem;
+}
+
+.brand-pill {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-pill img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brand-title {
+  font-size: 1.1rem;
+  line-height: 1.1;
+}
+
+.brand-subtitle {
+  font-size: 0.7rem;
+  color: #e0f2f1;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.navbar-nav .nav-link {
+  color: #ffffff !important;
+  font-weight: 550;
+  font-size: 1.05rem;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #ffe483 !important;
+}
+
+.nav-link {
+  color: #026b6c !important;
+  font-weight: 500;
+}
+
+.btn-font {
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  line-height: 1;
+  border-radius: 4px;
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+}
+
+.btn-font:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.btn-lang {
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+}
+
+.btn-lang:hover,
+.btn-lang:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.btn-register {
+  background-color: transparent;
+  border: 2px solid #ffffff;
+  border-radius: 50px;
+  color: #ffffff;
+  font-weight: 500;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.btn-register:hover {
+  background-color: #ffffff;
+  color: #026b6c;
+}

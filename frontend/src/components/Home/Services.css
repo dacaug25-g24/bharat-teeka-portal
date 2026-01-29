@@ -1,0 +1,32 @@
+.services-section {
+  margin: 4rem 0;
+}
+
+.services-section h2 {
+  font-weight: 700;
+  margin-bottom: 2rem;
+}
+
+.service-card {
+  padding: 1.5rem;
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.service-card h4 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.service-card p {
+  color: #6c757d;
+}
+
+.service-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}

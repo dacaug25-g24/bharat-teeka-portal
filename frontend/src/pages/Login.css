@@ -1,0 +1,26 @@
+.login-page {
+  background: linear-gradient(135deg, #f4f7f8, #eef2f3);
+}
+
+.login-card {
+  border: 0;
+  border-radius: 16px;
+}
+
+.login-title {
+  color: #024c4d;
+}
+
+.form-control:focus {
+  border-color: #024c4d;
+  box-shadow: 0 0 0 0.2rem rgba(2, 76, 77, 0.15);
+}
+
+.btn-teal {
+  background: linear-gradient(135deg, #012b2c, #024c4d);
+  border: none;
+}
+
+.btn-teal:hover {
+  background: linear-gradient(135deg, #024c4d, #026b6c);
+}
