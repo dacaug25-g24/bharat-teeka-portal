@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./vaccines.css";
-
-const API = import.meta.env.VITE_HOSPITAL_API || "http://localhost:8081";
+import { hospitalApi, getApiErrorMessage } from "../../../services/apiClients";
 
 export default function VaccineList() {
   const [vaccines, setVaccines] = useState([]);
@@ -29,10 +28,8 @@ export default function VaccineList() {
   const fetchAll = async ({ silent = false } = {}) => {
     if (!silent) setLoading(true);
     try {
-      const res = await fetch(`${API}/hospital/vaccines`);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      const arr = safeArray(data);
+      const res = await hospitalApi.get("/hospital/vaccines");
+      const arr = safeArray(res.data);
       setVaccines(arr);
 
       if (selected?.vaccineId) {
@@ -41,10 +38,11 @@ export default function VaccineList() {
       }
 
       if (!silent) showNotice("success", "Vaccines loaded successfully");
-    } catch {
+    } catch (e) {
+      console.error(e);
       setVaccines([]);
       setSelected(null);
-      showNotice("error", "Unable to fetch vaccines");
+      showNotice("error", `Unable to fetch vaccines: ${getApiErrorMessage(e)}`);
     } finally {
       if (!silent) setLoading(false);
     }
@@ -59,12 +57,11 @@ export default function VaccineList() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/hospital/vaccines/${id}`);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setSelected(data);
+      const res = await hospitalApi.get(`/hospital/vaccines/${id}`);
+      setSelected(res.data);
       showNotice("success", `Vaccine #${id} loaded`);
-    } catch {
+    } catch (e) {
+      console.error(e);
       showNotice("error", `Vaccine not found for ID ${id}`);
     } finally {
       setLoading(false);
@@ -80,18 +77,20 @@ export default function VaccineList() {
 
     setLoading(true);
     try {
-      const res = await fetch(
-        `${API}/hospital/vaccines/search?name=${encodeURIComponent(q)}`,
-      );
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setVaccines(safeArray(data));
+      const res = await hospitalApi.get("/hospital/vaccines/search", {
+        params: { name: q },
+      });
+      setVaccines(safeArray(res.data));
       setSelected(null);
       showNotice("success", `Search results for "${q}"`);
-    } catch {
+    } catch (e) {
+      console.error(e);
       setVaccines([]);
       setSelected(null);
-      showNotice("error", "Unable to search vaccines");
+      showNotice(
+        "error",
+        `Unable to search vaccines: ${getApiErrorMessage(e)}`,
+      );
     } finally {
       setLoading(false);
     }
@@ -102,16 +101,20 @@ export default function VaccineList() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/hospital/vaccines/expiring?days=${days}`);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setVaccines(safeArray(data));
+      const res = await hospitalApi.get("/hospital/vaccines/expiring", {
+        params: { days },
+      });
+      setVaccines(safeArray(res.data));
       setSelected(null);
       showNotice("success", `Vaccines expiring in ${days} days`);
-    } catch {
+    } catch (e) {
+      console.error(e);
       setVaccines([]);
       setSelected(null);
-      showNotice("error", "Unable to fetch expiring vaccines");
+      showNotice(
+        "error",
+        `Unable to fetch expiring vaccines: ${getApiErrorMessage(e)}`,
+      );
     } finally {
       setLoading(false);
     }
@@ -168,7 +171,6 @@ export default function VaccineList() {
 
   return (
     <div className="container-fluid p-0">
-      {/* Page head (same zip as slots) */}
       <div className="btp-page-head">
         <div>
           <div className="btp-page-title">Vaccines</div>
@@ -196,7 +198,6 @@ export default function VaccineList() {
         </div>
       )}
 
-      {/* Filters (zip style like slots) */}
       <div className="card hospital-card p-0 mb-3">
         <div className="btp-filters">
           <div className="btp-filter-grid">
@@ -220,7 +221,6 @@ export default function VaccineList() {
             </div>
 
             <div className="btp-filter-actions">
-              {/* ✅ all primary only */}
               <button
                 className="btn btn-primary"
                 onClick={fetchByName}
@@ -278,7 +278,6 @@ export default function VaccineList() {
             </div>
 
             <div className="btp-filter-actions">
-              {/* ✅ all primary only */}
               <button
                 className="btn btn-primary"
                 onClick={fetchExpiring}
@@ -304,7 +303,6 @@ export default function VaccineList() {
         </div>
       </div>
 
-      {/* Table + Details */}
       <div className="row g-3">
         <div className="col-12 col-lg-8">
           <div className="card hospital-card p-3">
@@ -473,13 +471,6 @@ export default function VaccineList() {
                     {selected.sideEffects || "-"}
                   </div>
                 </div>
-
-                {/* <hr /> */}
-
-                {/* <div className="text-muted btp-small mb-1">Full data (raw)</div>
-                <pre className="btp-raw">
-                  {JSON.stringify(selected, null, 2)}
-                </pre> */}
               </div>
             )}
           </div>

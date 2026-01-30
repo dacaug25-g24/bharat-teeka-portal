@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./reports.css";
-
-const HOSPITAL_API =
-  import.meta.env.VITE_HOSPITAL_API || "http://localhost:8081";
-const AUTH_API = import.meta.env.VITE_AUTH_API || "http://localhost:8080";
+import {
+  hospitalApi,
+  authApi,
+  getApiErrorMessage,
+} from "../../../services/apiClients";
 
 export default function Reports() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
   const hospitalId = user?.hospitalId;
 
-  // ✅ take hospital name from stored user
   const hospitalName =
     user?.hospitalName ||
     user?.username ||
@@ -22,14 +22,11 @@ export default function Reports() {
 
   const [notice, setNotice] = useState({ type: "", msg: "" });
 
-  // Preview
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Patient basics cache: { [patientId]: { fullName, aadhaarNumber } }
   const [patientMap, setPatientMap] = useState({});
 
-  // ✅ Export dropdown
   const [exportOpen, setExportOpen] = useState(false);
   const exportRef = useRef(null);
 
@@ -65,10 +62,7 @@ export default function Reports() {
 
     const results = await Promise.allSettled(
       missing.map((id) =>
-        fetch(`${AUTH_API}/auth/patients/${id}/basic`).then((r) => {
-          if (!r.ok) throw new Error();
-          return r.json();
-        }),
+        authApi.get(`/auth/patients/${id}/basic`).then((r) => r.data),
       ),
     );
 
@@ -98,22 +92,22 @@ export default function Reports() {
     try {
       setLoading(true);
 
-      // ✅ send hospitalName so PDF header looks professional
-      const url =
-        `${HOSPITAL_API}/hospital/vaccinations/report/pdf` +
-        `?hospitalId=${hospitalId}` +
-        `&from=${from}&to=${to}` +
-        `&hospitalName=${encodeURIComponent(hospitalName || "")}`;
+      const res = await hospitalApi.get(`/hospital/vaccinations/report/pdf`, {
+        params: {
+          hospitalId,
+          from,
+          to,
+          hospitalName: hospitalName || "",
+        },
+        responseType: "blob", // ✅ important for file
+      });
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error();
-      const blob = await res.blob();
-
-      downloadBlob(blob, `vaccination_report_${from}_to_${to}.pdf`);
+      downloadBlob(res.data, `vaccination_report_${from}_to_${to}.pdf`);
       showNotice("success", "PDF downloaded");
       setExportOpen(false);
-    } catch {
-      showNotice("danger", "Download failed. Check backend/CORS.");
+    } catch (e) {
+      console.error(e);
+      showNotice("danger", `Download failed: ${getApiErrorMessage(e)}`);
     } finally {
       setLoading(false);
     }
@@ -165,9 +159,7 @@ export default function Reports() {
               return `
                 <tr>
                   <td>${escapeHtml(r.recordId)}</td>
-                  <td>${escapeHtml(
-                    r?.appointment?.appointmentId ?? r.appointmentId ?? "-",
-                  )}</td>
+                  <td>${escapeHtml(r?.appointment?.appointmentId ?? r.appointmentId ?? "-")}</td>
                   <td>${escapeHtml(getPatientName(pid))}</td>
                   <td>${escapeHtml(getAadhaar(pid))}</td>
                   <td>${escapeHtml(r?.vaccine?.vaccineName ?? "-")}</td>
@@ -201,20 +193,24 @@ export default function Reports() {
     setRows([]);
 
     try {
-      const url = `${HOSPITAL_API}/hospital/vaccinations/hospital/${hospitalId}?from=${from}&to=${to}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error();
+      const res = await hospitalApi.get(
+        `/hospital/vaccinations/hospital/${hospitalId}`,
+        { params: { from, to } },
+      );
 
-      const data = await res.json();
-      const arr = Array.isArray(data) ? data : [];
+      const arr = Array.isArray(res.data) ? res.data : [];
       setRows(arr);
 
       const ids = arr.map((r) => r.patientId).filter(Boolean);
       await fetchPatientBasics(ids);
 
       showNotice("success", `Loaded ${arr.length} records`);
-    } catch {
-      showNotice("danger", "Unable to load report data");
+    } catch (e) {
+      console.error(e);
+      showNotice(
+        "danger",
+        `Unable to load report data: ${getApiErrorMessage(e)}`,
+      );
       setRows([]);
     } finally {
       setLoading(false);
@@ -226,14 +222,12 @@ export default function Reports() {
     showNotice("success", "Preview cleared");
   };
 
-  // ✅ auto-load preview on open
   useEffect(() => {
     if (!hospitalId) return;
     loadPreview();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hospitalId]);
 
-  // ✅ close export menu on outside click / ESC
   useEffect(() => {
     const onDown = (e) => {
       if (!exportRef.current) return;
@@ -269,10 +263,8 @@ export default function Reports() {
         </div>
       )}
 
-      {/* Controls */}
       <div className="card hospital-card p-3">
         <div className="row g-3 align-items-end">
-          {/* Left: dates */}
           <div className="col-12 col-lg-6">
             <div className="row g-3">
               <div className="col-12 col-md-6">
@@ -297,7 +289,6 @@ export default function Reports() {
             </div>
           </div>
 
-          {/* Right: actions + export */}
           <div className="col-12 col-lg-6">
             <div className="btp-reports-topbar">
               <div className="btp-reports-actions">
@@ -332,7 +323,6 @@ export default function Reports() {
                 </button>
               </div>
 
-              {/* ✅ Export dropdown (top-right) */}
               <div className="btp-export" ref={exportRef}>
                 <button
                   className="btn btn-outline-dark btp-export-btn"
@@ -365,15 +355,10 @@ export default function Reports() {
                 )}
               </div>
             </div>
-
-            {/* <small className="text-muted d-block mt-2">
-              Tip: Click <b>Show Data</b> to preview before downloading.
-            </small> */}
           </div>
         </div>
       </div>
 
-      {/* Preview */}
       <div className="card hospital-card p-3 mt-3">
         <div className="d-flex justify-content-between align-items-center mb-2">
           <h6 className="mb-0">Preview</h6>

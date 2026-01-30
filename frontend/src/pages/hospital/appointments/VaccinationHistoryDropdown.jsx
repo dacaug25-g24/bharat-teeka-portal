@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-
-const API = import.meta.env.VITE_HOSPITAL_API || "http://localhost:8081";
+import { hospitalApi } from "../../../services/apiClients";
 
 const VaccinationHistoryDropdown = ({ patientId }) => {
   const [history, setHistory] = useState([]);
@@ -10,11 +9,11 @@ const VaccinationHistoryDropdown = ({ patientId }) => {
   const fetchHistory = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
-        `${API}/hospital/vaccinations/patient/${patientId}`,
+      if (!patientId) return;
+      const res = await hospitalApi.get(
+        `/hospital/vaccinations/patient/${patientId}`,
       );
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = res.data;
       setHistory(Array.isArray(data) ? data : []);
     } catch {
       setHistory([]);

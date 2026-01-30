@@ -1,9 +1,9 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { adminApi } from "../../../services/adminApi";
 import "./admin-ui.css";
 
-const API = import.meta.env.VITE_ADMIN_API || "https://localhost:7233";
+const TOKEN_KEY = "token";
 
 export default function AddVaccine() {
   const navigate = useNavigate();
@@ -27,16 +27,49 @@ export default function AddVaccine() {
     setVaccine((p) => ({ ...p, [e.target.name]: e.target.value }));
   };
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const toNumberOrEmpty = (v) => {
+    if (v === "" || v === null || v === undefined) return "";
+    const n = Number(v);
+    return Number.isNaN(n) ? "" : n;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (saving) return;
+
     setSaving(true);
     try {
-      await axios.post(`${API}/api/admin/addvaccine`, vaccine);
+      const payload = {
+        ...vaccine,
+        minAge: toNumberOrEmpty(vaccine.minAge),
+        maxAge: toNumberOrEmpty(vaccine.maxAge),
+        doseRequired: toNumberOrEmpty(vaccine.doseRequired),
+        doseGapDays: toNumberOrEmpty(vaccine.doseGapDays),
+      };
+
+      await adminApi.post("/api/admin/addvaccine", payload, {
+        headers: getAuthHeaders(),
+      });
+
       alert("Vaccine added successfully!");
       navigate("/admin/manage-vaccines");
     } catch (error) {
       console.error(error);
-      alert("Failed to add vaccine");
+
+      const status = error?.response?.status;
+      if (status === 401) {
+        alert("Unauthorized (401): Please login again. Token missing/expired.");
+        navigate("/login", { replace: true });
+      } else if (status === 403) {
+        alert("Forbidden (403): You are not ADMIN or role claim mismatch.");
+      } else {
+        alert(error?.response?.data || "Failed to add vaccine");
+      }
     } finally {
       setSaving(false);
     }
@@ -58,6 +91,7 @@ export default function AddVaccine() {
                 className="btn btn-light admin-btn2"
                 type="button"
                 onClick={() => navigate(-1)}
+                disabled={saving}
               >
                 ← Back
               </button>
@@ -80,6 +114,7 @@ export default function AddVaccine() {
                   value={vaccine.vaccineName}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -91,6 +126,7 @@ export default function AddVaccine() {
                   value={vaccine.manufacturer}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -102,6 +138,7 @@ export default function AddVaccine() {
                   value={vaccine.vaccineType}
                   onChange={handleChange}
                   placeholder="mRNA / Viral Vector / Inactivated..."
+                  disabled={saving}
                 />
               </div>
 
@@ -123,6 +160,7 @@ export default function AddVaccine() {
                   value={vaccine.minAge}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -135,6 +173,7 @@ export default function AddVaccine() {
                   value={vaccine.maxAge}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -147,6 +186,7 @@ export default function AddVaccine() {
                   value={vaccine.doseRequired}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -158,6 +198,7 @@ export default function AddVaccine() {
                   name="doseGapDays"
                   value={vaccine.doseGapDays}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
@@ -177,6 +218,7 @@ export default function AddVaccine() {
                   name="storageTemperature"
                   value={vaccine.storageTemperature}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
@@ -188,6 +230,7 @@ export default function AddVaccine() {
                   name="expiryDate"
                   value={vaccine.expiryDate}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
@@ -208,6 +251,7 @@ export default function AddVaccine() {
                   name="description"
                   value={vaccine.description}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
@@ -219,6 +263,7 @@ export default function AddVaccine() {
                   name="sideEffects"
                   value={vaccine.sideEffects}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import VaccinationHistoryDropdown from "./VaccinationHistoryDropdown";
 import "./appointments.css";
-
-const HOSPITAL_API =
-  import.meta.env.VITE_HOSPITAL_API || "http://localhost:8081";
-const AUTH_API = import.meta.env.VITE_AUTH_API || "http://localhost:8080";
+import {
+  hospitalApi,
+  authApi,
+  getApiErrorMessage,
+} from "../../../services/apiClients";
 
 const TodayAppointments = ({ hospitalId, dateFilter }) => {
   const [appointments, setAppointments] = useState([]);
@@ -67,9 +68,7 @@ const TodayAppointments = ({ hospitalId, dateFilter }) => {
 
     const results = await Promise.allSettled(
       missing.map((id) =>
-        fetch(`${AUTH_API}/auth/patients/${id}/basic`).then((r) =>
-          r.ok ? r.json() : null,
-        ),
+        authApi.get(`/auth/patients/${id}/basic`).then((r) => r.data),
       ),
     );
 
@@ -89,19 +88,20 @@ const TodayAppointments = ({ hospitalId, dateFilter }) => {
 
     try {
       const url = dateFilter
-        ? `${HOSPITAL_API}/hospital/appointments/hospital/${hospitalId}?date=${dateFilter}`
-        : `${HOSPITAL_API}/hospital/appointments/hospital/${hospitalId}/today`;
+        ? `/hospital/appointments/hospital/${hospitalId}?date=${dateFilter}`
+        : `/hospital/appointments/hospital/${hospitalId}/today`;
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const res = await hospitalApi.get(url);
+      const data = res.data;
+
       const arr = Array.isArray(data) ? data : [];
       setAppointments(arr);
 
       const ids = [...new Set(arr.map((a) => a.patientId).filter(Boolean))];
       await fetchPatientBasics(ids);
-    } catch {
-      setError("Unable to load appointments");
+    } catch (e) {
+      console.error(e);
+      setError(getApiErrorMessage(e) || "Unable to load appointments");
       setAppointments([]);
     } finally {
       setLoading(false);
@@ -113,38 +113,6 @@ const TodayAppointments = ({ hospitalId, dateFilter }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hospitalId, dateFilter]);
 
-  // const completeWithDetails = async (appt) => {
-  //   const id = appt.appointmentId;
-
-  //   if (!actionUI.batchNumber.trim()) {
-  //     showNotice("danger", "Batch number is required");
-  //     return;
-  //   }
-
-  //   try {
-  //     setActionUI((p) => ({ ...p, saving: true }));
-
-  //     const res = await fetch(
-  //       `${HOSPITAL_API}/hospital/appointments/${id}/complete-details`,
-  //       {
-  //         method: "PUT",
-  //         headers: { "Content-Type": "application/json" },
-  //         body: JSON.stringify({
-  //           batchNumber: actionUI.batchNumber.trim(),
-  //           remarks: actionUI.remarks?.trim() || "",
-  //         }),
-  //       },
-  //     );
-
-  //     if (!res.ok) throw new Error();
-  //     showNotice("success", "Appointment completed & vaccination recorded");
-  //     closeActionUI();
-  //     fetchAppointments();
-  //   } catch {
-  //     showNotice("danger", "Failed to complete appointment");
-  //     setActionUI((p) => ({ ...p, saving: false }));
-  //   }
-  // };
   const completeWithDetails = async (appt) => {
     const id = appt.appointmentId;
 
@@ -156,29 +124,17 @@ const TodayAppointments = ({ hospitalId, dateFilter }) => {
     try {
       setActionUI((p) => ({ ...p, saving: true }));
 
-      const res = await fetch(
-        `${HOSPITAL_API}/hospital/appointments/${id}/complete-details`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            batchNumber: actionUI.batchNumber.trim(),
-            remarks: actionUI.remarks?.trim() || "",
-          }),
-        },
-      );
-
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(txt || `HTTP ${res.status}`);
-      }
+      await hospitalApi.put(`/hospital/appointments/${id}/complete-details`, {
+        batchNumber: actionUI.batchNumber.trim(),
+        remarks: actionUI.remarks?.trim() || "",
+      });
 
       showNotice("success", "Appointment completed & vaccination recorded");
       closeActionUI();
       await fetchAppointments();
     } catch (e) {
       console.error("Complete failed:", e);
-      showNotice("danger", `Failed: ${e.message || "Complete error"}`);
+      showNotice("danger", `Failed: ${getApiErrorMessage(e)}`);
       setActionUI((p) => ({ ...p, saving: false }));
     }
   };
@@ -194,19 +150,16 @@ const TodayAppointments = ({ hospitalId, dateFilter }) => {
     try {
       setActionUI((p) => ({ ...p, saving: true }));
 
-      const res = await fetch(
-        `${HOSPITAL_API}/hospital/appointments/${id}/cancel?reason=${encodeURIComponent(
-          actionUI.reason.trim(),
-        )}`,
-        { method: "PUT" },
-      );
+      await hospitalApi.put(`/hospital/appointments/${id}/cancel`, null, {
+        params: { reason: actionUI.reason.trim() },
+      });
 
-      if (!res.ok) throw new Error();
       showNotice("success", "Appointment cancelled successfully");
       closeActionUI();
-      fetchAppointments();
-    } catch {
-      showNotice("danger", "Failed to cancel appointment");
+      await fetchAppointments();
+    } catch (e) {
+      console.error("Cancel failed:", e);
+      showNotice("danger", `Failed: ${getApiErrorMessage(e)}`);
       setActionUI((p) => ({ ...p, saving: false }));
     }
   };
@@ -280,7 +233,6 @@ const TodayAppointments = ({ hospitalId, dateFilter }) => {
                           <span className="text-muted">No actions</span>
                         ) : (
                           <div className="btp-actions-wrap">
-                            {/* Buttons (when closed) */}
                             {!isOpen && (
                               <div className="btp-table-actions">
                                 <button
@@ -300,7 +252,6 @@ const TodayAppointments = ({ hospitalId, dateFilter }) => {
                               </div>
                             )}
 
-                            {/* Mini modal overlay */}
                             {isOpen && (
                               <div className="btp-mini-modal">
                                 <div

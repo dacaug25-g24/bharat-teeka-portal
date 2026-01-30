@@ -1,23 +1,58 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./admin-ui.css";
 
-const API = import.meta.env.VITE_ADMIN_API || "https://localhost:7233";
+//  OPTION B: HTTP runs on 5225
+const API = import.meta.env.VITE_ADMIN_API || "http://localhost:5225";
 const ROLE_MAP = { 1: "ADMIN", 3: "PATIENT", 2: "HOSPITAL" };
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
 
 export default function ManageUsers() {
+  const navigate = useNavigate();
+
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("ALL"); // ALL | PATIENT | HOSPITAL
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState(null); // optional: disable per-row while action running
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const handleAuthErrors = (error, fallbackMsg) => {
+    const status = error?.response?.status;
+
+    if (status === 401) {
+      alert("Unauthorized (401): Please login again. Token missing/expired.");
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      navigate("/login", { replace: true });
+      return true;
+    }
+
+    if (status === 403) {
+      alert("Forbidden (403): You are not ADMIN or role claim mismatch.");
+      return true;
+    }
+
+    alert(error?.response?.data || fallbackMsg);
+    return false;
+  };
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get(`${API}/api/admin/getallusers`);
+      const res = await axios.get(`${API}/api/admin/getallusers`, {
+        headers: getAuthHeaders(),
+      });
       setUsers(res.data || []);
     } catch (e) {
       console.error(e);
-      alert("Failed to load users");
+      handleAuthErrors(e, "Failed to load users");
     } finally {
       setLoading(false);
     }
@@ -25,28 +60,43 @@ export default function ManageUsers() {
 
   useEffect(() => {
     fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 🔴 deactivate user (DELETE)
   const deactivateUser = async (id) => {
-    if (!window.confirm("Are you sure you want to deactivate this user?")) return;
+    if (!window.confirm("Are you sure you want to deactivate this user?"))
+      return;
+
+    setBusyId(id);
     try {
-      await axios.delete(`${API}/api/admin/deactivateuser/${id}`);
-      fetchUsers();
+      await axios.delete(`${API}/api/admin/deactivateuser/${id}`, {
+        headers: getAuthHeaders(),
+      });
+      await fetchUsers();
     } catch (err) {
       console.error(err);
-      alert(err.response?.data || "Failed to deactivate user");
+      handleAuthErrors(err, "Failed to deactivate user");
+    } finally {
+      setBusyId(null);
     }
   };
 
   // 🟢 reactivate user (PUT)
   const activateUser = async (id) => {
+    setBusyId(id);
     try {
-      await axios.put(`${API}/api/admin/reactivateuser/${id}`);
-      fetchUsers();
+      await axios.put(
+        `${API}/api/admin/reactivateuser/${id}`,
+        {}, //  PUT body empty
+        { headers: getAuthHeaders() },
+      );
+      await fetchUsers();
     } catch (err) {
       console.error(err);
-      alert(err.response?.data || "Failed to activate user");
+      handleAuthErrors(err, "Failed to activate user");
+    } finally {
+      setBusyId(null);
     }
   };
 
@@ -72,7 +122,7 @@ export default function ManageUsers() {
 
   const countActive = useMemo(
     () => (filteredUsers || []).filter((u) => !!u.isActive).length,
-    [filteredUsers]
+    [filteredUsers],
   );
 
   return (
@@ -138,7 +188,11 @@ export default function ManageUsers() {
               />
             </div>
 
-            <button className="btn btn-outline-secondary admin-mini-btn" onClick={fetchUsers}>
+            <button
+              className="btn btn-outline-secondary admin-mini-btn"
+              onClick={fetchUsers}
+              disabled={loading}
+            >
               ↻ Refresh
             </button>
           </div>
@@ -154,7 +208,9 @@ export default function ManageUsers() {
           <div className="admin-empty">
             <div className="admin-empty-emoji">👀</div>
             <div className="fw-semibold">No users found</div>
-            <div className="text-muted small">Try changing filter or search.</div>
+            <div className="text-muted small">
+              Try changing filter or search.
+            </div>
           </div>
         ) : (
           <div className="table-responsive">
@@ -177,6 +233,7 @@ export default function ManageUsers() {
                   const roleName = ROLE_MAP[u.roleId] || "UNKNOWN";
                   const isAdmin = u.roleId === 1;
                   const active = !!u.isActive;
+                  const rowBusy = busyId === u.userId;
 
                   return (
                     <tr key={u.userId}>
@@ -188,7 +245,9 @@ export default function ManageUsers() {
                             {(u.username?.[0] || "U").toUpperCase()}
                           </div>
                           <div className="admin-usercell-meta">
-                            <div className="admin-usercell-name">{u.username}</div>
+                            <div className="admin-usercell-name">
+                              {u.username}
+                            </div>
                             <div className="admin-usercell-sub text-muted small">
                               {u.email}
                             </div>
@@ -197,7 +256,9 @@ export default function ManageUsers() {
                       </td>
 
                       <td>
-                        <span className={`admin-role-pill role-${roleName.toLowerCase()}`}>
+                        <span
+                          className={`admin-role-pill role-${roleName.toLowerCase()}`}
+                        >
                           {roleName}
                         </span>
                       </td>
@@ -207,7 +268,9 @@ export default function ManageUsers() {
                       <td className="text-muted">{u.address || "-"}</td>
 
                       <td>
-                        <span className={`admin-status-pill ${active ? "ok" : "bad"}`}>
+                        <span
+                          className={`admin-status-pill ${active ? "ok" : "bad"}`}
+                        >
                           {active ? "Active" : "Inactive"}
                         </span>
                       </td>
@@ -219,15 +282,17 @@ export default function ManageUsers() {
                           <button
                             className="admin-action danger"
                             onClick={() => deactivateUser(u.userId)}
+                            disabled={rowBusy}
                           >
-                            ⛔ Deactivate
+                            {rowBusy ? "⏳ ..." : "⛔ Deactivate"}
                           </button>
                         ) : (
                           <button
                             className="admin-action success"
                             onClick={() => activateUser(u.userId)}
+                            disabled={rowBusy}
                           >
-                            ✅ Activate
+                            {rowBusy ? "⏳ ..." : " Activate"}
                           </button>
                         )}
                       </td>

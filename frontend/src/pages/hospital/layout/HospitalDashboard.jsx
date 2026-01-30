@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./dashboard.css";
-
-const API = import.meta.env.VITE_HOSPITAL_API || "http://localhost:8081";
+import { hospitalApi, getApiErrorMessage } from "../../../services/apiClients";
 
 const EMPTY_COUNTS = { COMPLETED: 0, PENDING: 0, BOOKED: 0, CANCELLED: 0 };
 
@@ -15,6 +14,13 @@ const safeParseUser = () => {
 };
 
 const pct = (n, total) => (total ? Math.round((n / total) * 100) : 0);
+
+// ✅ Local ISO date (no UTC issue)
+const getLocalISODate = () => {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 
 /* ---- components outside ---- */
 const StatCard = ({ title, value, sub, btnText, onClick }) => (
@@ -66,7 +72,8 @@ const HospitalDashboard = () => {
   const user = safeParseUser();
   const hospitalId = user?.hospitalId;
 
-  const todayISO = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  // ✅ FIXED: use local date (NOT toISOString)
+  const todayISO = useMemo(() => getLocalISODate(), []);
 
   const [stats, setStats] = useState({
     slots: 0,
@@ -81,58 +88,59 @@ const HospitalDashboard = () => {
   const fetchStats = useCallback(async () => {
     if (!hospitalId) return;
 
-    const controller = new AbortController();
     setLoading(true);
     setError("");
 
     try {
       const [slotsRes, todayRes, vaccinesRes] = await Promise.allSettled([
-        fetch(
-          `${API}/hospital/slots?hospitalId=${hospitalId}&date=${todayISO}`,
-          {
-            signal: controller.signal,
+        // ✅ Correct endpoint on 8081
+        hospitalApi.get(`/hospital/slots`, {
+          params: {
+            hospitalId,
+            date: todayISO, // some backends use "date"
+            slotDate: todayISO, // some backends use "slotDate"
           },
-        ),
-        fetch(`${API}/hospital/appointments/hospital/${hospitalId}/today`, {
-          signal: controller.signal,
         }),
-        fetch(`${API}/hospital/vaccines`, { signal: controller.signal }),
+
+        hospitalApi.get(`/hospital/appointments/hospital/${hospitalId}/today`),
+        hospitalApi.get(`/hospital/vaccines`),
       ]);
 
       const slots =
-        slotsRes.status === "fulfilled" && slotsRes.value.ok
-          ? (await slotsRes.value.json()).length
+        slotsRes.status === "fulfilled" && Array.isArray(slotsRes.value.data)
+          ? slotsRes.value.data.length
           : 0;
 
       let todayAppointments = 0;
       const counts = { ...EMPTY_COUNTS };
 
-      if (todayRes.status === "fulfilled" && todayRes.value.ok) {
-        const list = await todayRes.value.json();
-        const arr = Array.isArray(list) ? list : [];
+      if (todayRes.status === "fulfilled") {
+        const arr = Array.isArray(todayRes.value.data)
+          ? todayRes.value.data
+          : [];
         todayAppointments = arr.length;
 
         for (const a of arr) {
           const s = a?.status;
-          if (s && Object.prototype.hasOwnProperty.call(counts, s))
+          if (s && Object.prototype.hasOwnProperty.call(counts, s)) {
             counts[s] += 1;
+          }
         }
       }
 
       const vaccines =
-        vaccinesRes.status === "fulfilled" && vaccinesRes.value.ok
-          ? (await vaccinesRes.value.json()).length
+        vaccinesRes.status === "fulfilled" &&
+        Array.isArray(vaccinesRes.value.data)
+          ? vaccinesRes.value.data.length
           : 0;
 
       setStats({ slots, todayAppointments, vaccines });
       setStatusCounts(counts);
     } catch (e) {
-      if (e?.name !== "AbortError") setError("Failed to load dashboard stats.");
+      setError(getApiErrorMessage(e) || "Failed to load dashboard stats.");
     } finally {
       setLoading(false);
     }
-
-    return () => controller.abort();
   }, [hospitalId, todayISO]);
 
   useEffect(() => {
@@ -179,7 +187,7 @@ const HospitalDashboard = () => {
         </button>
       </div>
 
-      {/* Quick Actions (ALL PRIMARY STYLE) */}
+      {/* Quick Actions */}
       <div className="card hospital-card p-3 mb-3">
         <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
           <h6 className="mb-0 fw-bold">Quick Actions</h6>
@@ -193,28 +201,24 @@ const HospitalDashboard = () => {
           >
             Add / Edit Slots
           </button>
-
           <button
             className="btn btn-primary"
             onClick={() => navigate("/hospital/appointments")}
           >
             Manage Appointments
           </button>
-
           <button
             className="btn btn-primary"
             onClick={() => navigate("/hospital/vaccines")}
           >
             View Vaccines
           </button>
-
           <button
             className="btn btn-primary"
             onClick={() => navigate("/hospital/vaccination-records")}
           >
             Vaccination Records
           </button>
-
           <button
             className="btn btn-primary"
             onClick={() => navigate("/hospital/reports")}
@@ -272,7 +276,6 @@ const HospitalDashboard = () => {
         </div>
 
         <div className="row g-3 align-items-center mt-2">
-          {/* Donut */}
           <div className="col-12 col-lg-4 d-flex justify-content-center">
             <div className="btp-donut" style={donutStyle}>
               <div className="btp-donut-center">
@@ -286,7 +289,6 @@ const HospitalDashboard = () => {
             </div>
           </div>
 
-          {/* Right side */}
           <div className="col-12 col-lg-8">
             <div className="btp-legend mb-3">
               <div className="btp-legend-item">
@@ -332,7 +334,6 @@ const HospitalDashboard = () => {
               </div>
             </div>
 
-            {/* Bars */}
             <div className="btp-bars">
               <BarRow
                 label="Completed"

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import "./vaccination-records.css";
-
-const HOSPITAL_API =
-  import.meta.env.VITE_HOSPITAL_API || "http://localhost:8081";
-const AUTH_API = import.meta.env.VITE_AUTH_API || "http://localhost:8080";
+import {
+  hospitalApi,
+  authApi,
+  getApiErrorMessage,
+} from "../../../services/apiClients";
 
 export default function VaccinationRecords() {
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -51,14 +52,13 @@ export default function VaccinationRecords() {
   };
 
   const fetchPatientBasics = async (patientIds) => {
-    const missing = patientIds.filter((id) => !patientMap[id]);
+    const unique = [...new Set(patientIds.filter(Boolean))];
+    const missing = unique.filter((id) => !patientMap[id]);
     if (missing.length === 0) return;
 
     const results = await Promise.allSettled(
       missing.map((id) =>
-        fetch(`${AUTH_API}/auth/patients/${id}/basic`).then((r) =>
-          r.ok ? r.json() : null,
-        ),
+        authApi.get(`/auth/patients/${id}/basic`).then((r) => r.data),
       ),
     );
 
@@ -77,21 +77,26 @@ export default function VaccinationRecords() {
     setLoading(true);
 
     try {
-      const url = `${HOSPITAL_API}/hospital/vaccinations/hospital/${hospitalId}?from=${from}&to=${to}`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error();
+      const res = await hospitalApi.get(
+        `/hospital/vaccinations/hospital/${hospitalId}`,
+        {
+          params: { from, to },
+        },
+      );
 
-      const data = await res.json();
-      const arr = Array.isArray(data) ? data : [];
-
+      const arr = Array.isArray(res.data) ? res.data : [];
       setRecords(arr);
 
-      const ids = [...new Set(arr.map((r) => r.patientId).filter(Boolean))];
+      const ids = arr.map((r) => r.patientId).filter(Boolean);
       await fetchPatientBasics(ids);
 
       showNotice("success", `Loaded ${arr.length} records`);
-    } catch {
-      showNotice("danger", "Unable to load vaccination records");
+    } catch (e) {
+      console.error(e);
+      showNotice(
+        "danger",
+        `Unable to load vaccination records: ${getApiErrorMessage(e)}`,
+      );
       setRecords([]);
       setFiltered([]);
     } finally {
@@ -101,6 +106,7 @@ export default function VaccinationRecords() {
 
   // Auto-load on open
   useEffect(() => {
+    if (!hospitalId) return;
     loadRecords();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hospitalId]);
@@ -143,7 +149,6 @@ export default function VaccinationRecords() {
 
   return (
     <div className="container-fluid p-0">
-      {/* Page head (zip like slots/vaccines) */}
       <div className="btp-page-head">
         <div>
           <div className="btp-page-title">Vaccination Records</div>
@@ -168,10 +173,8 @@ export default function VaccinationRecords() {
         </div>
       )}
 
-      {/* Filters */}
       <div className="card hospital-card p-0 mb-3">
         <div className="btp-filters">
-          {/* Date row */}
           <div className="btp-filter-grid">
             <div className="btp-filter-group">
               <label>From</label>
@@ -226,7 +229,6 @@ export default function VaccinationRecords() {
 
           <hr className="my-3" />
 
-          {/* Search row */}
           <div className="btp-filter-grid btp-filter-grid-3">
             <div className="btp-filter-group">
               <label>Patient Search</label>
@@ -258,7 +260,6 @@ export default function VaccinationRecords() {
         </div>
       </div>
 
-      {/* Table */}
       <div className="card hospital-card p-3">
         <div className="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
           <div className="fw-bold">Records</div>

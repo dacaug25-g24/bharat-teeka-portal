@@ -1,8 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./admin-ui.css";
 
-const API = import.meta.env.VITE_ADMIN_API || "https://localhost:7233";
+//  OPTION B: HTTP runs on 5225
+const API = import.meta.env.VITE_ADMIN_API || "http://localhost:5225";
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
 
 /* ---------------- COUNT UP HOOK ---------------- */
 function useCountUp(value, duration = 300) {
@@ -20,7 +24,7 @@ function useCountUp(value, duration = 300) {
 
     const tick = (now) => {
       const t = Math.min(1, (now - startTime) / duration);
-      const eased = 1 - Math.pow(1 - t, 3); // smooth easing
+      const eased = 1 - Math.pow(1 - t, 3);
       const current = Math.round(start + (end - start) * eased);
       setDisplay(current);
 
@@ -46,15 +50,46 @@ export default function Reports() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const navigate = useNavigate();
+
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const handleAuthErrors = (error, fallbackMsg) => {
+    const status = error?.response?.status;
+
+    if (status === 401) {
+      alert("Unauthorized (401): Please login again. Token missing/expired.");
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      navigate("/login", { replace: true });
+      return true;
+    }
+
+    if (status === 403) {
+      alert("Forbidden (403): You are not ADMIN or role claim mismatch.");
+      return true;
+    }
+
+    alert(error?.response?.data || fallbackMsg);
+    return false;
+  };
 
   const fetchReport = async (isRefresh = false) => {
     try {
       if (isRefresh) setRefreshing(true);
-      const res = await axios.get(`${API}/api/admin/userreport`);
-      setReport(res.data);
+      else setLoading(true);
+
+      const res = await axios.get(`${API}/api/admin/userreport`, {
+        headers: getAuthHeaders(),
+      });
+      setReport(res.data || null);
     } catch (e) {
       console.error(e);
-      alert("Failed to load report");
+      handleAuthErrors(e, "Failed to load report");
+      setReport(null);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -63,6 +98,7 @@ export default function Reports() {
 
   useEffect(() => {
     fetchReport(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Animated values
@@ -75,12 +111,32 @@ export default function Reports() {
   const cards = useMemo(
     () => [
       { label: "Total Users", value: totalUsers, icon: "👥", accent: "blue" },
-      { label: "Active Users", value: activeUsers, icon: "✅", accent: "green" },
-      { label: "Inactive Users", value: inactiveUsers, icon: "⏸️", accent: "orange" },
-      { label: "Total Patients", value: totalPatients, icon: "🧑‍⚕️", accent: "purple" },
-      { label: "Total Hospitals", value: totalHospitals, icon: "🏥", accent: "teal" },
+      {
+        label: "Active Users",
+        value: activeUsers,
+        icon: "",
+        accent: "green",
+      },
+      {
+        label: "Inactive Users",
+        value: inactiveUsers,
+        icon: "⏸️",
+        accent: "orange",
+      },
+      {
+        label: "Total Patients",
+        value: totalPatients,
+        icon: "🧑‍⚕️",
+        accent: "purple",
+      },
+      {
+        label: "Total Hospitals",
+        value: totalHospitals,
+        icon: "🏥",
+        accent: "teal",
+      },
     ],
-    [totalUsers, activeUsers, inactiveUsers, totalPatients, totalHospitals]
+    [totalUsers, activeUsers, inactiveUsers, totalPatients, totalHospitals],
   );
 
   if (loading) {
@@ -93,7 +149,18 @@ export default function Reports() {
   }
 
   if (!report) {
-    return <div className="alert alert-light border mb-0">No report data.</div>;
+    return (
+      <div className="alert alert-light border mb-0">
+        No report data.
+        <button
+          className="btn btn-sm btn-outline-secondary ms-2"
+          onClick={() => fetchReport(true)}
+          disabled={refreshing}
+        >
+          {refreshing ? "Refreshing..." : "↻ Retry"}
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -118,7 +185,9 @@ export default function Reports() {
       <div className="row g-3">
         {cards.map((c) => (
           <div className="col-12 col-sm-6 col-lg-4" key={c.label}>
-            <div className={`card admin-stat-card border-0 h-100 accent-${c.accent}`}>
+            <div
+              className={`card admin-stat-card border-0 h-100 accent-${c.accent}`}
+            >
               <div className="card-body d-flex align-items-center justify-content-between">
                 <div>
                   <div className="text-muted small">{c.label}</div>

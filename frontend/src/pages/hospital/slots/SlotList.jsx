@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./slots.css";
-
-const API = import.meta.env.VITE_HOSPITAL_API || "http://localhost:8081";
+import { hospitalApi, getApiErrorMessage } from "../../../services/apiClients";
 
 export default function SlotList({
   hospitalId,
@@ -46,23 +45,23 @@ export default function SlotList({
     }
 
     try {
-      let url = `${API}/hospital/slots?hospitalId=${hospitalId}&date=${date}`;
+      const res = canUseTimeFilter
+        ? await hospitalApi.get(`/hospital/slots/by-time`, {
+            params: { hospitalId, date, time },
+          })
+        : await hospitalApi.get(`/hospital/slots`, {
+            params: { hospitalId, date },
+          });
 
-      if (canUseTimeFilter) {
-        url = `${API}/hospital/slots/by-time?hospitalId=${hospitalId}&date=${date}&time=${time}`;
-      }
-
-      const res = await fetch(url);
-      if (!res.ok) throw new Error();
-
-      const data = await res.json();
+      const data = res.data;
       setSlots(Array.isArray(data) ? data : []);
 
       if (!silent) showLocalSuccess("Refreshed successfully");
-    } catch {
-      setLocalError("Unable to fetch slots");
+    } catch (e) {
+      const msg = getApiErrorMessage(e) || "Unable to fetch slots";
+      setLocalError(msg);
       setSlots([]);
-      onError?.("Unable to fetch slots");
+      onError?.(msg);
     } finally {
       if (!silent) setLoading(false);
     }
@@ -86,23 +85,19 @@ export default function SlotList({
     try {
       setDeleteState({ slotId, deleting: true });
 
-      const res = await fetch(`${API}/hospital/slots/${slotId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error();
+      await hospitalApi.delete(`/hospital/slots/${slotId}`);
 
       onSuccess?.("Slot deleted successfully");
       cancelDelete();
       onRefresh?.();
-    } catch {
-      onError?.("Failed to delete slot");
+    } catch (e) {
+      onError?.(getApiErrorMessage(e) || "Failed to delete slot");
       setDeleteState({ slotId, deleting: false });
     }
   };
 
   return (
     <div>
-      {/* Card header */}
       <div className="d-flex justify-content-between align-items-center px-3 py-3">
         <div className="fw-bold fs-6">Slots</div>
 
@@ -116,7 +111,6 @@ export default function SlotList({
         </button>
       </div>
 
-      {/* Filters */}
       <div className="btp-filters">
         <div className="btp-filter-grid">
           <div className="btp-filter-group">
@@ -172,7 +166,6 @@ export default function SlotList({
         )}
       </div>
 
-      {/* Table */}
       {slots.length === 0 && !loading ? (
         <div className="px-3 pb-3 text-muted">No slots found</div>
       ) : (

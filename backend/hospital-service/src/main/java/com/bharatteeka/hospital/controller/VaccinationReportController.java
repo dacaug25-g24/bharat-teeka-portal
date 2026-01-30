@@ -38,8 +38,6 @@ public class VaccinationReportController {
     private final VaccinationRecordRepository repo;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    // ✅ configure this in application.properties (recommended)
-    // auth.service.url=http://localhost:8080
     @Value("${auth.service.url:http://localhost:8080}")
     private String authServiceUrl;
 
@@ -57,7 +55,7 @@ public class VaccinationReportController {
         List<VaccinationRecord> rows =
                 repo.findByHospitalHospitalIdAndVaccinationDateBetweenOrderByVaccinationDateDesc(hospitalId, from, to);
 
-        // ✅ fetch patient basics so PDF matches dashboard
+        // fetch patient basics so PDF matches dashboard
         Map<Integer, PatientBasicResponse> patientBasics = fetchPatientBasics(rows);
 
         String safeHospitalName = (hospitalName == null || hospitalName.isBlank())
@@ -73,7 +71,7 @@ public class VaccinationReportController {
                 .body(pdfBytes);
     }
 
-    // ===================== HELPERS =====================
+    // HELPERS 
 
     private Map<Integer, PatientBasicResponse> fetchPatientBasics(List<VaccinationRecord> rows) {
         Set<Integer> ids = rows.stream()

@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import VaccinationHistoryDropdown from "./VaccinationHistoryDropdown";
 import "./appointments.css";
-
-const HOSPITAL_API =
-  import.meta.env.VITE_HOSPITAL_API || "http://localhost:8081";
-const AUTH_API = import.meta.env.VITE_AUTH_API || "http://localhost:8080";
+import { hospitalApi, authApi } from "../../../services/apiClients";
 
 const AllAppointments = ({ hospitalId, dateFilter }) => {
   const [appointments, setAppointments] = useState([]);
@@ -18,9 +15,7 @@ const AllAppointments = ({ hospitalId, dateFilter }) => {
 
     const results = await Promise.allSettled(
       missing.map((id) =>
-        fetch(`${AUTH_API}/auth/patients/${id}/basic`).then((r) =>
-          r.ok ? r.json() : null,
-        ),
+        authApi.get(`/auth/patients/${id}/basic`).then((r) => r.data),
       ),
     );
 
@@ -40,19 +35,18 @@ const AllAppointments = ({ hospitalId, dateFilter }) => {
 
     try {
       const url = dateFilter
-        ? `${HOSPITAL_API}/hospital/appointments/hospital/${hospitalId}?date=${dateFilter}`
-        : `${HOSPITAL_API}/hospital/appointments/hospital/${hospitalId}`;
+        ? `/hospital/appointments/hospital/${hospitalId}?date=${dateFilter}`
+        : `/hospital/appointments/hospital/${hospitalId}`;
 
-      const res = await fetch(url);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
+      const res = await hospitalApi.get(url);
+      const data = res.data;
 
       const arr = Array.isArray(data) ? data : [];
       setAppointments(arr);
 
       const ids = [...new Set(arr.map((a) => a.patientId).filter(Boolean))];
       await fetchPatientBasics(ids);
-    } catch {
+    } catch (e) {
       setError("Unable to load appointments");
       setAppointments([]);
     } finally {
@@ -62,6 +56,7 @@ const AllAppointments = ({ hospitalId, dateFilter }) => {
 
   useEffect(() => {
     fetchAppointments();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hospitalId, dateFilter]);
 
   const statusClass = (s) => {
