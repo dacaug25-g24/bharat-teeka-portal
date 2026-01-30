@@ -13,6 +13,7 @@ import BookSlot from "../pages/BookSlot";
 import Contact from "../pages/Contact";
 import RaiseIssue from "../pages/RaiseIssue";
 import Support from "../pages/Support";
+import ForgotPassword from "../pages/ForgotPassword";
 
 import About from "../components/Footer/About";
 import PrivacyPolicy from "../components/Footer/PrivacyPolicy";
@@ -29,20 +30,30 @@ import GetCertificate from "../components/Home/GetCertificate";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import HospitalRoutes from "../pages/hospital/HospitalRoutes";
-import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
 import AdminRoutes from "../pages/admin/AdminRoutes";
-import ForgotPassword from "../pages/ForgotPassword";
-
 import UserRoutes from "../pages/user/UserRoutes";
+
+const LANDING_ONLY = ["/login", "/register", "/forgot-password"];
 
 const AppRoutes = () => {
   const { pathname } = useLocation();
 
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+  const isAuthed = !!token && !!user;
+
+  // ✅ Rule:
+  // - Always show LandingNavbar on login/register/forgot
+  // - Else if logged-in => show AppNavbar (even on "/")
+  // - Else show LandingNavbar
+  const showLandingNavbar = LANDING_ONLY.includes(pathname) || !isAuthed;
+
   return (
     <>
-      {pathname === "/" ? <LandingNavbar /> : <AppNavbar />}
+      {showLandingNavbar ? <LandingNavbar /> : <AppNavbar />}
 
       <Routes>
+        {/* Public */}
         <Route path="/" element={<Home />} />
         <Route path="/find-center" element={<HeroSearch showFooter />} />
         <Route path="/book-slot" element={<BookSlot />} />
@@ -66,14 +77,7 @@ const AppRoutes = () => {
         <Route path="/side-effects" element={<SideEffects />} />
         <Route path="/get-certificate" element={<GetCertificate />} />
 
-        <Route
-          path="/admin-dashboard"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
+        {/* Protected */}
         <Route
           path="/hospital/*"
           element={
@@ -100,6 +104,8 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </>
