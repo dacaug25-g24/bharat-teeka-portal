@@ -4,10 +4,9 @@ import "./Navbar.css";
 
 export default function LandingNavbar() {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-teal py-2 shadow-sm">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-teal py-2 shadow-sm bt-nav">
       <div className="container-fluid px-4">
-
-        <a className="navbar-brand fw-bold d-flex align-items-center" href="#home">
+        <Link className="navbar-brand fw-bold d-flex align-items-center" to="/">
           <img
             src={emblemGov}
             alt="Government emblem"
@@ -19,7 +18,7 @@ export default function LandingNavbar() {
             </span>
             <span className="brand-subtitle">Towards Healthy Bharat</span>
           </div>
-        </a>
+        </Link>
 
         <button
           className="navbar-toggler"
@@ -32,30 +31,45 @@ export default function LandingNavbar() {
 
         <div className="collapse navbar-collapse" id="landingNavbar">
           <ul className="navbar-nav mx-auto gap-3 align-items-center">
-
             <li className="nav-item">
-              <a className="nav-link" href="#home">Home</a>
+              <Link className="nav-link" to="/">
+                Home
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#find-center">Find Center</a>
+              <Link className="nav-link" to="/find-center">
+                Find Center
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#book-slot">Book Slot</a>
+              <Link className="nav-link" to="/book-slot">
+                Book Slot
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#download-certificate">Download Certificate</a>
+              <Link className="nav-link" to="/download-certificate">
+                Download Certificate
+              </Link>
             </li>
             <li className="nav-item">
-              <a className="nav-link" href="#faq">FAQ</a>
+              <Link className="nav-link" to="/faq">
+                FAQ
+              </Link>
             </li>
-
             <li className="nav-item">
-              <Link className="nav-link" to="/contact">Contact Us</Link>
+              <Link className="nav-link" to="/contact">
+                Contact Us
+              </Link>
             </li>
           </ul>
 
-          <a className="btn btn-register px-4 ms-2" href="/login">Sign In</a>
-          <a className="btn btn-register px-4 ms-2" href="/register">Register</a>
+          {/* ✅ pill buttons stay correct */}
+          <Link className="btn btn-register px-4 ms-2" to="/login">
+            Sign In
+          </Link>
+          <Link className="btn btn-register px-4 ms-2" to="/register">
+            Register
+          </Link>
         </div>
       </div>
     </nav>

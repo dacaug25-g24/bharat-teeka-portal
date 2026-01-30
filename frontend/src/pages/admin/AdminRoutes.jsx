@@ -1,10 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminDashboard from "./dashboard/AdminDashboard";
 
-// Existing
-import ManageHospital from "./components/ManageHospital";
-
-// New pages
+// Admin pages
 import ManageProfile from "./components/ManageProfile";
 import ManageVaccine from "./components/ManageVaccine";
 import ManageUsers from "./components/ManageUsers";
@@ -16,16 +13,12 @@ import EditVaccine from "./components/EditVaccine";
 export default function AdminRoutes() {
   return (
     <Routes>
-      {/* Layout route */}
+      {/* Layout */}
       <Route path="/" element={<AdminDashboard />}>
-        
-        {/* ✅ DEFAULT: show profile immediately */}
+        {/* Default */}
         <Route index element={<ManageProfile />} />
 
-        {/* Existing routes (unchanged) */}
-        <Route path="dashboard" element={<div className="card p-4">Admin Dashboard Home</div>} />
-        <Route path="hospitals" element={<ManageHospital />} />
-
+        {/* Pages */}
         <Route path="profile" element={<ManageProfile />} />
         <Route path="manage-vaccines" element={<ManageVaccine />} />
         <Route path="manage-users" element={<ManageUsers />} />
@@ -35,8 +28,8 @@ export default function AdminRoutes() {
         <Route path="add-vaccine" element={<AddVaccine />} />
         <Route path="update-vaccine/:id" element={<EditVaccine />} />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Fallback inside /admin */}
+        <Route path="*" element={<Navigate to="" replace />} />
       </Route>
     </Routes>
   );

@@ -1,92 +1,119 @@
+/* ====== Shared navbar theme ====== */
 .bg-teal {
   background-color: #026b6c !important;
 }
 
-.navbar-brand {
+.bt-nav .navbar-brand {
   font-size: 1rem;
 }
 
-.brand-pill {
-  width: 32px;
-  height: 32px;
+.bt-nav .brand-pill {
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background-color: transparent;
+  background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.brand-pill img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.brand-title {
+.bt-nav .brand-title {
   font-size: 1.1rem;
   line-height: 1.1;
 }
 
-.brand-subtitle {
+.bt-nav .brand-subtitle {
   font-size: 0.7rem;
   color: #e0f2f1;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.navbar-nav .nav-link {
+/* ✅ ONLY navbar links (not sidebar) */
+.bt-nav .navbar-nav .nav-link {
   color: #ffffff !important;
   font-weight: 550;
-  font-size: 1.05rem;
+  font-size: 1.03rem;
 }
 
-.navbar-nav .nav-link:hover {
+.bt-nav .navbar-nav .nav-link:hover {
   color: #ffe483 !important;
 }
 
-.nav-link {
-  color: #026b6c !important;
-  font-weight: 500;
-}
-
-.btn-font {
-  padding: 2px 8px;
-  font-size: 0.8rem;
-  line-height: 1;
-  border-radius: 4px;
-  border-color: rgba(255, 255, 255, 0.6);
-  color: #ffffff;
-}
-
-.btn-font:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-}
-
-.btn-lang {
-  border-color: rgba(255, 255, 255, 0.6);
-  color: #ffffff;
-  font-size: 0.85rem;
-  padding: 4px 10px;
-}
-
-.btn-lang:hover,
-.btn-lang:focus {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-}
-
-.btn-register {
+/* ====== Landing buttons ====== */
+.bt-nav .btn-register {
   background-color: transparent;
   border: 2px solid #ffffff;
   border-radius: 50px;
   color: #ffffff;
-  font-weight: 500;
+  font-weight: 600;
   padding-top: 6px;
   padding-bottom: 6px;
 }
 
-.btn-register:hover {
+.bt-nav .btn-register:hover {
   background-color: #ffffff;
   color: #026b6c;
+}
+
+/* ====== Role badge ====== */
+.bt-nav .role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  line-height: 1;
+}
+
+.bt-nav .badge-user {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.bt-nav .badge-hospital {
+  background: rgba(255, 228, 131, 0.14);
+  color: #ffe483;
+  border-color: rgba(255, 228, 131, 0.35);
+}
+
+.bt-nav .badge-admin {
+  background: rgba(0, 0, 0, 0.18);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ====== AppNavbar menu style (pill active) ====== */
+.bt-nav .nav-role-menu {
+  gap: 10px;
+}
+
+.bt-nav .nav-link-soft {
+  padding: 7px 12px !important;
+  border-radius: 12px;
+  transition: background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+.bt-nav .nav-link-soft.active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff !important;
+}
+
+/* ====== Right buttons ====== */
+.bt-nav .btn-dashboard {
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bt-nav .btn-logout {
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-weight: 800;
+  white-space: nowrap;
 }
