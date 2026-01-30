@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Footer from "../components/Footer/Footer";
 import "./register.css";
 
@@ -28,7 +28,15 @@ export default function Register() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  // Inline per-field errors (shown under each field)
+  const [fieldErrors, setFieldErrors] = useState({});
+
+  // Top alert error on submit
+  const [submitError, setSubmitError] = useState("");
+
+  // track what user touched (so we don’t shout errors before typing)
+  const [touched, setTouched] = useState({});
 
   const [showPwd, setShowPwd] = useState(false);
   const [showConfirmPwd, setShowConfirmPwd] = useState(false);
@@ -36,17 +44,11 @@ export default function Register() {
   const errorRef = useRef(null);
 
   useEffect(() => {
-    if (error) {
+    if (submitError) {
       errorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [error]);
-
-  const onChange = (e) => {
-    setError("");
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+  }, [submitError]);
 
   const calcAge = (dobStr) => {
     const dob = new Date(dobStr);
@@ -57,82 +59,298 @@ export default function Register() {
     return age;
   };
 
-  const validate = () => {
-    const username = form.username.trim();
-    const email = form.email.trim();
-    const phone = form.phone.trim();
-    const address = form.address.trim();
-    const firstName = form.firstName.trim();
-    const lastName = form.lastName.trim();
-    const aadhaar = form.aadhaarNumber.trim();
+  // --- Validators (match backend) ---
+  const validators = useMemo(() => {
+    const isBlank = (s) => !s || !String(s).trim();
 
-    if (!username) return "Username is required";
-    if (username.length < 3) return "Username must be at least 3 characters";
+    const username = (v) => {
+      const val = (v || "").trim();
+      if (!val) return "Username is required";
+      if (val.length < 3) return "Username must be at least 3 characters";
+      if (val.length > 50) return "Username must be at most 50 characters";
+      if (!/^[A-Za-z0-9._]+$/.test(val))
+        return "Only letters, numbers, dot(.) and underscore(_) allowed";
+      return "";
+    };
 
-    if (!email) return "Email is required";
+    const email = (v) => {
+      const val = (v || "").trim();
+      if (!val) return "Email is required";
+      if (!/^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/.test(val))
+        return "Enter a valid email (example: user@gmail.com)";
+      return "";
+    };
 
-    const phoneRegex = /^[6-9]\d{9}$/;
-    if (!phoneRegex.test(phone)) return "Enter a valid 10-digit Indian phone number";
+    const phone = (v) => {
+      const val = (v || "").trim();
+      if (!val) return "Phone is required";
+      if (!/^[6-9]\d{9}$/.test(val))
+        return "Enter valid 10-digit Indian phone (starts with 6-9)";
+      return "";
+    };
 
-    if (!form.password) return "Password is required";
-    if (form.password.length < 6) return "Password must be at least 6 characters";
-    if (form.password !== form.confirmPassword) return "Passwords do not match";
+    const password = (v) => {
+      const val = v || "";
+      if (!val) return "Password is required";
+      if (/\s/.test(val)) return "Password must not contain spaces";
+      // min 8, 1 upper, 1 lower, 1 digit, 1 special from @$!%*?&^#
+      const ok =
+        /[a-z]/.test(val) &&
+        /[A-Z]/.test(val) &&
+        /\d/.test(val) &&
+        /[@$!%*?&^#]/.test(val) &&
+        val.length >= 8;
+      if (!ok)
+        return "Min 8 chars + 1 uppercase + 1 lowercase + 1 number + 1 special (@$!%*?&^#)";
+      return "";
+    };
 
-    if (!firstName) return "First name is required";
-    if (!lastName) return "Last name is required";
-    if (!form.dateOfBirth) return "Date of birth is required";
-    if (!form.gender) return "Gender is required";
+    const confirmPassword = (v, all) => {
+      const val = v || "";
+      if (!val) return "Confirm password is required";
+      if (val !== (all.password || "")) return "Passwords do not match";
+      return "";
+    };
 
-    const age = calcAge(form.dateOfBirth);
-    if (Number.isNaN(age)) return "Invalid date of birth";
-    if (age < 18) return "Only 18+ users can create an account. Add minors as beneficiaries after login.";
+    const firstName = (v) => {
+      const val = (v || "").trim();
+      if (!val) return "First name is required";
+      if (val.length > 50) return "First name max 50 characters";
+      if (!/^[A-Za-z ]+$/.test(val)) return "First name must contain only letters";
+      return "";
+    };
 
-    if (!aadhaar) return "Aadhaar is required";
-    if (!/^\d{12}$/.test(aadhaar)) return "Aadhaar must be exactly 12 digits";
+    const lastName = (v) => {
+      const val = (v || "").trim();
+      if (!val) return "Last name is required";
+      if (val.length > 50) return "Last name max 50 characters";
+      if (!/^[A-Za-z ]+$/.test(val)) return "Last name must contain only letters";
+      return "";
+    };
 
-    if (!form.bloodGroup) return "Blood group is required";
-    if (!address) return "Address is required";
+    const dateOfBirth = (v) => {
+      const val = (v || "").trim();
+      if (!val) return "Date of birth is required";
+      const age = calcAge(val);
+      if (Number.isNaN(age)) return "Invalid date of birth";
+      if (age < 18)
+        return "Only 18+ can register. Add minors as beneficiaries after login.";
+      return "";
+    };
 
-    return "";
+    const gender = (v) => {
+      const val = (v || "").trim();
+      if (!val) return "Gender is required";
+      return "";
+    };
+
+    const aadhaarNumber = (v) => {
+      const val = (v || "").trim();
+      if (!val) return "Aadhaar is required";
+      if (!/^\d{12}$/.test(val)) return "Aadhaar must be exactly 12 digits";
+      return "";
+    };
+
+    const bloodGroup = (v) => {
+      const val = (v || "").trim().toUpperCase();
+      if (!val) return "Blood group is required";
+      if (!/^(A|B|AB|O)[+-]$/.test(val))
+        return "Invalid blood group (example: A+, O-, AB+)";
+      return "";
+    };
+
+    const address = (v) => {
+      const val = (v || "").trim();
+      if (!val) return "Address is required";
+      if (val.length < 5) return "Address is too short";
+      return "";
+    };
+
+    return {
+      isBlank,
+      username,
+      email,
+      phone,
+      password,
+      confirmPassword,
+      firstName,
+      lastName,
+      dateOfBirth,
+      gender,
+      aadhaarNumber,
+      bloodGroup,
+      address,
+    };
+  }, []);
+
+  // Validate single field
+  const validateField = (name, value, nextForm) => {
+    switch (name) {
+      case "username":
+        return validators.username(value);
+      case "email":
+        return validators.email(value);
+      case "phone":
+        return validators.phone(value);
+      case "password":
+        return validators.password(value);
+      case "confirmPassword":
+        return validators.confirmPassword(value, nextForm);
+      case "firstName":
+        return validators.firstName(value);
+      case "lastName":
+        return validators.lastName(value);
+      case "dateOfBirth":
+        return validators.dateOfBirth(value);
+      case "gender":
+        return validators.gender(value);
+      case "aadhaarNumber":
+        return validators.aadhaarNumber(value);
+      case "bloodGroup":
+        return validators.bloodGroup(value);
+      case "address":
+        return validators.address(value);
+      default:
+        return "";
+    }
+  };
+
+  // Validate all fields (for final submit)
+  const validateAll = (nextForm) => {
+    const errs = {};
+    const fields = [
+      "username",
+      "email",
+      "phone",
+      "password",
+      "confirmPassword",
+      "firstName",
+      "lastName",
+      "dateOfBirth",
+      "gender",
+      "aadhaarNumber",
+      "bloodGroup",
+      "address",
+    ];
+
+    fields.forEach((f) => {
+      const msg = validateField(f, nextForm[f], nextForm);
+      if (msg) errs[f] = msg;
+    });
+
+    return errs;
+  };
+
+  const markTouched = (name) => {
+    setTouched((p) => ({ ...p, [name]: true }));
+  };
+
+  const onChange = (e) => {
+    setSubmitError("");
+    const { name, value } = e.target;
+
+    // input hygiene like before
+    let cleaned = value;
+
+    if (name === "aadhaarNumber") cleaned = value.replace(/\D/g, "").slice(0, 12);
+    if (name === "phone") cleaned = value.replace(/\D/g, "").slice(0, 10);
+    if (name === "username") cleaned = value.replace(/[^A-Za-z0-9._]/g, "");
+
+    const nextForm = { ...form, [name]: cleaned };
+    setForm(nextForm);
+
+    // live validation only after touch
+    if (touched[name]) {
+      const msg = validateField(name, cleaned, nextForm);
+      setFieldErrors((p) => ({ ...p, [name]: msg }));
+    }
+
+    // if password changes, revalidate confirmPassword too (live)
+    if (name === "password" && touched.confirmPassword) {
+      const msg2 = validateField("confirmPassword", nextForm.confirmPassword, nextForm);
+      setFieldErrors((p) => ({ ...p, confirmPassword: msg2 }));
+    }
+  };
+
+  const onBlur = (e) => {
+    const { name } = e.target;
+    markTouched(name);
+
+    const msg = validateField(name, form[name], form);
+    setFieldErrors((p) => ({ ...p, [name]: msg }));
+
+    // if user leaves password, revalidate confirm as well
+    if (name === "password" && touched.confirmPassword) {
+      const msg2 = validateField("confirmPassword", form.confirmPassword, form);
+      setFieldErrors((p) => ({ ...p, confirmPassword: msg2 }));
+    }
+  };
+
+  const showErr = (name) => {
+    return Boolean(touched[name] && fieldErrors[name]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const msg = validate();
-    if (msg) {
-      setError(msg);
+    // mark all required fields touched
+    const requiredFields = [
+      "username",
+      "email",
+      "phone",
+      "password",
+      "confirmPassword",
+      "firstName",
+      "lastName",
+      "dateOfBirth",
+      "gender",
+      "aadhaarNumber",
+      "bloodGroup",
+      "address",
+    ];
+    const nextTouched = {};
+    requiredFields.forEach((f) => (nextTouched[f] = true));
+    setTouched((p) => ({ ...p, ...nextTouched }));
+
+    const errs = validateAll(form);
+    setFieldErrors(errs);
+
+    if (Object.keys(errs).length > 0) {
+      setSubmitError("Please correct the highlighted fields and try again.");
       return;
     }
 
     setLoading(true);
-    setError("");
+    setSubmitError("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: form.username.trim(),
-          password: form.password,
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          address: form.address.trim(),
+      const res = await fetch(
+        `${import.meta.env.VITE_AUTH_API || "http://localhost:8080"}/api/auth/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: form.username.trim(),
+            password: form.password,
+            email: form.email.trim(),
+            phone: form.phone.trim(),
+            address: form.address.trim(),
 
-          firstName: form.firstName.trim(),
-          lastName: form.lastName.trim(),
-          dateOfBirth: form.dateOfBirth,
-          gender: form.gender,
-          aadhaarNumber: form.aadhaarNumber.trim(),
-          bloodGroup: form.bloodGroup,
-          remarks: form.remarks.trim() || null,
-        }),
-      });
+            firstName: form.firstName.trim(),
+            lastName: form.lastName.trim(),
+            dateOfBirth: form.dateOfBirth, // yyyy-MM-dd
+            gender: form.gender,
+            aadhaarNumber: form.aadhaarNumber.trim(),
+            bloodGroup: form.bloodGroup.trim().toUpperCase(),
+            remarks: form.remarks.trim() || null,
+          }),
+        }
+      );
 
       const data = await res.json();
 
       if (!res.ok || !data?.success) {
-        setError(data?.message || "Registration failed!");
+        setSubmitError(data?.message || "Registration failed!");
         return;
       }
 
@@ -140,7 +358,9 @@ export default function Register() {
       navigate("/login");
     } catch (err) {
       console.error("Register error:", err);
-      setError("Cannot connect to server. Please ensure backend is running on port 8080.");
+      setSubmitError(
+        "Cannot connect to server. Please ensure backend is running on port 8080."
+      );
     } finally {
       setLoading(false);
     }
@@ -160,13 +380,13 @@ export default function Register() {
                   </p>
                 </div>
 
-                {error && (
+                {submitError && (
                   <div ref={errorRef} className="alert alert-danger border-0 py-2">
-                    {error}
+                    {submitError}
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} noValidate>
                   {/* ACCOUNT */}
                   <div className="d-flex align-items-center justify-content-between mb-2">
                     <h5 className="fw-semibold mb-0">Account Details</h5>
@@ -182,13 +402,19 @@ export default function Register() {
                       <input
                         name="username"
                         type="text"
-                        className="form-control"
+                        className={`form-control ${showErr("username") ? "is-invalid" : ""}`}
                         value={form.username}
                         onChange={onChange}
+                        onBlur={onBlur}
                         disabled={loading}
-                        placeholder="e.g. user123"
-                        required
+                        placeholder="e.g. user_123"
+                        autoComplete="username"
                       />
+                      {showErr("username") && (
+                        <div className="invalid-feedback d-block">
+                          {fieldErrors.username}
+                        </div>
+                      )}
                     </div>
 
                     <div className="col-md-6">
@@ -198,13 +424,17 @@ export default function Register() {
                       <input
                         name="email"
                         type="email"
-                        className="form-control"
+                        className={`form-control ${showErr("email") ? "is-invalid" : ""}`}
                         value={form.email}
                         onChange={onChange}
+                        onBlur={onBlur}
                         disabled={loading}
-                        placeholder="e.g. user@example.com"
-                        required
+                        placeholder="e.g. user@gmail.com"
+                        autoComplete="email"
                       />
+                      {showErr("email") && (
+                        <div className="invalid-feedback d-block">{fieldErrors.email}</div>
+                      )}
                     </div>
 
                     <div className="col-md-6">
@@ -214,13 +444,19 @@ export default function Register() {
                       <input
                         name="phone"
                         type="tel"
-                        className="form-control"
+                        className={`form-control ${showErr("phone") ? "is-invalid" : ""}`}
                         value={form.phone}
                         onChange={onChange}
+                        onBlur={onBlur}
                         disabled={loading}
-                        placeholder="10-digit Indian number"
-                        required
+                        placeholder="10-digit number (starts 6-9)"
+                        inputMode="numeric"
+                        maxLength={10}
+                        autoComplete="tel"
                       />
+                      {showErr("phone") && (
+                        <div className="invalid-feedback d-block">{fieldErrors.phone}</div>
+                      )}
                     </div>
 
                     <div className="col-md-6">
@@ -231,23 +467,27 @@ export default function Register() {
                         <input
                           name="password"
                           type={showPwd ? "text" : "password"}
-                          className="form-control"
+                          className={`form-control ${showErr("password") ? "is-invalid" : ""}`}
                           value={form.password}
                           onChange={onChange}
+                          onBlur={onBlur}
                           disabled={loading}
-                          placeholder="Minimum 6 characters"
-                          required
+                          placeholder="Min 8 chars + strong pattern"
+                          autoComplete="new-password"
                         />
                         <button
                           className="btn btn-outline-secondary"
                           type="button"
                           onClick={() => setShowPwd((p) => !p)}
                           aria-label={showPwd ? "Hide password" : "Show password"}
+                          disabled={loading}
                         >
                           <i className={`bi ${showPwd ? "bi-eye-slash" : "bi-eye"}`} />
                         </button>
                       </div>
-                      <div className="form-text">Minimum 6 characters</div>
+                      {showErr("password") && (
+                        <div className="invalid-feedback d-block">{fieldErrors.password}</div>
+                      )}
                     </div>
 
                     <div className="col-md-6">
@@ -258,22 +498,33 @@ export default function Register() {
                         <input
                           name="confirmPassword"
                           type={showConfirmPwd ? "text" : "password"}
-                          className="form-control"
+                          className={`form-control ${
+                            showErr("confirmPassword") ? "is-invalid" : ""
+                          }`}
                           value={form.confirmPassword}
                           onChange={onChange}
+                          onBlur={onBlur}
                           disabled={loading}
                           placeholder="Re-enter password"
-                          required
+                          autoComplete="new-password"
                         />
                         <button
                           className="btn btn-outline-secondary"
                           type="button"
                           onClick={() => setShowConfirmPwd((p) => !p)}
-                          aria-label={showConfirmPwd ? "Hide confirm password" : "Show confirm password"}
+                          aria-label={
+                            showConfirmPwd ? "Hide confirm password" : "Show confirm password"
+                          }
+                          disabled={loading}
                         >
                           <i className={`bi ${showConfirmPwd ? "bi-eye-slash" : "bi-eye"}`} />
                         </button>
                       </div>
+                      {showErr("confirmPassword") && (
+                        <div className="invalid-feedback d-block">
+                          {fieldErrors.confirmPassword}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -290,13 +541,16 @@ export default function Register() {
                         <input
                           name="firstName"
                           type="text"
-                          className="form-control"
+                          className={`form-control ${showErr("firstName") ? "is-invalid" : ""}`}
                           value={form.firstName}
                           onChange={onChange}
+                          onBlur={onBlur}
                           disabled={loading}
-                          placeholder="Enter first name"
-                          required
+                          placeholder="e.g. Shubham"
                         />
+                        {showErr("firstName") && (
+                          <div className="invalid-feedback d-block">{fieldErrors.firstName}</div>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -306,13 +560,16 @@ export default function Register() {
                         <input
                           name="lastName"
                           type="text"
-                          className="form-control"
+                          className={`form-control ${showErr("lastName") ? "is-invalid" : ""}`}
                           value={form.lastName}
                           onChange={onChange}
+                          onBlur={onBlur}
                           disabled={loading}
-                          placeholder="Enter last name"
-                          required
+                          placeholder="e.g. Kumar"
                         />
+                        {showErr("lastName") && (
+                          <div className="invalid-feedback d-block">{fieldErrors.lastName}</div>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -322,13 +579,15 @@ export default function Register() {
                         <input
                           name="dateOfBirth"
                           type="date"
-                          className="form-control"
+                          className={`form-control ${showErr("dateOfBirth") ? "is-invalid" : ""}`}
                           value={form.dateOfBirth}
                           onChange={onChange}
+                          onBlur={onBlur}
                           disabled={loading}
-                          required
                         />
-                        <div className="form-text">Must be 18+ to create account</div>
+                        {showErr("dateOfBirth") && (
+                          <div className="invalid-feedback d-block">{fieldErrors.dateOfBirth}</div>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -337,17 +596,20 @@ export default function Register() {
                         </label>
                         <select
                           name="gender"
-                          className="form-select"
+                          className={`form-select ${showErr("gender") ? "is-invalid" : ""}`}
                           value={form.gender}
                           onChange={onChange}
+                          onBlur={onBlur}
                           disabled={loading}
-                          required
                         >
                           <option value="">Select</option>
                           <option value="Male">Male</option>
                           <option value="Female">Female</option>
                           <option value="Other">Other</option>
                         </select>
+                        {showErr("gender") && (
+                          <div className="invalid-feedback d-block">{fieldErrors.gender}</div>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -357,15 +619,18 @@ export default function Register() {
                         <input
                           name="aadhaarNumber"
                           type="text"
-                          className="form-control"
+                          className={`form-control ${showErr("aadhaarNumber") ? "is-invalid" : ""}`}
                           value={form.aadhaarNumber}
                           onChange={onChange}
+                          onBlur={onBlur}
                           disabled={loading}
                           maxLength={12}
                           inputMode="numeric"
                           placeholder="12-digit Aadhaar"
-                          required
                         />
+                        {showErr("aadhaarNumber") && (
+                          <div className="invalid-feedback d-block">{fieldErrors.aadhaarNumber}</div>
+                        )}
                       </div>
 
                       <div className="col-md-6">
@@ -374,11 +639,11 @@ export default function Register() {
                         </label>
                         <select
                           name="bloodGroup"
-                          className="form-select"
+                          className={`form-select ${showErr("bloodGroup") ? "is-invalid" : ""}`}
                           value={form.bloodGroup}
                           onChange={onChange}
+                          onBlur={onBlur}
                           disabled={loading}
-                          required
                         >
                           <option value="">Select</option>
                           {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((bg) => (
@@ -387,6 +652,9 @@ export default function Register() {
                             </option>
                           ))}
                         </select>
+                        {showErr("bloodGroup") && (
+                          <div className="invalid-feedback d-block">{fieldErrors.bloodGroup}</div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -404,13 +672,16 @@ export default function Register() {
                         <input
                           name="address"
                           type="text"
-                          className="form-control"
+                          className={`form-control ${showErr("address") ? "is-invalid" : ""}`}
                           value={form.address}
                           onChange={onChange}
+                          onBlur={onBlur}
                           disabled={loading}
-                          placeholder="House no, area, city"
-                          required
+                          placeholder="House no, street, city"
                         />
+                        {showErr("address") && (
+                          <div className="invalid-feedback d-block">{fieldErrors.address}</div>
+                        )}
                       </div>
 
                       <div className="col-12">
@@ -422,13 +693,16 @@ export default function Register() {
                           value={form.remarks}
                           onChange={onChange}
                           disabled={loading}
-                          placeholder="Any important info (allergy, etc.)"
+                          placeholder="Any important note (allergy, etc.)"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <button className="btn btn-primary w-100 fw-semibold py-2 mt-4" disabled={loading}>
+                  <button
+                    className="btn btn-primary w-100 fw-semibold py-2 mt-4"
+                    disabled={loading}
+                  >
                     {loading ? (
                       <>
                         <span className="spinner-border spinner-border-sm me-2" />

@@ -10,7 +10,6 @@ export const getPatientIdByUserId = async (userId) => {
   return res.data?.patientId || null;
 };
 
-
 export const getTestParentChild = async () => {
   const res = await patientApi.get("/test/parent-child");
   return res.data;
@@ -45,7 +44,16 @@ export const addChild = async ({ parentUserId, payload }) => {
   return res.data;
 };
 
+export const deleteChild = async ({ parentUserId, patientId }) => {
+  const res = await patientApi.delete(`/parent/children/${patientId}`, {
+    params: { parentUserId },
+  });
+  return res.data;
+};
 
+// ---------------------
+// Public browse APIs
+// ---------------------
 export const getStates = async () => {
   const res = await patientApi.get("/locations/states");
   return res.data;
@@ -63,19 +71,6 @@ export const getHospitalsByCity = async ({ cityId, hospitalType }) => {
   return res.data;
 };
 
-export const getAvailableSlots = async ({ hospitalId, date, vaccineId }) => {
-  const res = await patientApi.get("/slots/available", {
-    params: { hospitalId, date, vaccineId },
-  });
-  return res.data;
-};
-
-
-export const getSlotById = async (slotId) => {
-  const res = await patientApi.get(`/slots/${slotId}`);
-  return res.data;
-};
-
 export const getVaccinesByHospital = async ({ hospitalId, date }) => {
   const res = await patientApi.get("/vaccines/by-hospital", {
     params: { hospitalId, date },
@@ -83,7 +78,22 @@ export const getVaccinesByHospital = async ({ hospitalId, date }) => {
   return res.data;
 };
 
+export const getAvailableSlots = async ({ hospitalId, date, vaccineId }) => {
+  const params = { hospitalId, date };
+  if (vaccineId) params.vaccineId = vaccineId;
 
+  const res = await patientApi.get("/slots/available", { params });
+  return res.data;
+};
+
+export const getSlotById = async (slotId) => {
+  const res = await patientApi.get(`/slots/${slotId}`);
+  return res.data;
+};
+
+// ---------------------
+// Protected appointment APIs
+// ---------------------
 export const getAppointmentDetails = async ({ patientId, parentUserId }) => {
   const res = await patientApi.get("/appointments/details", {
     params: { patientId, parentUserId },
@@ -104,22 +114,16 @@ export const cancelAppointment = async (appointmentId, parentUserId = null) => {
   const params = {};
   if (parentUserId) params.parentUserId = parentUserId;
 
-  const res = await patientApi.put(
-    `/appointments/${appointmentId}/cancel`,
-    null,
-    { params }
-  );
-
-  return res.data;
-};
-
-export const deleteChild = async ({ parentUserId, patientId }) => {
-  const res = await patientApi.delete(`/parent/children/${patientId}`, {
-    params: { parentUserId },
+  const res = await patientApi.put(`/appointments/${appointmentId}/cancel`, null, {
+    params,
   });
+
   return res.data;
 };
 
+// ---------------------
+// Helper: Range availability
+// ---------------------
 export const getSlotsAvailabilityRange = async ({
   hospitalId,
   vaccineId = null,
@@ -146,12 +150,8 @@ export const getSlotsAvailabilityRange = async ({
     });
 
     const list = Array.isArray(slots) ? slots : [];
-    result.push({
-      date: dt,
-      count: list.length,
-    });
+    result.push({ date: dt, count: list.length });
   }
 
   return result;
 };
-

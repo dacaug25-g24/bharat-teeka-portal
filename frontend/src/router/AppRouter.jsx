@@ -31,6 +31,7 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import HospitalRoutes from "../pages/hospital/HospitalRoutes";
 import AdminDashboard from "../pages/admin/dashboard/AdminDashboard";
 import AdminRoutes from "../pages/admin/AdminRoutes";
+import ForgotPassword from "../pages/ForgotPassword";
 
 import UserRoutes from "../pages/user/UserRoutes";
 
@@ -58,6 +59,7 @@ const AppRoutes = () => {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         <Route path="/raise-issue" element={<RaiseIssue />} />
         <Route path="/support" element={<Support />} />
@@ -89,14 +91,6 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-        {/* <Route
-          path="/hospital/*"
-          element={
-            <ProtectedRoute>
-              <HospitalRoutes />
-            </ProtectedRoute>
-          }
-        /> */}
 
         <Route
           path="/user/*"
@@ -106,8 +100,6 @@ const AppRoutes = () => {
             </ProtectedRoute>
           }
         />
-
-        {/* <Route path="*" element={<Navigate to="/" replace />} /> */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </>
