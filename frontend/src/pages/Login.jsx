@@ -30,7 +30,9 @@ export default function Login() {
   const redirectBasedOnRole = (roleId) => {
     const r = Number(roleId);
 
-    if (r === 1) return navigate("/admin-dashboard", { replace: true });
+    // IMPORTANT: Your admin routes are /admin/*
+    if (r === 1) return navigate("/admin/profile", { replace: true });
+
     if (r === 2) return navigate("/hospital/dashboard", { replace: true });
     if (r === 3 || r === 4)
       return navigate("/user/dashboard", { replace: true });
@@ -51,14 +53,17 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: form.username.trim(),
-          password: form.password,
-        }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_AUTH_API || "http://localhost:8080"}/api/auth/login`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: form.username.trim(),
+            password: form.password,
+          }),
+        },
+      );
 
       const data = await res.json();
 
@@ -67,15 +72,14 @@ export default function Login() {
         return;
       }
 
-      // localStorage.setItem("user", JSON.stringify(data.user));
+      // Store user + token
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("token", data.token);
 
       redirectBasedOnRole(data.user.roleId);
     } catch (err) {
       console.error("Login error:", err);
-      setError(
-        "Connection error. Please ensure backend is running on port 8080.",
-      );
+      setError("Connection error. Please ensure backend is running.");
     } finally {
       setLoading(false);
     }
@@ -148,7 +152,7 @@ export default function Login() {
               <Link to="/register" className="text-decoration-none">
                 Create account
               </Link>
-              <Link to="#" className="text-decoration-none">
+              <Link to="/forgot-password" className="text-decoration-none">
                 Forgot password?
               </Link>
             </div>

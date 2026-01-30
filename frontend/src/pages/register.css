@@ -1,42 +1,59 @@
-.register-page {
-    background: linear-gradient(135deg, #f4f7f8, #eef2f3);
+/* src/pages/register.css */
+
+/* Keep same clean UI like your old pages */
+body {
+  background: #f8f9fa;
 }
 
-.register-card {
-    border: 0;
-    border-radius: 16px;
-    overflow: hidden;
+.card {
+  border-radius: 16px;
 }
 
-.register-title {
-    color: #024c4d;
-}
-
-.register-subtitle {
-    font-size: 0.95rem;
-}
-
-.section-title-form {
-    color: #024c4d;
-    font-size: 1.2rem;
-}
-
+/* Smooth focus similar to login */
 .form-control:focus,
-.form-select:focus {
-    border-color: #024c4d;
-    box-shadow: 0 0 0 0.2rem rgba(2, 76, 77, 0.15);
+.form-select:focus,
+textarea.form-control:focus {
+  border-color: #024c4d;
+  box-shadow: 0 0 0 0.2rem rgba(2, 76, 77, 0.15);
 }
 
-.btn-teal {
-    background: linear-gradient(135deg, #012b2c, #024c4d);
-    border: none;
+/* Make invalid message look neat (not huge) */
+.invalid-feedback {
+  font-size: 0.85rem;
 }
 
-.btn-teal:hover {
-    background: linear-gradient(135deg, #024c4d, #026b6c);
+/* Inputs spacing */
+.form-label {
+  font-weight: 600;
+  color: #1f2937;
 }
 
-.small-note {
-    font-size: 0.9rem;
-    color: #6c757d;
+/* Primary button same feel */
+.btn-primary {
+  background: linear-gradient(135deg, #012b2c, #024c4d);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #024c4d, #026b6c);
+}
+
+.btn-primary:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* Password eye button */
+.input-group .btn.btn-outline-secondary {
+  border-color: #ced4da;
+}
+
+.input-group .btn.btn-outline-secondary:hover {
+  background: #f3f4f6;
+}
+
+/* Small note alert */
+.alert-info {
+  background: #e9f7f7;
+  color: #024c4d;
 }
