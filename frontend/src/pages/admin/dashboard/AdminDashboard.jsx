@@ -1,15 +1,30 @@
+import { useEffect } from "react";
 import "./Dashboard.css";
 import Footer from "../../../components/Footer/Footer";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
+const USER_KEY = "user";
+const TOKEN_KEY = "token";
+
 export default function AdminDashboard() {
-  const user = JSON.parse(localStorage.getItem("user"));
   const navigate = useNavigate();
   const location = useLocation();
 
+  const user = JSON.parse(localStorage.getItem(USER_KEY) || "null");
+  const token = localStorage.getItem(TOKEN_KEY);
+
+  // ✅ guard: if not logged in, kick to login
+  useEffect(() => {
+    if (!user || !token) {
+      navigate("/login", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    window.location.href = "/login";
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    navigate("/login", { replace: true });
   };
 
   const isActive = (path) =>
@@ -74,7 +89,9 @@ export default function AdminDashboard() {
           <header className="admin-topbar">
             <small>
               Welcome,{" "}
-              <span className="admin-name text-warning">{user?.username}</span>
+              <span className="admin-name text-warning">
+                {user?.username || "Admin"}
+              </span>
             </small>
 
             <button className="logout-btn btn btn-sm" onClick={handleLogout}>

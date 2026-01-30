@@ -110,9 +110,6 @@
   }
 }
 
-/* ===============================
-   Dashboard - small UI fixes
-   =============================== */
 
 .btp-kpi {
   min-height: 110px;
@@ -197,10 +194,6 @@
   }
 }
 
-/* ===============================
-   Quick Actions - ALL PRIMARY
-   (matches your UI + never full width)
-   =============================== */
 
 .btp-quick-actions-primary {
   display: flex;
@@ -232,9 +225,6 @@
   }
 }
 
-/* ===============================
-   Appointments page UI (match dashboard)
-   =============================== */
 
 .btp-page-title {
   font-size: 26px;

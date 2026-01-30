@@ -3,11 +3,14 @@ using AdminService.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdminService.Controllers
 {
+    [Authorize(Roles = "ADMIN")]
     [Route("api/admin")]
     [ApiController]
+
     public class AdminController : ControllerBase
     {
         [HttpGet("test")]

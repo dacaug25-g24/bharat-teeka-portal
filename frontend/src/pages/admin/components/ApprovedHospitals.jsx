@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { adminApi } from "../../../services/adminApi";
 import "./admin-ui.css";
 
-const API = import.meta.env.VITE_ADMIN_API || "https://localhost:7233";
+const TOKEN_KEY = "token";
 
 export default function ApprovedHospitals() {
+  const navigate = useNavigate();
+
   const [form, setForm] = useState({
     roleId: 2,
     username: "",
@@ -22,18 +25,57 @@ export default function ApprovedHospitals() {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingStates, setLoadingStates] = useState(true);
 
   const [submitting, setSubmitting] = useState(false);
 
-  // ✅ Load states on page load
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const handleAuthError = (error, fallbackMsg) => {
+    const status = error?.response?.status;
+
+    if (status === 401) {
+      alert("Unauthorized (401): Please login again. Token missing/expired.");
+      navigate("/login", { replace: true });
+      return;
+    }
+    if (status === 403) {
+      alert("Forbidden (403): You are not ADMIN or role claim mismatch.");
+      return;
+    }
+
+    alert(error?.response?.data || fallbackMsg);
+  };
+
+  const toNumberOrEmpty = (v) => {
+    if (v === "" || v === null || v === undefined) return "";
+    const n = Number(v);
+    return Number.isNaN(n) ? "" : n;
+  };
+
+  // ✅ Load states
   useEffect(() => {
-    axios
-      .get(`${API}/api/admin/getallstates`)
-      .then((res) => setStates(res.data || []))
-      .catch((err) => {
+    const fetchStates = async () => {
+      setLoadingStates(true);
+      try {
+        const res = await adminApi.get("/api/admin/getallstates", {
+          headers: getAuthHeaders(),
+        });
+        setStates(res.data || []);
+      } catch (err) {
         console.error("States load error:", err);
         setStates([]);
-      });
+        handleAuthError(err, "Failed to load states");
+      } finally {
+        setLoadingStates(false);
+      }
+    };
+
+    fetchStates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e) => {
@@ -51,20 +93,20 @@ export default function ApprovedHospitals() {
       cityId: "",
     }));
 
-    if (!stateId) {
-      setCities([]);
-      return;
-    }
+    setCities([]);
+
+    if (!stateId) return;
 
     setLoadingCities(true);
     try {
-      const res = await axios.get(
-        `${API}/api/admin/getcitiesbystate/${stateId}`
-      );
+      const res = await adminApi.get(`/api/admin/getcitiesbystate/${stateId}`, {
+        headers: getAuthHeaders(),
+      });
       setCities(res.data || []);
     } catch (err) {
       console.error("Cities load error:", err);
       setCities([]);
+      handleAuthError(err, "Failed to load cities");
     } finally {
       setLoadingCities(false);
     }
@@ -89,22 +131,26 @@ export default function ApprovedHospitals() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
+    if (submitting) return;
 
+    setSubmitting(true);
     try {
       const payload = {
         ...form,
-        stateId: form.stateId === "" ? "" : Number(form.stateId),
-        cityId: form.cityId === "" ? "" : Number(form.cityId),
+        roleId: 2, // fixed
+        stateId: toNumberOrEmpty(form.stateId),
+        cityId: toNumberOrEmpty(form.cityId),
       };
 
-      await axios.post(`${API}/api/admin/addhospital`, payload);
+      await adminApi.post("/api/admin/addhospital", payload, {
+        headers: getAuthHeaders(),
+      });
 
       alert("Hospital added successfully!");
       resetForm();
     } catch (error) {
       console.error("Add hospital error:", error);
-      alert(error.response?.data || "Failed to add hospital");
+      handleAuthError(error, "Failed to add hospital");
     } finally {
       setSubmitting(false);
     }
@@ -143,6 +189,7 @@ export default function ApprovedHospitals() {
                   value={form.hospitalName}
                   onChange={handleChange}
                   required
+                  disabled={submitting}
                 />
               </div>
 
@@ -154,6 +201,7 @@ export default function ApprovedHospitals() {
                   value={form.registrationNo}
                   onChange={handleChange}
                   required
+                  disabled={submitting}
                 />
               </div>
 
@@ -165,6 +213,7 @@ export default function ApprovedHospitals() {
                   value={form.hospitalType}
                   onChange={handleChange}
                   required
+                  disabled={submitting}
                 >
                   <option value="">Select Hospital Type</option>
                   <option value="GOVERNMENT">Government</option>
@@ -182,8 +231,12 @@ export default function ApprovedHospitals() {
                   value={form.stateId}
                   onChange={handleStateChange}
                   required
+                  disabled={submitting || loadingStates}
                 >
-                  <option value="">Select State</option>
+                  <option value="">
+                    {loadingStates ? "Loading states..." : "Select State"}
+                  </option>
+
                   {states.map((s) => (
                     <option key={s.stateId} value={s.stateId}>
                       {s.stateName}
@@ -192,7 +245,7 @@ export default function ApprovedHospitals() {
                 </select>
               </div>
 
-              {/*City Dropdown (dependent) */}
+              {/* City Dropdown */}
               <div className="col-md-6">
                 <label className="form-label">City</label>
                 <select
@@ -200,15 +253,22 @@ export default function ApprovedHospitals() {
                   name="cityId"
                   value={form.cityId}
                   onChange={handleChange}
-                  disabled={!form.stateId || loadingCities || !cities.length}
+                  disabled={
+                    submitting ||
+                    !form.stateId ||
+                    loadingCities ||
+                    !cities.length
+                  }
                   required
                 >
                   <option value="">
                     {loadingCities
                       ? "Loading cities..."
                       : !form.stateId
-                      ? "Select state first"
-                      : "Select City"}
+                        ? "Select state first"
+                        : !cities.length
+                          ? "No cities found"
+                          : "Select City"}
                   </option>
 
                   {cities.map((c) => (
@@ -236,6 +296,7 @@ export default function ApprovedHospitals() {
                   value={form.username}
                   onChange={handleChange}
                   required
+                  disabled={submitting}
                 />
               </div>
 
@@ -248,6 +309,7 @@ export default function ApprovedHospitals() {
                   value={form.password}
                   onChange={handleChange}
                   required
+                  disabled={submitting}
                 />
               </div>
 
@@ -269,6 +331,7 @@ export default function ApprovedHospitals() {
                   value={form.email}
                   onChange={handleChange}
                   required
+                  disabled={submitting}
                 />
               </div>
 
@@ -280,6 +343,7 @@ export default function ApprovedHospitals() {
                   value={form.phone}
                   onChange={handleChange}
                   required
+                  disabled={submitting}
                 />
               </div>
 
@@ -292,6 +356,7 @@ export default function ApprovedHospitals() {
                   value={form.address}
                   onChange={handleChange}
                   required
+                  disabled={submitting}
                 />
               </div>
 

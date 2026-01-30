@@ -21,10 +21,10 @@ export default function HospitalRoutes() {
         {/* Appointments */}
         <Route path="appointments" element={<AppointmentDashboard />} />
 
-        {/* Vaccines */}
+        {/* ✅ Vaccines */}
         <Route path="vaccines" element={<VaccineList />} />
 
-        {/* Reports */}
+        {/* ✅ Reports */}
         <Route path="reports" element={<Reports />} />
 
         <Route path="vaccination-records" element={<VaccinationRecords />} />

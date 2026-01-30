@@ -3,7 +3,9 @@ import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import "./admin-ui.css";
 
-const API = import.meta.env.VITE_ADMIN_API || "https://localhost:7233";
+// ✅ OPTION B: HTTP runs on 5225
+const API = import.meta.env.VITE_ADMIN_API || "http://localhost:5225";
+const TOKEN_KEY = "token";
 
 export default function EditVaccine() {
   const { id } = useParams();
@@ -27,39 +29,96 @@ export default function EditVaccine() {
     expiryDate: "",
   });
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const handleAuthErrors = (error, fallbackMsg) => {
+    const status = error?.response?.status;
+
+    if (status === 401) {
+      alert("Unauthorized (401): Please login again. Token missing/expired.");
+      navigate("/login", { replace: true });
+      return;
+    }
+    if (status === 403) {
+      alert("Forbidden (403): You are not ADMIN or role claim mismatch.");
+      return;
+    }
+
+    alert(error?.response?.data || fallbackMsg);
+  };
+
+  const normalizeDate = (val) => {
+    if (!val) return "";
+    const s = String(val);
+    return s.includes("T") ? s.split("T")[0] : s;
+  };
+
+  const toNumberOrEmpty = (v) => {
+    if (v === "" || v === null || v === undefined) return "";
+    const n = Number(v);
+    return Number.isNaN(n) ? "" : n;
+  };
+
+  // Fetch vaccine by id
   useEffect(() => {
-    const fetch = async () => {
+    const fetchVaccine = async () => {
+      setLoading(true);
       try {
-        const res = await axios.get(`${API}/api/admin/getvaccinebyid/${id}`);
+        const res = await axios.get(`${API}/api/admin/getvaccinebyid/${id}`, {
+          headers: getAuthHeaders(),
+        });
+
         const data = res.data || {};
         setVaccine({
           ...data,
-          expiryDate: data.expiryDate ? data.expiryDate.split("T")[0] : "",
+          expiryDate: normalizeDate(data.expiryDate),
         });
       } catch (e) {
         console.error(e);
-        alert("Failed to load vaccine");
+        handleAuthErrors(e, "Failed to load vaccine");
       } finally {
         setLoading(false);
       }
     };
-    fetch();
+
+    fetchVaccine();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const handleChange = (e) => {
-    setVaccine((p) => ({ ...p, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setVaccine((p) => ({ ...p, [name]: value }));
   };
 
+  // ✅ Update vaccine
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (saving) return;
+
     setSaving(true);
     try {
-      await axios.put(`${API}/api/admin/updatevaccine/${id}`, vaccine);
+      const payload = {
+        ...vaccine,
+        minAge: toNumberOrEmpty(vaccine.minAge),
+        maxAge: toNumberOrEmpty(vaccine.maxAge),
+        doseRequired: toNumberOrEmpty(vaccine.doseRequired),
+        doseGapDays: toNumberOrEmpty(vaccine.doseGapDays),
+        storageTemperature: vaccine.storageTemperature, // keep as string if backend expects string
+        expiryDate: vaccine.expiryDate || null,
+      };
+
+      await axios.put(`${API}/api/admin/updatevaccine/${id}`, payload, {
+        headers: getAuthHeaders(),
+      });
+
       alert("Vaccine updated successfully!");
       navigate("/admin/manage-vaccines");
     } catch (e) {
       console.error(e);
-      alert("Failed to update vaccine");
+      handleAuthErrors(e, "Failed to update vaccine");
     } finally {
       setSaving(false);
     }
@@ -108,9 +167,10 @@ export default function EditVaccine() {
                 <input
                   className="form-control admin-input2"
                   name="vaccineName"
-                  value={vaccine.vaccineName}
+                  value={vaccine.vaccineName || ""}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -119,9 +179,10 @@ export default function EditVaccine() {
                 <input
                   className="form-control admin-input2"
                   name="manufacturer"
-                  value={vaccine.manufacturer}
+                  value={vaccine.manufacturer || ""}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -130,8 +191,9 @@ export default function EditVaccine() {
                 <input
                   className="form-control admin-input2"
                   name="vaccineType"
-                  value={vaccine.vaccineType}
+                  value={vaccine.vaccineType || ""}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
@@ -150,9 +212,10 @@ export default function EditVaccine() {
                   className="form-control admin-input2"
                   type="number"
                   name="minAge"
-                  value={vaccine.minAge}
+                  value={vaccine.minAge ?? ""}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -162,9 +225,10 @@ export default function EditVaccine() {
                   className="form-control admin-input2"
                   type="number"
                   name="maxAge"
-                  value={vaccine.maxAge}
+                  value={vaccine.maxAge ?? ""}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -174,9 +238,10 @@ export default function EditVaccine() {
                   className="form-control admin-input2"
                   type="number"
                   name="doseRequired"
-                  value={vaccine.doseRequired}
+                  value={vaccine.doseRequired ?? ""}
                   onChange={handleChange}
                   required
+                  disabled={saving}
                 />
               </div>
 
@@ -186,8 +251,9 @@ export default function EditVaccine() {
                   className="form-control admin-input2"
                   type="number"
                   name="doseGapDays"
-                  value={vaccine.doseGapDays}
+                  value={vaccine.doseGapDays ?? ""}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
@@ -205,8 +271,9 @@ export default function EditVaccine() {
                 <input
                   className="form-control admin-input2"
                   name="storageTemperature"
-                  value={vaccine.storageTemperature}
+                  value={vaccine.storageTemperature || ""}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
@@ -216,8 +283,9 @@ export default function EditVaccine() {
                   className="form-control admin-input2"
                   type="date"
                   name="expiryDate"
-                  value={vaccine.expiryDate}
+                  value={vaccine.expiryDate || ""}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
@@ -236,8 +304,9 @@ export default function EditVaccine() {
                   className="form-control admin-input2"
                   rows="3"
                   name="description"
-                  value={vaccine.description}
+                  value={vaccine.description || ""}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 
@@ -247,8 +316,9 @@ export default function EditVaccine() {
                   className="form-control admin-input2"
                   rows="3"
                   name="sideEffects"
-                  value={vaccine.sideEffects}
+                  value={vaccine.sideEffects || ""}
                   onChange={handleChange}
+                  disabled={saving}
                 />
               </div>
 

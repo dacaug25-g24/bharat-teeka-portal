@@ -14,10 +14,10 @@ import java.util.List;
 @Repository
 public interface SlotRepository extends JpaRepository<Slot, Integer> {
 
-    // ✅ Get slots by hospital + date
+    // Get slots by hospital + date
     List<Slot> findByHospital_HospitalIdAndDate(Integer hospitalId, LocalDate date);
 
-    // ✅ Get slots by hospital + date + time
+    // Get slots by hospital + date + time
     List<Slot> findByHospital_HospitalIdAndDateAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
             Integer hospitalId,
             LocalDate date,
@@ -25,11 +25,6 @@ public interface SlotRepository extends JpaRepository<Slot, Integer> {
             LocalTime end
     );
 
-    // ✅ Get available slots directly from DB
-//    @Query("SELECT s FROM Slot s WHERE s.hospital.hospitalId = :hospitalId " +
-//           "AND s.date = :date AND s.capacity - s.bookedCount > 0")
-//    List<Slot> findAvailableSlots(@Param("hospitalId") Integer hospitalId,
-//                                  @Param("date") LocalDate date);
     @Query("""
     	    SELECT s FROM Slot s
     	    WHERE s.hospital.hospitalId = :hospitalId
@@ -43,7 +38,7 @@ public interface SlotRepository extends JpaRepository<Slot, Integer> {
     	);
 
 
-    // ✅ Get slots by hospital + vaccine + date
+    // Get slots by hospital + vaccine + date
     @Query("SELECT s FROM Slot s WHERE s.hospital.hospitalId = :hospitalId AND s.vaccine.vaccineId = :vaccineId AND s.date = :date AND s.isActive = true")
     List<Slot> findByHospitalIdAndVaccineIdAndDate(
             @Param("hospitalId") Integer hospitalId,

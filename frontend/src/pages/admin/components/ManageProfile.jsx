@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { adminApi } from "../../../services/adminApi";
 import "./admin-ui.css";
 
-const API = import.meta.env.VITE_ADMIN_API || "https://localhost:7233";
 const PHOTO_KEY = "admin_profile_photo";
+const TOKEN_KEY = "token";
+const USER_KEY = "user";
 
 export default function ManageProfile() {
+  const navigate = useNavigate();
+
   const [profile, setProfile] = useState({
     userId: "",
     username: "",
@@ -18,81 +22,107 @@ export default function ManageProfile() {
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // profile photo (local only)
   const [photo, setPhoto] = useState(localStorage.getItem(PHOTO_KEY) || "");
 
-  // initials fallback
   const initials = useMemo(() => {
     const name = (profile.username || "Admin").trim();
     const parts = name.split(" ").filter(Boolean);
     return ((parts[0]?.[0] || "A") + (parts[1]?.[0] || "")).toUpperCase();
   }, [profile.username]);
 
-  // fetch admin profile
+  // ✅ Safe: even if adminApi interceptor already attaches token
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  };
+
+  const handleAuthErrors = (error, fallbackMsg) => {
+    const status = error?.response?.status;
+
+    if (status === 401) {
+      alert("Unauthorized (401): Please login again. Token missing/expired.");
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      navigate("/login", { replace: true });
+      return true;
+    }
+
+    if (status === 403) {
+      alert("Forbidden (403): You are not ADMIN or role claim mismatch.");
+      return true;
+    }
+
+    alert(error?.response?.data || fallbackMsg);
+    return false;
+  };
+
   const fetchAdminProfile = async () => {
+    setLoading(true);
     try {
-      const res = await axios.get(`${API}/api/admin/getadminprofile`);
+      // ✅ correct axios signature: (url, config)
+      const res = await adminApi.get("/api/admin/getadminprofile", {
+        headers: getAuthHeaders(),
+      });
       setProfile(res.data || {});
     } catch (error) {
       console.error(error);
-      alert("Failed to load admin profile");
+      handleAuthErrors(error, "Failed to load admin profile");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // optional guard: if token missing, don't spam API
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
     fetchAdminProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProfile((p) => ({ ...p, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
-  // validation
   const validate = () => {
     const e = {};
 
-    // email validation
-    if (!profile.email) {
-      e.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email)) {
+    if (!profile.email) e.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profile.email))
       e.email = "Enter a valid email address";
-    }
 
-    // phone validation (10–15 digits)
-    if (!profile.phone) {
-      e.phone = "Phone number is required";
-    } else if (!/^\d{10,15}$/.test(profile.phone)) {
+    if (!profile.phone) e.phone = "Phone number is required";
+    else if (!/^\d{10,15}$/.test(profile.phone))
       e.phone = "Phone must contain 10–15 digits";
-    }
 
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  // update profile
   const handleUpdate = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     setSaving(true);
     try {
-      await axios.put(`${API}/api/admin/updateadminprofile`, profile);
+      await adminApi.put("/api/admin/updateadminprofile", profile, {
+        headers: getAuthHeaders(),
+      });
       alert("Profile updated successfully");
       fetchAdminProfile();
     } catch (error) {
       console.error(error);
-      alert(error.response?.data || "Failed to update profile");
+      handleAuthErrors(error, "Failed to update profile");
     } finally {
       setSaving(false);
     }
   };
 
-  // photo upload (local preview)
   const handlePhotoChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -196,7 +226,11 @@ export default function ManageProfile() {
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label">Username</label>
-                    <input className="form-control" value={profile.username} disabled />
+                    <input
+                      className="form-control"
+                      value={profile.username}
+                      disabled
+                    />
                   </div>
 
                   <div className="col-md-6">
@@ -259,7 +293,8 @@ export default function ManageProfile() {
               </form>
 
               <div className="admin-hint mt-3">
-                Profile photo is stored locally. Backend upload can be added later.
+                Profile photo is stored locally. Backend upload can be added
+                later.
               </div>
             </div>
           </div>

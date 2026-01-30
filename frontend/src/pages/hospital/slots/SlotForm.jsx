@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./slots.css";
-
-const API = import.meta.env.VITE_HOSPITAL_API || "http://localhost:8081";
+import { hospitalApi, getApiErrorMessage } from "../../../services/apiClients";
 
 export default function SlotForm({
   hospitalId,
@@ -31,18 +30,15 @@ export default function SlotForm({
     let mounted = true;
     setLoadingVaccines(true);
 
-    fetch(`${API}/hospital/vaccines`)
+    hospitalApi
+      .get("/hospital/vaccines")
       .then((res) => {
-        if (!res.ok) throw new Error();
-        return res.json();
-      })
-      .then((data) => {
         if (!mounted) return;
-        setVaccines(Array.isArray(data) ? data : []);
+        setVaccines(Array.isArray(res.data) ? res.data : []);
       })
-      .catch(() => {
+      .catch((e) => {
         if (!mounted) return;
-        onError?.("Failed to load vaccines");
+        onError?.(getApiErrorMessage(e) || "Failed to load vaccines");
       })
       .finally(() => {
         if (!mounted) return;
@@ -128,20 +124,11 @@ export default function SlotForm({
     try {
       setSaving(true);
 
-      const url = isEdit
-        ? `${API}/hospital/slots/${slot.slotId}`
-        : `${API}/hospital/slots`;
-      const method = isEdit ? "PUT" : "POST";
+      const res = isEdit
+        ? await hospitalApi.put(`/hospital/slots/${slot.slotId}`, payload)
+        : await hospitalApi.post(`/hospital/slots`, payload);
 
-      const res = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) throw new Error();
-
-      const saved = await res.json().catch(() => null);
+      const saved = res.data ?? null;
 
       onSuccess?.(
         isEdit ? "Slot updated successfully" : "Slot added successfully",
@@ -149,8 +136,8 @@ export default function SlotForm({
       );
 
       if (!isEdit) clearForm();
-    } catch {
-      onError?.("Failed to save slot");
+    } catch (e2) {
+      onError?.(getApiErrorMessage(e2) || "Failed to save slot");
     } finally {
       setSaving(false);
     }
@@ -231,7 +218,6 @@ export default function SlotForm({
         </div>
       </div>
 
-      {/* Button row (not full width) */}
       <div className="btp-form-actions">
         <button
           type="button"
