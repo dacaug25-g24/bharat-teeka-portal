@@ -29,6 +29,15 @@
   animation: fadeIn 1.2s ease-in-out;
 }
 
+.hero-search-btn {
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.hero-search-btn:hover {
+  transform: scale(1.04);
+  filter: brightness(0.95);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
