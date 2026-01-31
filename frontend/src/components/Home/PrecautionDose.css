@@ -22,6 +22,10 @@
   border-color: #000 !important;
 }
 
+.section-title{
+  font-size: 1.8rem !important;
+}
+
 .btn-precaution {
   background-color: #00a5a5; 
   color: #fff;

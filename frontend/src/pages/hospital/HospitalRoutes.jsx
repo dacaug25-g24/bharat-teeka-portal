@@ -1,35 +1,36 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import HospitalDashboard from "./dashboard/HospitalDashboard";
-import ManageSlot from "./components/ManageSlot";
-
-// Dashboard panel component
-function DashboardPanel() {
-  return (
-    <div className="hospital-info-panel">
-      <h5>Hospital Dashboard</h5>
-      <p>Welcome to the hospital dashboard.</p>
-    </div>
-  );
-}
+import HospitalLayout from "./layout/HospitalLayout";
+import HospitalDashboard from "./layout/HospitalDashboard";
+import ManageSlot from "./slots/ManageSlot";
+import AppointmentDashboard from "./appointments/AppointmentDashboard";
+import VaccineList from "./vaccines/VaccineList";
+import Reports from "./reports/Reports";
+import VaccinationRecords from "./vaccinations/VaccinationRecords";
 
 export default function HospitalRoutes() {
   return (
     <Routes>
-      {/* Parent hospital route */}
-      <Route path="/" element={<HospitalDashboard />}>
+      <Route path="/" element={<HospitalLayout />}>
+        {/* Dashboard */}
+        <Route index element={<HospitalDashboard />} />
+        <Route path="dashboard" element={<HospitalDashboard />} />
 
-        {/* Default: show dashboard when /hospital is accessed */}
-        <Route index element={<DashboardPanel />} />
-
-        {/* Explicit dashboard path */}
-        <Route path="dashboard" element={<DashboardPanel />} />
-
-        {/* Manage slots */}
+        {/* Slots */}
         <Route path="slots" element={<ManageSlot />} />
 
+        {/* Appointments */}
+        <Route path="appointments" element={<AppointmentDashboard />} />
+
+        {/* ✅ Vaccines */}
+        <Route path="vaccines" element={<VaccineList />} />
+
+        {/* ✅ Reports */}
+        <Route path="reports" element={<Reports />} />
+
+        <Route path="vaccination-records" element={<VaccinationRecords />} />
       </Route>
 
-      {/* Redirect unknown /hospital/* paths to dashboard */}
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/hospital/dashboard" replace />} />
     </Routes>
   );

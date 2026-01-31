@@ -1,115 +1,117 @@
-/* =========================
-   PAGE LAYOUT
-========================= */
+/* ===== Layout ===== */
 .admin-page {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-
-  /* 🔥 SIDEBAR BACKGROUND PAINT (KEY FIX) */
-  background: linear-gradient(
-    to right,
-    #0a9092 0,
-    #06676a 250px,
-    #f4f6f8 250px,
-    #f4f6f8 100%
-  );
+  background: #ffffff;
 }
 
 .admin-body {
   display: flex;
-  flex: 1;
+  min-height: calc(100vh - 60px);
+  background: #ffffff;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
+/* ===== Sidebar ===== */
 .admin-sidebar {
-  width: 250px;
-  padding: 1.5rem 1rem;
-  color: white;
-  flex-shrink: 0;
+  width: 240px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 20px 16px;
 }
 
 .sidebar-title {
-  font-weight: 800;
-  text-align: center;
-  font-size: 1.5rem;
-  margin-bottom: 2rem;
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 4px;
+  color: #111827;
+}
+
+.sidebar-subtitle {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #6b7280;
+  margin-bottom: 20px;
 }
 
 .sidebar-menu li {
-  padding: 1rem;
-  border-radius: 0.5rem;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 6px;
   cursor: pointer;
-  margin-bottom: 0.75rem;
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: background 0.3s;
+  color: #374151;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.sidebar-menu li:hover,
+.sidebar-menu li {
+  padding: 8px 12px;     /* ⬅ reduced vertical padding */
+  margin-bottom: 4px;    /* ⬅ reduced gap between items */
+}
+
+
+.sidebar-menu li:hover {
+  background: #f3f4f6;
+}
+
 .sidebar-menu li.active {
-  background: rgba(255, 255, 255, 0.15);
+  background: #f9fafb;
+  color: #111827;
+  font-weight: 600;
+  border-left: 3px solid #111827;
 }
 
-/* =========================
-   MAIN CONTENT
-========================= */
+/* ===== Main Area ===== */
 .admin-main {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: #ffffff;
 }
 
-/* TOP BAR */
+/* ===== Topbar ===== */
 .admin-topbar {
-  background: linear-gradient(to right, #169c9e, #1b8a8e);
-  padding: 0.75rem 1.5rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: white;
+  height: 56px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
 }
 
-.admin-topbar small {
-  font-size: 1.6rem;
-}
-
-.admin-topbar .admin-name {
-  font-weight: 700;
-}
-
-/* CONTENT */
-.admin-content {
-  flex: 1;
-}
-
-/* USER INFO PANEL */
-.user-info-panel {
-  background: white;
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #333;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-
-/* =========================
-   BUTTONS
-========================= */
-.logout-btn {
-  background: #dc3545;
-  color: white;
-  border-radius: 0.5rem;
-  padding: 0.5rem 1rem;
+.admin-name {
   font-weight: 600;
+  color: #111827;
+}
+
+/* ===== Logout Button (Text only) ===== */
+.logout-btn {
+  background: transparent !important;
+  border: 1px solid transparent;
+  color: #374151;
+  padding: 4px 10px;
+  font-size: 13px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .logout-btn:hover {
-  background: #c82333;
+  color: #dc2626;
+  border: 1px solid #dc2626;
+  background: transparent;
+}
+
+/* ===== Content ===== */
+.admin-content {
+  background: #ffffff;
+  min-height: calc(100vh - 56px);
+  padding: 24px;
+}
+
+/* ===== Footer override (optional) ===== */
+footer {
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
 }

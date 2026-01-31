@@ -1,7 +1,12 @@
 package com.bharatteeka.auth.controller;
 
-import com.bharatteeka.auth.dto.*;
+import com.bharatteeka.auth.dto.AuthResponse;
+import com.bharatteeka.auth.dto.LoginRequest;
+import com.bharatteeka.auth.dto.RegisterRequest;
+import com.bharatteeka.auth.entity.Hospital;
 import com.bharatteeka.auth.entity.User;
+import com.bharatteeka.auth.repository.HospitalRepository;
+import com.bharatteeka.auth.security.JwtUtil;
 import com.bharatteeka.auth.service.AuthService;
 
 import jakarta.validation.Valid;
@@ -9,142 +14,185 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.bharatteeka.auth.dto.ForgotPasswordVerifyRequest;
+import com.bharatteeka.auth.dto.ForgotPasswordResetRequest;
+import com.bharatteeka.auth.dto.SimpleResponse;
+
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    
+
     @Autowired
     private AuthService authService;
-    
-    // Step 1: Create account
-    @PostMapping("/create-account")
-    public ResponseEntity<Map<String, Object>> createAccount(@Validated @RequestBody CreateAccountRequest request) {
+
+    @Autowired
+    private HospitalRepository hospitalRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+    @PostMapping("/register")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         try {
-            System.out.println("📝 Creating account for: " + request.getUsername());
-            
-            User user = authService.createAccount(
-                request.getUsername(),
-                request.getPassword(),
-                request.getEmail(),
-                request.getPhone(),
-                request.getAddress()
-            );
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Account created successfully. Please complete registration.");
-            response.put("userId", user.getUserId());
-            response.put("username", user.getUsername());
-            
-            System.out.println("✅ Account created with ID: " + user.getUserId());
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            System.out.println("❌ Account creation error: " + e.getMessage());
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-    }
-    
-    // Step 2: Complete registration
-    @PostMapping("/complete-registration")
-    public ResponseEntity<Map<String, Object>> completeRegistration(@Valid @RequestBody CompleteRegistrationRequest request) {
-        try {
-            User user = authService.completeRegistration(
-                request.getUserId(),
-                request.getFullName(),
-                LocalDate.parse(request.getDateOfBirth()),
-                request.getGender(),
-                request.getAadhaarNumber(),
-                request.getBloodGroup(), // ✅ pass blood group
-                request.getRemarks()
+            User user = authService.registerPatient(
+                    request.getUsername(),
+                    request.getPassword(),
+                    request.getEmail(),
+                    request.getPhone(),
+                    request.getAddress(),
+                    request.getFirstName(),
+                    request.getLastName(),
+                    LocalDate.parse(request.getDateOfBirth()),
+                    request.getGender(),
+                    request.getAadhaarNumber(),
+                    request.getBloodGroup(),
+                    request.getRemarks()
             );
 
             String roleName = getRoleName(user.getRoleId());
-            int age = calculateAge(LocalDate.parse(request.getDateOfBirth()));
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Registration completed successfully!");
-            response.put("userId", user.getUserId());
-            response.put("username", user.getUsername());
-            response.put("roleId", user.getRoleId());
-            response.put("roleName", roleName);
-            response.put("age", age);
+            AuthResponse.UserData userData = new AuthResponse.UserData(
+                    user.getUserId(),
+                    user.getUsername(),
+                    user.getRoleId(),
+                    roleName,
+                    user.getEmail(),
+                    user.getPhone(),
+                    user.getAddress(),
+                    null
+            );
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new AuthResponse(
+                            true,
+                            "Registration successful! Please login.",
+                            userData,
+                            null
+                    ));
+
         } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new AuthResponse(false, e.getMessage(), null, null));
         }
     }
 
-    
-    // Login
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         try {
-            System.out.println("🔐 Login attempt for user: " + request.getUsername());
-            
-            User user = authService.authenticate(request.getUsername(), request.getPassword());
-            
+            System.out.println("🔥 LOGIN API HIT - JWT SHOULD BE GENERATED");
+
+            Integer hospitalId = null;
+
+            Map<String, Object> result =
+                    authService.loginWithToken(
+                            request.getUsername(),
+                            request.getPassword(),
+                            null
+                    );
+
+            User user = (User) result.get("user");
+            String token = (String) result.get("token");
+
+            System.out.println("🔥 JWT TOKEN = " + token);
+
             String roleName = getRoleName(user.getRoleId());
-            
-            Map<String, Object> userData = new HashMap<>();
-            userData.put("userId", user.getUserId());
-            userData.put("username", user.getUsername());
-            userData.put("roleId", user.getRoleId());
-            userData.put("roleName", roleName);
-            userData.put("email", user.getEmail());
-            userData.put("phone", user.getPhone());
-            userData.put("address", user.getAddress());
-            userData.put("isActive", user.getIsActive());
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Login successful!");
-            response.put("user", userData);
-            
-            System.out.println("✅ Login successful for user: " + user.getUsername() + " (Role: " + roleName + ")");
-            return ResponseEntity.ok(response);
-            
+
+            if (user.getRoleId() != null && user.getRoleId() == 2) {
+                Hospital hospital = hospitalRepository.findByUserUserId(user.getUserId());
+                if (hospital != null) {
+                    hospitalId = hospital.getHospitalId();
+                }
+            }
+
+            AuthResponse.UserData userData = new AuthResponse.UserData(
+                    user.getUserId(),
+                    user.getUsername(),
+                    user.getRoleId(),
+                    roleName,
+                    user.getEmail(),
+                    user.getPhone(),
+                    user.getAddress(),
+                    hospitalId
+            );
+
+            AuthResponse response = new AuthResponse();
+            response.setSuccess(true);
+            response.setMessage("Login successful!");
+            response.setUser(userData);
+            response.setToken(token);
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
         } catch (Exception e) {
-            System.out.println("❌ Login failed: " + e.getMessage());
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", false);
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse(false, e.getMessage(), null, null));
         }
     }
-    
-    // Helper method to get role name
+
     private String getRoleName(Integer roleId) {
         if (roleId == null) return "Unknown";
-        switch(roleId) {
-            case 1: return "Admin";
-            case 2: return "Hospital";
-            case 3: return "Patient";
-            case 4: return "Parent";
-            case 0: return "Pending Registration";
-            default: return "Unknown";
-        }
+
+        return switch (roleId) {
+            case 1 -> "Admin";
+            case 2 -> "Hospital";
+            case 3 -> "Patient";
+            case 4 -> "Parent";
+            case 0 -> "Pending";
+            default -> "Unknown";
+        };
     }
     
-    // Helper method to calculate age
-    private int calculateAge(LocalDate dob) {
-        return java.time.Period.between(dob, LocalDate.now()).getYears();
+    @PostMapping("/forgot-password/verify")
+    public ResponseEntity<SimpleResponse> verifyForgotPassword(@Valid @RequestBody ForgotPasswordVerifyRequest req) {
+        try {
+            boolean verified = authService.verifyForgotPassword(
+                    req.getUsername(),
+                    req.getEmail(),
+                    req.getAadhaar(),
+                    req.getDob()
+            );
+
+            if (!verified) {
+                return ResponseEntity.status(HttpStatus.OK)
+                        .body(new SimpleResponse(false, "Details not matched", false));
+            }
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new SimpleResponse(true, "Verified successfully. You can set a new password.", true));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new SimpleResponse(false, e.getMessage(), false));
+        }
     }
+
+    @PostMapping("/forgot-password/reset")
+    public ResponseEntity<SimpleResponse> resetPassword(@Valid @RequestBody ForgotPasswordResetRequest req) {
+        try {
+            authService.resetPassword(
+                    req.getUsername(),
+                    req.getEmail(),
+                    req.getAadhaar(),
+                    req.getDob(),
+                    req.getNewPassword(),
+                    req.getConfirmPassword()
+            );
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new SimpleResponse(true, "Password updated successfully! Please login.", null));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new SimpleResponse(false, e.getMessage(), null));
+        }
+    }
+
+    
 }
+

@@ -1,8 +1,12 @@
 package com.bharatteeka.hospital.controller;
 
+import com.bharatteeka.hospital.dto.CompleteAppointmentRequest;
 import com.bharatteeka.hospital.entity.Appointment;
 import com.bharatteeka.hospital.service.AppointmentService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -16,15 +20,6 @@ public class AppointmentController {
         this.service = service;
     }
 
-    @GetMapping("/today")
-    public List<Appointment> todayAppointments() {
-        List<Appointment> appts = service.getTodayAppointments();
-        if (appts.isEmpty()) {
-            throw new RuntimeException("No appointments today");
-        }
-        return appts;
-    }
-
     @GetMapping
     public List<Appointment> allAppointments() {
         return service.getAllAppointments();
@@ -35,6 +30,30 @@ public class AppointmentController {
         return service.getPatientHistory(patientId);
     }
 
+    @GetMapping("/hospital/{hospitalId}")
+    public List<Appointment> hospitalAppointments(
+            @PathVariable Integer hospitalId,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date
+    ) {
+        if (date != null) return service.getAppointmentsByHospitalAndDate(hospitalId, date);
+        return service.getAppointmentsByHospital(hospitalId);
+    }
+
+    @GetMapping("/hospital/{hospitalId}/today")
+    public List<Appointment> todayAppointments(@PathVariable Integer hospitalId) {
+        return service.getTodayAppointments(hospitalId);
+    }
+
+    @PutMapping("/{id}/complete-details")
+    public Appointment completeWithDetails(
+            @PathVariable Integer id,
+            @RequestBody CompleteAppointmentRequest req
+    ) {
+        return service.markCompletedWithBatch(id, req.getRemarks(), req.getBatchNumber());
+    }
+
     @PutMapping("/{id}/complete")
     public Appointment completeAppointment(
             @PathVariable Integer id,
@@ -43,8 +62,12 @@ public class AppointmentController {
         return service.markCompleted(id, remarks);
     }
 
-//    @PostMapping("/book")
-//    public Appointment bookAppointment(@RequestBody Appointment appointment) {
-//        return service.bookAppointment(appointment);
-//    }
+    @PutMapping("/{id}/cancel")
+    public Appointment cancelAppointment(
+            @PathVariable Integer id,
+            @RequestParam String reason
+    ) {
+        return service.cancelAppointment(id, reason);
+    }
 }
+

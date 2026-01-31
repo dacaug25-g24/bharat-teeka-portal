@@ -59,7 +59,6 @@ export default function DownloadCertificate({ showFooter = false }) {
                         </div>
                     </div>
 
-                    {/* Buttons like PrecautionDose */}
                     <div className="d-flex gap-3 w-100">
                         <Link to="/get-certificate" className="flex-fill text-decoration-none">
                             <button className="btn btn-precaution rounded-pill w-100">

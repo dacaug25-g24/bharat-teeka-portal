@@ -1,0 +1,59 @@
+/* src/pages/register.css */
+
+/* Keep same clean UI like your old pages */
+body {
+  background: #f8f9fa;
+}
+
+.card {
+  border-radius: 16px;
+}
+
+/* Smooth focus similar to login */
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+  border-color: #024c4d;
+  box-shadow: 0 0 0 0.2rem rgba(2, 76, 77, 0.15);
+}
+
+/* Make invalid message look neat (not huge) */
+.invalid-feedback {
+  font-size: 0.85rem;
+}
+
+/* Inputs spacing */
+.form-label {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Primary button same feel */
+.btn-primary {
+  background: linear-gradient(135deg, #012b2c, #024c4d);
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #024c4d, #026b6c);
+}
+
+.btn-primary:disabled {
+  opacity: 0.8;
+  cursor: not-allowed;
+}
+
+/* Password eye button */
+.input-group .btn.btn-outline-secondary {
+  border-color: #ced4da;
+}
+
+.input-group .btn.btn-outline-secondary:hover {
+  background: #f3f4f6;
+}
+
+/* Small note alert */
+.alert-info {
+  background: #e9f7f7;
+  color: #024c4d;
+}

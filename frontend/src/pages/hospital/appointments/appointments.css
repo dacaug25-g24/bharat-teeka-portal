@@ -1,0 +1,283 @@
+
+.btp-page-title {
+    font-size: 26px;
+    font-weight: 800;
+    margin: 10px 0 14px;
+}
+
+/* KPI cards */
+.btp-kpi-mini {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+    padding: 16px;
+    text-align: center;
+}
+
+.btp-kpi-mini .btp-kpi-label {
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 8px;
+}
+
+.btp-kpi-mini .btp-kpi-value {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+/* Filters container */
+.btp-filters {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+    padding: 14px;
+}
+
+.btp-filter-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btp-filter-group label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #495057;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.btp-filter-group input[type="date"] {
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    padding: 0 12px;
+}
+
+/* Ensure buttons never full width */
+.btp-filter-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btp-filter-actions .btn {
+    width: auto !important;
+    flex: 0 0 auto !important;
+    border-radius: 10px;
+    padding: 8px 14px;
+    white-space: nowrap;
+}
+
+/* Tabs */
+.btp-tabs {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.btp-tab {
+    border: 1px solid #0d6efd;
+    background: #fff;
+    color: #0d6efd;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btp-tab.active {
+    background: #0d6efd;
+    color: #fff;
+}
+
+/* Table wrapper */
+.btp-table-wrap {
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+.btp-table-wrap .table {
+    margin: 0;
+}
+
+/* Status chips */
+.btp-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 0.2px;
+    border: 1px solid transparent;
+}
+
+.btp-chip.completed {
+    background: rgba(25, 135, 84, 0.12);
+    color: #198754;
+    border-color: rgba(25, 135, 84, 0.25);
+}
+
+.btp-chip.cancelled {
+    background: rgba(220, 53, 69, 0.12);
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.25);
+}
+
+.btp-chip.booked {
+    background: rgba(255, 193, 7, 0.18);
+    color: #b58100;
+    border-color: rgba(255, 193, 7, 0.35);
+}
+
+.btp-chip.pending {
+    background: rgba(13, 110, 253, 0.12);
+    color: #0d6efd;
+    border-color: rgba(13, 110, 253, 0.25);
+}
+
+/* Actions stacked */
+.btp-table-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 140px;
+}
+
+.btp-table-actions .btn {
+    border-radius: 10px;
+    padding: 8px 12px;
+}
+/* ===============================
+   Mini modal inside Actions cell
+   =============================== */
+
+.btp-actions-td {
+    position: relative;
+}
+
+.btp-actions-wrap {
+    position: relative;
+    min-height: 44px;
+}
+
+/* The overlay container */
+.btp-mini-modal {
+    position: absolute;
+    top: -8px;
+    right: 0;
+    z-index: 30;
+    width: 360px;
+    max-width: 90vw;
+}
+
+/* Backdrop only inside cell area */
+.btp-mini-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.12);
+    z-index: 29;
+}
+
+/* The panel */
+.btp-mini-panel {
+    position: relative;
+    z-index: 30;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(16, 24, 40, 0.18);
+    overflow: hidden;
+}
+
+/* Head */
+.btp-mini-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 12px;
+    border-bottom: 1px solid #eef0f3;
+    background: #fbfcfe;
+}
+
+.btp-mini-title {
+    font-weight: 900;
+    font-size: 14px;
+    color: #212529;
+}
+
+/* Body */
+.btp-mini-body {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btp-mini-field .form-control {
+    border-radius: 10px;
+}
+
+/* Footer */
+/* Footer: equal size buttons */
+.btp-mini-foot {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 equal buttons */
+    gap: 10px;
+    padding: 12px;
+    border-top: 1px solid #eef0f3;
+    background: #fff;
+}
+
+/* Force same height & look */
+.btp-mini-foot .btn {
+    height: 40px;
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 0;
+    /* important */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+/* Mobile: make it centered */
+@media (max-width: 576px) {
+    .btp-mini-modal {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: calc(100vw - 24px);
+    }
+}
+
+.btp-mini-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    background: #fff;
+    color: #495057;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: 0;
+}
+
+.btp-mini-close:hover {
+    background: #f1f3f5;
+}

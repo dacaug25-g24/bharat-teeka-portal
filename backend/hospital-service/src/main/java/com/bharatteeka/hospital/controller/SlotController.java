@@ -1,7 +1,12 @@
 package com.bharatteeka.hospital.controller;
 
 import com.bharatteeka.hospital.entity.Slot;
+import com.bharatteeka.hospital.dto.SlotRequest;
+
+
 import com.bharatteeka.hospital.service.SlotService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -20,7 +25,6 @@ public class SlotController {
         this.service = service;
     }
 
-    // ✅ Get slots by hospital + date
     @GetMapping
     public List<Slot> getSlotsByDate(
             @RequestParam Integer hospitalId,
@@ -32,7 +36,6 @@ public class SlotController {
         );
     }
 
-    // ✅ Get slots by hospital + date + time
     @GetMapping("/by-time")
     public List<Slot> getSlotsByDateAndTime(
             @RequestParam Integer hospitalId,
@@ -46,7 +49,6 @@ public class SlotController {
         );
     }
 
-    // ✅ Get available slots (filtered by capacity > bookedCount)
     @GetMapping("/available")
     public List<Slot> getAvailableSlots(
             @RequestParam Integer hospitalId,
@@ -55,8 +57,6 @@ public class SlotController {
         return service.getAvailableSlots(hospitalId, LocalDate.parse(date));
     }
 
-
-    // ✅ Get slots by hospital + vaccine + date
     @GetMapping("/by-vaccine")
     public List<Slot> getSlotsByVaccine(
             @RequestParam Integer hospitalId,
@@ -65,4 +65,27 @@ public class SlotController {
     ) {
         return service.getSlotsByVaccine(hospitalId, vaccineId, LocalDate.parse(date));
     }
+
+    
+    @PostMapping
+    public Slot createSlot(@RequestBody SlotRequest request) {
+        return service.createSlot(request);
+    }
+    
+    @PutMapping("/{slotId}")
+    public Slot updateSlot(
+            @PathVariable Integer slotId,
+            @RequestBody SlotRequest request
+    ) {
+        return service.updateSlot(slotId, request);
+    }
+   
+    @DeleteMapping("/{slotId}")
+    public ResponseEntity<String> deleteSlot(@PathVariable Integer slotId) {
+        service.deleteSlot(slotId);
+        return ResponseEntity.ok("Slot deactivated successfully");
+    }
+
+
+
 }

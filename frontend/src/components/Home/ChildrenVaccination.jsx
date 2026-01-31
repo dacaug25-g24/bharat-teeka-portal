@@ -51,7 +51,6 @@ export default function ChildrenVaccination() {
                     </div>
                 </div>
 
-                {/* Buttons like PrecautionDose */}
                 <div className="d-flex gap-2 flex-wrap">
                     <button className="btn btn-precaution rounded-pill px-4">
                         Book Your Slot

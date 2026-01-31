@@ -1,0 +1,386 @@
+/* Make sidebar look clean on desktop and stack on mobile */
+.hospital-aside {
+  min-height: 100vh;
+}
+
+.hospital-navlink {
+  transition: 0.15s ease;
+}
+
+.hospital-navlink:hover {
+  background: #f1f5fb;
+}
+
+/* Content background (same vibe as patient ui) */
+.hospital-content {
+  min-height: calc(100vh - 140px);
+}
+
+/* Optional: keep tables readable everywhere */
+.table thead th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table tbody td {
+  vertical-align: middle;
+}
+
+/* ✅ Card look (matches screenshot) */
+.hospital-card {
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+/* ✅ Donut chart styles (used in HospitalDashboard) */
+.btp-donut {
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  position: relative;
+  background: conic-gradient(#198754 0% calc(var(--p1) * 1%),
+      #ffc107 calc(var(--p1) * 1%) calc((var(--p1) + var(--p2)) * 1%),
+      #0d6efd calc((var(--p1) + var(--p2)) * 1%) calc((var(--p1) + var(--p2) + var(--p3)) * 1%),
+      #dc3545 calc((var(--p1) + var(--p2) + var(--p3)) * 1%) calc((var(--p1) + var(--p2) + var(--p3) + var(--p4)) * 1%),
+      #f1f3f5 0 100%);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.btp-donut::after {
+  content: "";
+  position: absolute;
+  inset: 18px;
+  background: #fff;
+  border-radius: 50%;
+  border: 1px solid #eef0f3;
+}
+
+.btp-donut-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  z-index: 2;
+}
+
+.btp-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btp-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btp-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex: 0 0 10px;
+}
+
+.btp-dot-success {
+  background: #198754;
+}
+
+.btp-dot-warning {
+  background: #ffc107;
+}
+
+.btp-dot-primary {
+  background: #0d6efd;
+}
+
+.btp-dot-danger {
+  background: #dc3545;
+}
+
+/* Mobile: sidebar becomes top stacked */
+@media (max-width: 992px) {
+  .hospital-aside {
+    min-height: auto;
+  }
+}
+
+
+.btp-kpi {
+  min-height: 110px;
+}
+
+/* ✅ Header layout + refresh not full width */
+.btp-dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btp-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btp-refresh-btn {
+  width: auto !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto !important;
+  white-space: nowrap;
+}
+
+.btp-dashboard-header .btn,
+.btp-card-head .btn {
+  flex: 0 0 auto !important;
+  width: auto !important;
+}
+
+/* Bars */
+.btp-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.btp-bar-row {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.btp-bar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.btp-bar-label {
+  font-weight: 700;
+  font-size: 14px;
+  color: #212529;
+}
+
+.btp-bar-sub {
+  font-size: 12px;
+}
+
+.btp-progress {
+  height: 14px;
+  border-radius: 999px;
+  background: #eef0f3;
+}
+
+.btp-progress .progress-bar {
+  border-radius: 999px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .btp-bar-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.btp-quick-actions-primary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* 🔥 force same size and no full width */
+.btp-quick-actions-primary .btn {
+  width: auto !important;
+  flex: 0 0 auto !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  border-radius: 12px;
+  padding: 10px 18px;
+}
+
+/* Keep primary buttons consistent (not huge) */
+.btp-quick-actions-primary .btn-primary {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Mobile: allow wrapping, but still nice */
+@media (max-width: 576px) {
+  .btp-quick-actions-primary .btn {
+    flex: 1 1 auto !important;
+  }
+}
+
+
+.btp-page-title {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 10px 0 14px;
+}
+
+/* KPI row cards on appointments page */
+.btp-kpi-mini {
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  padding: 16px;
+  text-align: center;
+}
+
+.btp-kpi-mini .btp-kpi-label {
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 8px;
+}
+
+.btp-kpi-mini .btp-kpi-value {
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* Filters row */
+.btp-filters {
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  padding: 14px;
+}
+
+.btp-filter-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btp-filter-group label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #495057;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.btp-filter-group input[type="date"] {
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid #dee2e6;
+  padding: 0 12px;
+}
+
+.btp-filter-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btp-filter-actions .btn {
+  width: auto !important;
+  border-radius: 10px;
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+
+/* Tabs */
+.btp-tabs {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btp-tab {
+  border: 1px solid #0d6efd;
+  background: #fff;
+  color: #0d6efd;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btp-tab.active {
+  background: #0d6efd;
+  color: #fff;
+}
+
+/* Table wrapper */
+.btp-table-wrap {
+  margin-top: 10px;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+}
+
+.btp-table-wrap .table {
+  margin: 0;
+}
+
+/* Status chips */
+.btp-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  border: 1px solid transparent;
+}
+
+.btp-chip.completed {
+  background: rgba(25, 135, 84, 0.12);
+  color: #198754;
+  border-color: rgba(25, 135, 84, 0.25);
+}
+
+.btp-chip.cancelled {
+  background: rgba(220, 53, 69, 0.12);
+  color: #dc3545;
+  border-color: rgba(220, 53, 69, 0.25);
+}
+
+.btp-chip.booked {
+  background: rgba(255, 193, 7, 0.18);
+  color: #b58100;
+  border-color: rgba(255, 193, 7, 0.35);
+}
+
+.btp-chip.pending {
+  background: rgba(13, 110, 253, 0.12);
+  color: #0d6efd;
+  border-color: rgba(13, 110, 253, 0.25);
+}
+
+/* Action buttons in table */
+.btp-table-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 140px;
+}
+
+.btp-table-actions .btn {
+  border-radius: 10px;
+  padding: 8px 12px;
+}
