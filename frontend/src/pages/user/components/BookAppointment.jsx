@@ -118,23 +118,28 @@ export default function BookAppointment() {
     <div className="container-fluid p-0">
       <div className="card border-0 shadow-sm">
         <div className="card-body">
-          <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-            <div>
+
+          <div className="d-flex align-items-start gap-2 mb-3">
+            <div className="flex-grow-1 min-w-0">
               <h5 className="mb-1">Book Appointment</h5>
               <div className="text-muted small">
-                Step 1: Choose person, Step 2: Select location, Step 3: Select
-                vaccine, Step 4: Pick date and slot, then book
+                Step 1: Choose person, Step 2: Select location, Step 3: Select vaccine,
+                Step 4: Pick date and slot, then book
               </div>
             </div>
 
             <button
               type="button"
-              className="btn btn-outline-secondary btn-sm"
+              className="btn btn-outline-secondary btn-sm ms-auto flex-shrink-0 align-self-start px-2 py-1 small"
               onClick={resetAll}
             >
               Reset All
             </button>
           </div>
+
+
+
+
 
           {error && (
             <div className="alert alert-danger py-2 mb-3">{String(error)}</div>

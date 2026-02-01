@@ -34,4 +34,11 @@ public class VaccinationController {
                 hospitalId, from, to
         );
     }
+    
+    @GetMapping("/appointment/{appointmentId}")
+    public VaccinationRecord byAppointment(@PathVariable Integer appointmentId) {
+        return repo.findByAppointmentAppointmentId(appointmentId)
+            .orElseThrow(() -> new RuntimeException("Vaccination record not found"));
+    }
+
 }
