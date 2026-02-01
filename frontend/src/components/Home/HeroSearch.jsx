@@ -420,7 +420,7 @@ export default function HeroSearch({ showFooter = false }) {
               </div>
             )}
 
-            {/* ✅ Slots Preview panel (shows after clicking View Slots) */}
+            {/* Slots Preview panel (shows after clicking View Slots) */}
             {selectedHospital && (
               <div className="mt-4 p-3 border rounded-4 bg-light">
                 <div className="d-flex justify-content-between align-items-start flex-wrap gap-2">
