@@ -13,11 +13,6 @@ export default function UserDashboardLayout() {
     if (!user) navigate("/login", { replace: true });
   }, [user, navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    window.location.href = "/login";
-  };
-
   const linkClass = ({ isActive }) =>
     `nav-link d-flex flex-nowrap align-items-center gap-2 px-3 py-2 rounded text-nowrap ${
       isActive
@@ -62,7 +57,7 @@ export default function UserDashboardLayout() {
 
                   <NavLink to="history" className={linkClass}>
                     <span className="fs-5 flex-shrink-0">🧾</span>
-                    <span className="text-nowrap">History</span>
+                    <span className="text-nowrap">History & Certificate</span>
                   </NavLink>
 
                   <NavLink to="profile" className={linkClass}>
@@ -89,13 +84,6 @@ export default function UserDashboardLayout() {
                       Role: {isParent ? "Parent" : "Patient/User"}
                     </div>
                   </div>
-
-                  <button
-                    className="btn btn-outline-danger btn-sm"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </button>
                 </div>
               </div>
 
