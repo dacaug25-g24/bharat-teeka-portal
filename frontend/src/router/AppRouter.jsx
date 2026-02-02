@@ -26,6 +26,7 @@ import HeroSearch from "../components/Home/HeroSearch";
 import DownloadCertificate from "../components/Home/DownloadCertificate";
 import Faq from "../components/Home/Faq";
 import SideEffects from "../components/Home/SideEffects";
+import GetCertificate from "../components/Home/GetCertificate";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import HospitalRoutes from "../pages/hospital/HospitalRoutes";
@@ -41,7 +42,7 @@ const AppRoutes = () => {
   const user = localStorage.getItem("user");
   const isAuthed = !!token && !!user;
 
-  // Rule:
+  // ✅ Rule:
   // - Always show LandingNavbar on login/register/forgot
   // - Else if logged-in => show AppNavbar (even on "/")
   // - Else show LandingNavbar
@@ -74,7 +75,7 @@ const AppRoutes = () => {
         <Route path="/raise-issue" element={<RaiseIssue />} />
         <Route path="/support" element={<Support />} />
         <Route path="/side-effects" element={<SideEffects />} />
-        {/* <Route path="/get-certificate" element={<GetCertificate />} /> */}
+        <Route path="/get-certificate" element={<GetCertificate />} />
 
         {/* Protected */}
         <Route

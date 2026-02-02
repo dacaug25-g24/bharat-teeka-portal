@@ -1,3 +1,4 @@
+/* ====== Shared navbar theme ====== */
 .bg-teal {
   background-color: #026b6c !important;
 }
@@ -28,7 +29,7 @@
   letter-spacing: 0.05em;
 }
 
-/* ONLY navbar links (not sidebar) */
+/* ✅ ONLY navbar links (not sidebar) */
 .bt-nav .navbar-nav .nav-link {
   color: #ffffff !important;
   font-weight: 550;
