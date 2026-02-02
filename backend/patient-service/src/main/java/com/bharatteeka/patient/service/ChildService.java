@@ -19,147 +19,124 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ChildService {
 
-    private final PatientRepository patientRepository;
-    private final ParentChildRepository parentChildRepository;
-    private final BeneficiaryAccessService beneficiaryAccessService;
+	private final PatientRepository patientRepository;
+	private final ParentChildRepository parentChildRepository;
 
-    @Transactional
-    public Patient addChild(Integer parentUserId, ChildRequestDto dto) {
+	private String normalizeGender(String gender) {
+		if (gender == null || gender.trim().isEmpty()) {
+			throw new IllegalArgumentException("Gender is required");
+		}
+		String g = gender.trim();
+		if (g.equalsIgnoreCase("male"))
+			return "Male";
+		if (g.equalsIgnoreCase("female"))
+			return "Female";
+		if (g.equalsIgnoreCase("other"))
+			return "Other";
+		throw new IllegalArgumentException("Gender must be Male, Female, or Other");
+	}
 
-        require(parentUserId != null, "parentUserId is required");
-        require(dto != null, "Request body is required");
+	@Transactional
+	public Patient addChild(Integer parentUserId, ChildRequestDto dto) {
 
-        requireText(dto.getFirstName(), "First name is required");
-        requireText(dto.getLastName(), "Last name is required");
-        require(dto.getDateOfBirth() != null, "Date of birth is required");
-        requireText(dto.getBloodGroup(), "Blood group is required");
-        require(dto.getRelationId() != null, "Relation is required");
-        requireText(dto.getAadharNumber(), "Aadhaar is required");
+		if (parentUserId == null)
+			throw new IllegalArgumentException("parentUserId is required");
+		if (dto == null)
+			throw new IllegalArgumentException("Request body is required");
 
-        int age = Period.between(dto.getDateOfBirth(), LocalDate.now()).getYears();
-        if (age >= 18) throw new IllegalArgumentException("Beneficiary must be below 18 years");
+		if (dto.getFirstName() == null || dto.getFirstName().trim().isEmpty())
+			throw new IllegalArgumentException("First name is required");
 
-        String aadhaar = dto.getAadharNumber().trim();
-        if (!aadhaar.matches("^\\d{12}$")) {
-            throw new IllegalArgumentException("Aadhaar must be exactly 12 digits");
-        }
-        if (patientRepository.existsByAadharNumber(aadhaar)) {
-            throw new IllegalArgumentException("Aadhaar already exists");
-        }
+		if (dto.getLastName() == null || dto.getLastName().trim().isEmpty())
+			throw new IllegalArgumentException("Last name is required");
 
-        String gender = normalizeGender(dto.getGender());
+		if (dto.getDateOfBirth() == null)
+			throw new IllegalArgumentException("Date of birth is required");
 
-        Patient child = Patient.builder()
-                .userId(null)
-                .firstName(dto.getFirstName().trim())
-                .lastName(dto.getLastName().trim())
-                .dateOfBirth(dto.getDateOfBirth())
-                .gender(gender)
-                .aadharNumber(aadhaar)
-                .bloodGroup(dto.getBloodGroup().trim())
-                .isAdult(false)
-                .isActive(true)
-                .remarks(textOrNull(dto.getRemarks()))
-                .build();
+		if (dto.getBloodGroup() == null || dto.getBloodGroup().trim().isEmpty())
+			throw new IllegalArgumentException("Blood group is required");
 
-        Patient savedChild = patientRepository.save(child);
+		if (dto.getRelationId() == null)
+			throw new IllegalArgumentException("Relation is required");
 
-        ParentChild mapping = ParentChild.builder()
-                .parentUserId(parentUserId)
-                .childPatientId(savedChild.getPatientId())
-                .relationId(dto.getRelationId())
-                .build();
+		if (dto.getAadharNumber() == null || dto.getAadharNumber().trim().isEmpty())
+			throw new IllegalArgumentException("Aadhaar is required");
 
-        parentChildRepository.save(mapping);
+		int age = Period.between(dto.getDateOfBirth(), LocalDate.now()).getYears();
+		if (age >= 18) {
+			throw new IllegalArgumentException("Beneficiary must be below 18 years");
+		}
 
-        return savedChild;
-    }
+		String aadhaar = dto.getAadharNumber().trim();
+		if (!aadhaar.matches("^\\d{12}$")) {
+			throw new IllegalArgumentException("Aadhaar must be exactly 12 digits");
+		}
 
-    public List<ChildResponseDto> getChildrenDetails(Integer parentUserId) {
+		if (patientRepository.existsByAadharNumber(aadhaar)) {
+			throw new IllegalArgumentException("Aadhaar already exists");
+		}
 
-        require(parentUserId != null, "parentUserId is required");
+		String gender = normalizeGender(dto.getGender());
 
-        List<ParentChild> mappings = parentChildRepository.findByParentUserId(parentUserId);
+		Patient child = Patient.builder().userId(null).firstName(dto.getFirstName().trim())
+				.lastName(dto.getLastName().trim()).dateOfBirth(dto.getDateOfBirth()).gender(gender) // ✅ STRING
+				.aadharNumber(aadhaar).bloodGroup(dto.getBloodGroup().trim()).isAdult(false).isActive(true)
+				.remarks(
+						dto.getRemarks() != null && !dto.getRemarks().trim().isEmpty() ? dto.getRemarks().trim() : null)
+				.build();
 
-        return mappings.stream()
-                .map(mapping -> {
-                    Patient child = patientRepository.findById(mapping.getChildPatientId())
-                            .orElseThrow(() -> new IllegalArgumentException(
-                                    "Child not found: " + mapping.getChildPatientId()
-                            ));
-                    return new Object[]{mapping, child};
-                })
-                .filter(arr -> Boolean.TRUE.equals(((Patient) arr[1]).getIsActive()))
-                .map(arr -> {
-                    ParentChild mapping = (ParentChild) arr[0];
-                    Patient child = (Patient) arr[1];
+		Patient savedChild = patientRepository.save(child);
 
-                    return ChildResponseDto.builder()
-                            .parentChildId(mapping.getParentChildId())
-                            .parentUserId(mapping.getParentUserId())
-                            .patientId(child.getPatientId())
-                            .relationId(mapping.getRelationId())
-                            .firstName(child.getFirstName())
-                            .lastName(child.getLastName())
-                            .dateOfBirth(child.getDateOfBirth())
-                            .gender(child.getGender())
-                            .aadharNumber(child.getAadharNumber())
-                            .bloodGroup(child.getBloodGroup())
-                            .isActive(child.getIsActive())
-                            .remarks(child.getRemarks())
-                            .build();
-                })
-                .collect(Collectors.toList());
-    }
+		ParentChild mapping = ParentChild.builder().parentUserId(parentUserId).childPatientId(savedChild.getPatientId())
+				.relationId(dto.getRelationId()).build();
 
-    @Transactional
-    public void deleteChild(Integer parentUserId, Integer patientId) {
+		parentChildRepository.save(mapping);
 
-        require(parentUserId != null, "parentUserId is required");
-        require(patientId != null, "patientId is required");
+		return savedChild;
+	}
 
-        // ✅ reuse access check (simple)
-        beneficiaryAccessService.validateChildLinkedToParent(parentUserId, patientId);
+	public List<ChildResponseDto> getChildrenDetails(Integer parentUserId) {
 
-        ParentChild link = parentChildRepository.findByParentUserIdAndChildPatientId(parentUserId, patientId)
-                .orElseThrow(() -> new IllegalArgumentException("Beneficiary not linked to this parent"));
+		if (parentUserId == null)
+			throw new IllegalArgumentException("parentUserId is required");
 
-        Patient child = patientRepository.findById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("Child patient not found"));
+		List<ParentChild> mappings = parentChildRepository.findByParentUserId(parentUserId);
 
-        if (child.getUserId() != null || Boolean.TRUE.equals(child.getIsAdult())) {
-            throw new IllegalArgumentException("Cannot delete: patient is not a beneficiary");
-        }
+		return mappings.stream().map(mapping -> {
+			Patient child = patientRepository.findById(mapping.getChildPatientId())
+					.orElseThrow(() -> new IllegalArgumentException("Child not found: " + mapping.getChildPatientId()));
 
-        parentChildRepository.delete(link);
+			return new Object[] { mapping, child };
+		}).filter(arr -> Boolean.TRUE.equals(((Patient) arr[1]).getIsActive())).map(arr -> {
+			ParentChild mapping = (ParentChild) arr[0];
+			Patient child = (Patient) arr[1];
 
-        child.setIsActive(false);
-        patientRepository.save(child);
-    }
+			return ChildResponseDto.builder().parentChildId(mapping.getParentChildId())
+					.parentUserId(mapping.getParentUserId()).patientId(child.getPatientId())
+					.relationId(mapping.getRelationId()).firstName(child.getFirstName()).lastName(child.getLastName())
+					.dateOfBirth(child.getDateOfBirth()).gender(child.getGender()).aadharNumber(child.getAadharNumber())
+					.bloodGroup(child.getBloodGroup()).isActive(child.getIsActive()).remarks(child.getRemarks())
+					.build();
+		}).collect(Collectors.toList());
+	}
 
-    // -------------------------
-    // Helpers
-    // -------------------------
-    private String normalizeGender(String gender) {
-        requireText(gender, "Gender is required");
-        String g = gender.trim();
-        if (g.equalsIgnoreCase("male")) return "Male";
-        if (g.equalsIgnoreCase("female")) return "Female";
-        if (g.equalsIgnoreCase("other")) return "Other";
-        throw new IllegalArgumentException("Gender must be Male, Female, or Other");
-    }
+	@Transactional
+	public void deleteChild(Integer parentUserId, Integer patientId) {
 
-    private void require(boolean condition, String message) {
-        if (!condition) throw new IllegalArgumentException(message);
-    }
+		ParentChild link = parentChildRepository.findByParentUserIdAndChildPatientId(parentUserId, patientId)
+				.orElseThrow(() -> new RuntimeException("Beneficiary not linked to this parent"));
 
-    private void requireText(String value, String message) {
-        if (value == null || value.trim().isEmpty()) throw new IllegalArgumentException(message);
-    }
+		Patient child = patientRepository.findById(patientId)
+				.orElseThrow(() -> new RuntimeException("Child patient not found"));
 
-    private String textOrNull(String value) {
-        if (value == null) return null;
-        String v = value.trim();
-        return v.isEmpty() ? null : v;
-    }
+		if (child.getUserId() != null || Boolean.TRUE.equals(child.getIsAdult())) {
+			throw new RuntimeException("Cannot delete: patient is not a beneficiary");
+		}
+
+		parentChildRepository.delete(link);
+
+		child.setIsActive(false);
+		patientRepository.save(child);
+	}
+
 }

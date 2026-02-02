@@ -16,6 +16,11 @@ export default function HospitalLayout() {
     if (user && roleId !== 2) navigate("/login", { replace: true });
   }, [user, roleId, navigate]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  };
+
   const pageTitle = (() => {
     if (pathname.includes("/hospital/appointments")) return "Appointments";
     if (pathname.includes("/hospital/slots")) return "Slots";
@@ -33,7 +38,7 @@ export default function HospitalLayout() {
           <div className="row g-0">
             {/* Sidebar */}
             <aside className="col-12 col-md-3 col-lg-2 border-end bg-white hospital-aside">
-              <HospitalSidebar/>
+              <HospitalSidebar handleLogout={handleLogout} />
             </aside>
 
             {/* Main */}
@@ -50,6 +55,13 @@ export default function HospitalLayout() {
                       </span>
                     </div>
                   </div>
+
+                  <button
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
                 </div>
               </div>
 

@@ -42,18 +42,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (jwtUtil.isTokenValid(token)) {
                 Claims claims = jwtUtil.parseClaims(token);
-//
-//                String subject = claims.getSubject();
-//                String role = String.valueOf(claims.get("role")); // ex: HOSPITAL
-//                var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
-                
-                String role = String.valueOf(claims.get("role")); // or roleName
-                if (role != null) role = role.trim().toUpperCase();  // ✅ normalize
 
+                String subject = claims.getSubject();
+                String role = String.valueOf(claims.get("role")); // ex: HOSPITAL
                 var authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
-
-                var auth = new UsernamePasswordAuthenticationToken(role, null, authorities);
+                var auth = new UsernamePasswordAuthenticationToken(subject, null, authorities);
                 SecurityContextHolder.getContext().setAuthentication(auth);
 
                 request.setAttribute("hospitalId", claims.get("hospitalId"));

@@ -155,27 +155,3 @@ export const getSlotsAvailabilityRange = async ({
 
   return result;
 };
-
-// ---------------------
-// Certificate APIs (PDF download)
-// ---------------------
-
-export const downloadCertificatePdfByAppointment = async (appointmentId) => {
-  const res = await patientApi.get("/certificates/download", {
-    params: { appointmentId },
-    responseType: "blob",
-  });
-  return res.data; // Blob
-};
-
-
-export const downloadCertificatePdfByPatient = async (patientId) => {
-  const res = await patientApi.get("/certificates/download", {
-    params: { patientId },
-    responseType: "blob",
-  });
-  return res.data; // Blob
-};
-
-
-
