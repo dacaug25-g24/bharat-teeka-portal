@@ -397,7 +397,7 @@ export default function HeroSearch({ showFooter = false }) {
                                     active ? "btn-primary" : "btn-outline-primary"
                                   }`}
                                   onClick={() => {
-                                    // ✅ make View Slots work again:
+                                    // make View Slots work again:
                                     setSelectedHospital(h);
                                     setVaccineId("");
                                     setAvailability([]);
