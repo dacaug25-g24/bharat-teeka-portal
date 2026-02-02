@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-export default function HospitalSidebar({ handleLogout }) {
+export default function HospitalSidebar() {
   const linkClass = ({ isActive }) =>
     `nav-link d-flex align-items-center gap-2 px-3 py-2 rounded hospital-navlink ${
       isActive ? "fw-semibold text-primary bg-primary-subtle" : "text-dark"
@@ -41,14 +41,6 @@ export default function HospitalSidebar({ handleLogout }) {
         </nav>
 
         <hr className="my-3" />
-
-        <button
-          type="button"
-          className="btn btn-outline-danger w-100"
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
       </div>
     </div>
   );

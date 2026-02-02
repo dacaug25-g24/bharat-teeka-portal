@@ -71,7 +71,7 @@ export default function AppNavbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-teal py-2 shadow-sm bt-nav">
       <div className="container-fluid px-4">
-        {/* ✅ Brand click -> Home page (but stays AppNavbar because logged in) */}
+        {/* Brand click -> Home page (but stays AppNavbar because logged in) */}
         <Link className="navbar-brand fw-bold d-flex align-items-center" to="/">
           <img
             src={emblemGov}

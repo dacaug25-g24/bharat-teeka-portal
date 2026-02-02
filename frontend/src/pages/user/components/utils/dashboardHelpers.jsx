@@ -10,8 +10,22 @@ export const safeStr = (v) => {
 
 export const toDateObj = (v) => {
   if (!v) return null;
-  const d = new Date(v);
-  if (Number.isFinite(d.getTime())) return d;
+
+  // 1) Try native parsing (ISO is best)
+  const d1 = new Date(v);
+  if (Number.isFinite(d1.getTime())) return d1;
+
+  // 2) Handle DD-MM-YYYY or DD/MM/YYYY manually
+  const s = String(v).trim();
+  const m = s.match(/^(\d{2})[-/](\d{2})[-/](\d{4})$/);
+  if (m) {
+    const dd = Number(m[1]);
+    const mm = Number(m[2]);
+    const yyyy = Number(m[3]);
+    const d2 = new Date(yyyy, mm - 1, dd);
+    if (Number.isFinite(d2.getTime())) return d2;
+  }
+
   return null;
 };
 
@@ -46,9 +60,19 @@ export const statusBadgeClass = (status) => {
 };
 
 export const getAppointmentSortTime = (x) => {
-  const d = x?.appointmentDate || x?.date || x?.createdAt || x?.slotDate || null;
+  const d =
+    x?.appointmentDate ??
+    x?.date ??
+    x?.slotDate ??
+    x?.createdAt ??
+    x?.updatedAt ??
+    null;
+
   const time = toDateObj(d)?.getTime();
-  return Number.isFinite(time) ? time : 0;
+
+  // IMPORTANT: never return 0 for "unknown",
+  // because 0 breaks sorting (everything becomes equal).
+  return Number.isFinite(time) ? time : Number.NEGATIVE_INFINITY;
 };
 
 export const findLatestAppointment = (appointments) => {

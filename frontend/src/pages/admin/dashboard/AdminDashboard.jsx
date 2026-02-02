@@ -21,12 +21,6 @@ export default function AdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem(USER_KEY);
-    localStorage.removeItem(TOKEN_KEY);
-    navigate("/login", { replace: true });
-  };
-
   const isActive = (path) =>
     location.pathname === path || location.pathname.startsWith(path + "/");
 
@@ -93,10 +87,6 @@ export default function AdminDashboard() {
                 {user?.username || "Admin"}
               </span>
             </small>
-
-            <button className="logout-btn btn btn-sm" onClick={handleLogout}>
-              Logout
-            </button>
           </header>
 
           <div className="admin-content container-fluid py-4">
