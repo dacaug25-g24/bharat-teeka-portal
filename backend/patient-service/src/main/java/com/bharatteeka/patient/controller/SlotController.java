@@ -1,7 +1,7 @@
 package com.bharatteeka.patient.controller;
 
 import com.bharatteeka.patient.dto.SlotDto;
-import com.bharatteeka.patient.service.SlotQueryService;
+import com.bharatteeka.patient.service.SlotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -16,29 +16,22 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class SlotController {
 
-	private final SlotQueryService slotQueryService;
+    private final SlotService slotService;
 
-	@GetMapping("/available")
-	public ResponseEntity<?> available(@RequestParam Integer hospitalId,
-			@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-			@RequestParam(required = false) Integer vaccineId) {
-		try {
-			List<SlotDto> list = slotQueryService.getAvailableSlots(hospitalId, date, vaccineId);
-			return ResponseEntity.ok(list);
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
+    @GetMapping("/available")
+    public ResponseEntity<?> available(
+            @RequestParam Integer hospitalId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) Integer vaccineId
+    ) {
+        List<SlotDto> list = slotService.getAvailableSlots(hospitalId, date, vaccineId);
+        return ResponseEntity.ok(list);
+    }
 
-	@GetMapping("/{slotId}")
-	public ResponseEntity<?> get(@PathVariable Integer slotId) {
-		try {
-			SlotDto dto = slotQueryService.getSlotById(slotId);
-			if (dto == null)
-				return ResponseEntity.notFound().build();
-			return ResponseEntity.ok(dto);
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
-	}
+    @GetMapping("/{slotId}")
+    public ResponseEntity<?> getSlot(@PathVariable Integer slotId) {
+        SlotDto dto = slotService.getSlotDetails(slotId);
+        if (dto == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(dto);
+    }
 }
