@@ -63,7 +63,7 @@ export default function LandingNavbar() {
             </li>
           </ul>
 
-          {/* pill buttons stay correct */}
+          {/* ✅ pill buttons stay correct */}
           <Link className="btn btn-register px-4 ms-2" to="/login">
             Sign In
           </Link>

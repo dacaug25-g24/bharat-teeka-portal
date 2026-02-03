@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import { useMemo, useEffect, useRef } from "react";
+import { useMemo } from "react";
 import useBookAppointmentData from "./hooks/useBookAppointmentData";
 import {
   beneficiaryLabel,
@@ -92,19 +91,6 @@ export default function BookAppointment() {
     handleBook,
   } = useBookAppointmentData();
 
-  // ✅ Scroll target (alerts area)
-  const topRef = useRef(null);
-
-  // ✅ Auto-scroll when any message shows
-  useEffect(() => {
-    if (error || successMsg || slotsInfo || earliestInfo) {
-      topRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [error, successMsg, slotsInfo, earliestInfo]);
-
   // Names for summary card
   const selectedStateName = useMemo(() => {
     const s = states.find((x) => String(getStateKey(x)) === String(stateId));
@@ -132,8 +118,8 @@ export default function BookAppointment() {
     <div className="container-fluid p-0">
       <div className="card border-0 shadow-sm">
         <div className="card-body">
-          <div className="d-flex align-items-start gap-2 mb-3">
-            <div className="flex-grow-1 min-w-0">
+          <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+            <div>
               <h5 className="mb-1">Book Appointment</h5>
               <div className="text-muted small">
                 Step 1: Choose person, Step 2: Select location, Step 3: Select
@@ -143,15 +129,12 @@ export default function BookAppointment() {
 
             <button
               type="button"
-              className="btn btn-outline-secondary btn-sm ms-auto flex-shrink-0 align-self-start px-2 py-1 small"
+              className="btn btn-outline-secondary btn-sm"
               onClick={resetAll}
             >
               Reset All
             </button>
           </div>
-
-          {/* ✅ Scroll anchor for alerts */}
-          <div ref={topRef} />
 
           {error && (
             <div className="alert alert-danger py-2 mb-3">{String(error)}</div>
