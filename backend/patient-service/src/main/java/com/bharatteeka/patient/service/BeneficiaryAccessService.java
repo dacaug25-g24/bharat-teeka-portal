@@ -11,10 +11,6 @@ public class BeneficiaryAccessService {
 
     private final ParentChildRepository parentChildRepository;
 
-    /**
-     * Adult patient => always allowed
-     * Child beneficiary => parentUserId must be provided and mapping must exist
-     */
     public void validateAccess(Patient patient, Integer parentUserId, String action) {
 
         if (patient == null) return;

@@ -17,15 +17,6 @@ public class CertificateController {
 
     private final CertificateService certificateService;
 
-    /**
-     * Download vaccination certificate as PDF.
-     *
-     * You can pass either:
-     *  - appointmentId (preferred) OR
-     *  - patientId
-     *
-     * Authorization header will be forwarded to hospital-service.
-     */
     @GetMapping("/download")
     public ResponseEntity<byte[]> downloadCertificate(
             @RequestParam(required = false) Integer appointmentId,
@@ -33,7 +24,7 @@ public class CertificateController {
             @RequestHeader(value = "Authorization", required = false) String authHeader
     ) {
         try {
-            // ✅ basic validation
+            //  basic validation
             if (appointmentId == null && patientId == null) {
                 return ResponseEntity.badRequest()
                         .contentType(MediaType.TEXT_PLAIN)
@@ -52,13 +43,13 @@ public class CertificateController {
                     .body(pdfBytes);
 
         } catch (IllegalArgumentException ex) {
-            // ✅ known business validation issues
+            //  known business validation issues
             return ResponseEntity.badRequest()
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(("Bad Request: " + ex.getMessage()).getBytes());
 
         } catch (Exception ex) {
-            // ✅ avoid breaking download with raw stacktrace
+            //  avoid breaking download with raw stacktrace
             return ResponseEntity.internalServerError()
                     .contentType(MediaType.TEXT_PLAIN)
                     .body(("Failed to generate certificate: " + ex.getMessage()).getBytes());

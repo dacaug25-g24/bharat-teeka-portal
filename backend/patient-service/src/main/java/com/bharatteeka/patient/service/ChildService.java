@@ -36,8 +36,8 @@ public class ChildService {
         require(dto.getRelationId() != null, "Relation is required");
         requireText(dto.getAadharNumber(), "Aadhaar is required");
 
-        int age = Period.between(dto.getDateOfBirth(), LocalDate.now()).getYears();
-        if (age >= 18) throw new IllegalArgumentException("Beneficiary must be below 18 years");
+//        int age = Period.between(dto.getDateOfBirth(), LocalDate.now()).getYears();
+//        if (age >= 18) throw new IllegalArgumentException("Beneficiary must be below 18 years");
 
         String aadhaar = dto.getAadharNumber().trim();
         if (!aadhaar.matches("^\\d{12}$")) {
@@ -118,7 +118,7 @@ public class ChildService {
         require(parentUserId != null, "parentUserId is required");
         require(patientId != null, "patientId is required");
 
-        // ✅ reuse access check (simple)
+        // reuse access check (simple)
         beneficiaryAccessService.validateChildLinkedToParent(parentUserId, patientId);
 
         ParentChild link = parentChildRepository.findByParentUserIdAndChildPatientId(parentUserId, patientId)
@@ -137,9 +137,9 @@ public class ChildService {
         patientRepository.save(child);
     }
 
-    // -------------------------
+    
     // Helpers
-    // -------------------------
+    
     private String normalizeGender(String gender) {
         requireText(gender, "Gender is required");
         String g = gender.trim();

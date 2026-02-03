@@ -32,9 +32,9 @@ public class AppointmentService {
     private static final String STATUS_COMPLETED = "COMPLETED";
     private static final String STATUS_CANCELLED = "CANCELLED";
 
-    // -------------------------
+    
     // BOOK APPOINTMENT
-    // -------------------------
+    
     @Transactional
     public Appointment bookAppointment(AppointmentRequestDto dto) {
 
@@ -45,7 +45,7 @@ public class AppointmentService {
 
         Patient patient = getPatientOrThrow(dto.getPatientId());
 
-        // ✅ reusable beneficiary validation
+        // reusable beneficiary validation
         beneficiaryAccessService.validateAccess(patient, dto.getParentUserId(), "booking");
 
         // slot exists
@@ -88,24 +88,24 @@ public class AppointmentService {
         return appointmentRepository.save(appointment);
     }
 
-    // -------------------------
+    
     // LIST APPOINTMENTS
-    // -------------------------
+    
     public List<Appointment> getAppointmentsByPatient(Integer patientId, Integer parentUserId) {
 
         require(patientId != null, "patientId is required");
 
         Patient patient = getPatientOrThrow(patientId);
 
-        // ✅ reusable beneficiary validation
+        // reusable beneficiary validation
         beneficiaryAccessService.validateAccess(patient, parentUserId, "history");
 
         return appointmentRepository.findByPatientId(patientId);
     }
 
-    // -------------------------
+    
     // CANCEL APPOINTMENT
-    // -------------------------
+    
     @Transactional
     public Appointment cancelAppointment(Integer appointmentId, Integer parentUserId) {
 
@@ -116,7 +116,7 @@ public class AppointmentService {
 
         Patient patient = getPatientOrThrow(appt.getPatientId());
 
-        // ✅ reusable beneficiary validation
+        // reusable beneficiary validation
         beneficiaryAccessService.validateAccess(patient, parentUserId, "cancel");
 
         // cannot cancel completed
@@ -140,9 +140,9 @@ public class AppointmentService {
         return saved;
     }
 
-    // -------------------------
+    
     // DETAILS (appointments + slot/vaccine/hospital info)
-    // -------------------------
+    
     public List<AppointmentDetailsDto> getAppointmentDetails(Integer patientId, Integer parentUserId) {
 
         List<Appointment> appointments = getAppointmentsByPatient(patientId, parentUserId);
@@ -191,9 +191,9 @@ public class AppointmentService {
         }).collect(Collectors.toList());
     }
 
-    // -------------------------
+    
     // Helpers
-    // -------------------------
+    
     private Patient getPatientOrThrow(Integer patientId) {
         return patientRepository.findById(patientId)
                 .orElseThrow(() -> new IllegalArgumentException("Patient not found: " + patientId));

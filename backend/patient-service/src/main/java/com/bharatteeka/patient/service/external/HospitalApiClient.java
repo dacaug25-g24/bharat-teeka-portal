@@ -20,11 +20,6 @@ public class HospitalApiClient {
     @Value("${hospital.service.base-url:http://localhost:8081}")
     private String hospitalBaseUrl;
 
-    /**
-     * Default endpoint path (your current one).
-     * If your hospital-service uses /api prefix, set:
-     * hospital.service.vaccinations-path=/api/hospital/vaccinations/patient/{patientId}
-     */
     @Value("${hospital.service.vaccinations-path:/hospital/vaccinations/patient/{patientId}}")
     private String vaccinationsPath;
 
@@ -40,7 +35,7 @@ public class HospitalApiClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(List.of(MediaType.APPLICATION_JSON));
 
-        // ✅ forward token safely as "Bearer <token>"
+        // forward token safely as "Bearer <token>"
         headers.set(HttpHeaders.AUTHORIZATION, normalizeBearer(authHeader));
 
         HttpEntity<Void> entity = new HttpEntity<>(headers);
@@ -57,7 +52,7 @@ public class HospitalApiClient {
             return arr == null ? List.of() : Arrays.asList(arr);
 
         } catch (HttpClientErrorException.NotFound ex) {
-            // ✅ optional fallback: if hospital-service is actually under /api and config not set
+            // optional fallback: if hospital-service is actually under /api and config not set
             String fallbackUrl = hospitalBaseUrl + "/api/hospital/vaccinations/patient/" + patientId;
 
             try {
@@ -89,12 +84,6 @@ public class HospitalApiClient {
         }
     }
 
-    /**
-     * Accepts:
-     *  - "Bearer abc"
-     *  - "abc"
-     * Returns always: "Bearer abc"
-     */
     private String normalizeBearer(String authHeader) {
         if (authHeader == null || authHeader.trim().isEmpty()) {
             throw new IllegalArgumentException("Authorization token is required to call hospital-service");

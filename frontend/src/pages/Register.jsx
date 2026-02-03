@@ -75,11 +75,15 @@ export default function Register() {
 
     const email = (v) => {
       const val = (v || "").trim();
+
       if (!val) return "Email is required";
-      if (!/^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$/.test(val))
-        return "Enter a valid email (example: user@gmail.com)";
+
+      if (!/^[A-Za-z0-9+_.-]+@gmail\.com$/.test(val))
+        return "Only Gmail addresses are allowed (example: user@gmail.com)";
+
       return "";
     };
+
 
     const phone = (v) => {
       const val = (v || "").trim();
@@ -498,9 +502,8 @@ export default function Register() {
                         <input
                           name="confirmPassword"
                           type={showConfirmPwd ? "text" : "password"}
-                          className={`form-control ${
-                            showErr("confirmPassword") ? "is-invalid" : ""
-                          }`}
+                          className={`form-control ${showErr("confirmPassword") ? "is-invalid" : ""
+                            }`}
                           value={form.confirmPassword}
                           onChange={onChange}
                           onBlur={onBlur}

@@ -68,7 +68,9 @@ export default function BeneficiaryForm({
             </div>
 
             <div className="col-md-6">
-              <label className="form-label">Aadhaar *</label>
+              <label className="form-label">
+                Aadhaar *<small className="text-muted">(Child / Parent)</small>
+              </label>
               <input
                 className="form-control"
                 name="aadharNumber"
