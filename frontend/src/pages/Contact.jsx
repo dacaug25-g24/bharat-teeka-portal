@@ -22,13 +22,29 @@ export default function Contact() {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate form submission
-    setTimeout(() => {
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/bharatteeka@gmail.com", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        setSuccess(true);
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setTimeout(() => setSuccess(false), 5000);
+      } else {
+        alert("There was an error sending your message. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Something went wrong. Please check your internet connection.");
+    } finally {
       setLoading(false);
-      setSuccess(true);
-      setFormData({ name: "", email: "", subject: "", message: "" });
-      setTimeout(() => setSuccess(false), 3000);
-    }, 1000);
+    }
   };
 
   return (
@@ -87,8 +103,7 @@ export default function Contact() {
                   <div>
                     <h6 className="fw-semibold mb-1">Email</h6>
                     <p className="text-muted mb-0 small">
-                      support@cowin.gov.in<br />
-                      info@bharatteeka.gov.in
+                      bharatteeka@gmail.com
                     </p>
                   </div>
                 </div>

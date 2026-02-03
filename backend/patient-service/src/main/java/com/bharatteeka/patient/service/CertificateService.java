@@ -28,18 +28,18 @@ public class CertificateService {
             Integer patientId,
             String authHeader
     ) {
-        // ✅ Token required because hospital-service is protected (your logs show 403)
+        // Token required because hospital-service is protected (your logs show 403)
         String bearer = normalizeBearer(authHeader);
 
         Integer finalPatientId = resolvePatientId(appointmentId, patientId);
 
-        // ✅ patient-service responsibility
+        // patient-service responsibility
         Patient patient = patientRepository.findById(finalPatientId)
                 .orElseThrow(() -> new IllegalArgumentException("Patient not found for patientId=" + finalPatientId));
 
         String patientName = safe(patient.getFirstName()) + " " + safe(patient.getLastName());
 
-        // ✅ hospital-service responsibility
+        // hospital-service responsibility
         List<VaccinationRecordDto> records;
         try {
             records = hospitalApiClient.getVaccinationsByPatient(finalPatientId, bearer);
@@ -62,7 +62,7 @@ public class CertificateService {
             throw new IllegalArgumentException("No vaccination record found for certificate");
         }
 
-        // ✅ pick "latest/best" record: highest doseNumber (simple + stable)
+        // pick "latest/best" record: highest doseNumber
         VaccinationRecordDto record = records.stream()
                 .max(Comparator.comparingInt(r -> Optional.ofNullable(r.getDoseNumber()).orElse(0)))
                 .orElse(records.get(0));
@@ -106,12 +106,6 @@ public class CertificateService {
         return patientId;
     }
 
-    /**
-     * Ensures we always send "Bearer <token>" to hospital-service.
-     * Accepts:
-     *  - "Bearer abc"
-     *  - "abc"
-     */
     private String normalizeBearer(String authHeader) {
         if (authHeader == null || authHeader.trim().isEmpty()) {
             throw new IllegalArgumentException("Authorization token is required to download certificate");

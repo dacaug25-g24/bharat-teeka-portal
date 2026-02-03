@@ -11,10 +11,6 @@ public class BeneficiaryAccessService {
 
     private final ParentChildRepository parentChildRepository;
 
-    /**
-     * Adult patient => always allowed
-     * Child beneficiary => parentUserId must be provided and mapping must exist
-     */
     public void validateAccess(Patient patient, Integer parentUserId, String action) {
 
         if (patient == null) return;
@@ -37,9 +33,6 @@ public class BeneficiaryAccessService {
         }
     }
 
-    /**
-     * Helper used in delete child
-     */
     public void validateChildLinkedToParent(Integer parentUserId, Integer childPatientId) {
         boolean allowed = parentChildRepository.existsByParentUserIdAndChildPatientId(parentUserId, childPatientId);
         if (!allowed) {

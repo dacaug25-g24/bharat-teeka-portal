@@ -28,7 +28,6 @@ public class SlotController {
         return ResponseEntity.ok(list);
     }
 
-    // optional endpoint (handy for appointment details UI)
     @GetMapping("/{slotId}")
     public ResponseEntity<?> getSlot(@PathVariable Integer slotId) {
         SlotDto dto = slotService.getSlotDetails(slotId);

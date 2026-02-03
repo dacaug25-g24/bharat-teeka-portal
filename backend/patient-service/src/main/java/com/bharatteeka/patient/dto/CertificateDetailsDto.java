@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class CertificateDetailsDto {
     private Integer patientId;
     private String patientName;
-    private String aadhaarOrGovId; // keep name generic (if you don’t store aadhaar, show “-”)
+    private String aadhaarOrGovId;
     private Integer appointmentId;
 
     private String vaccineName;
