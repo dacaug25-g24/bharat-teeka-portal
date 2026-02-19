@@ -3,94 +3,99 @@ package com.bharatteeka.patient.service.external;
 import com.bharatteeka.patient.dto.VaccinationRecordDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
+import java.time.Duration;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class HospitalApiClient {
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
 
-    @Value("${hospital.service.base-url:http://localhost:8081}")
+    @Value("${hospital.service.base-url:http://localhost:9090}")
     private String hospitalBaseUrl;
 
     @Value("${hospital.service.vaccinations-path:/hospital/vaccinations/patient/{patientId}}")
     private String vaccinationsPath;
 
+    @Value("${hospital.service.timeout-ms:2000}")
+    private long timeoutMs;
+
+    /**
+     * If your Appointment/Certificate service layer is non-reactive and expects List,
+     * keep this method blocking to minimize refactor.
+     * (Interview line: "Internally WebClient is reactive, but we block at boundary.")
+     */
     public List<VaccinationRecordDto> getVaccinationsByPatient(Integer patientId, String authHeader) {
 
-        if (patientId == null) {
-            throw new IllegalArgumentException("patientId is required");
-        }
+        if (patientId == null) throw new IllegalArgumentException("patientId is required");
 
-        // Build primary URL from config
+        String token = normalizeBearer(authHeader);
+
         String url = hospitalBaseUrl + vaccinationsPath.replace("{patientId}", String.valueOf(patientId));
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        return webClient.get()
+                .uri(url)
+                .accept(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .retrieve()
+                .bodyToFlux(VaccinationRecordDto.class)
+                .collectList()
+                .timeout(Duration.ofMillis(timeoutMs))
+                // fallback for any error (timeout / 5xx / 4xx). Keep it simple.
+                .onErrorResume(ex -> fallback(ex, url))
+                .block();
+    }
 
-        // forward token safely as "Bearer <token>"
-        headers.set(HttpHeaders.AUTHORIZATION, normalizeBearer(authHeader));
+    private Mono<List<VaccinationRecordDto>> fallback(Throwable ex, String url) {
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+        // Clean interview-friendly logs/messages
+        if (ex instanceof WebClientResponseException wex) {
 
-        try {
-            ResponseEntity<VaccinationRecordDto[]> res = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    entity,
-                    VaccinationRecordDto[].class
-            );
-
-            VaccinationRecordDto[] arr = res.getBody();
-            return arr == null ? List.of() : Arrays.asList(arr);
-
-        } catch (HttpClientErrorException.NotFound ex) {
-            // optional fallback: if hospital-service is actually under /api and config not set
-            String fallbackUrl = hospitalBaseUrl + "/api/hospital/vaccinations/patient/" + patientId;
-
-            try {
-                ResponseEntity<VaccinationRecordDto[]> res2 = restTemplate.exchange(
-                        fallbackUrl,
-                        HttpMethod.GET,
-                        entity,
-                        VaccinationRecordDto[].class
-                );
-                VaccinationRecordDto[] arr2 = res2.getBody();
-                return arr2 == null ? List.of() : Arrays.asList(arr2);
-            } catch (HttpClientErrorException ex2) {
-                throw ex2; // handled below
+            // If 403 -> almost always security mismatch or token issue
+            if (wex.getStatusCode().value() == 403) {
+                return Mono.error(new IllegalArgumentException(
+                        "403 Forbidden from hospital-service for GET " + url +
+                        ". Token invalid/expired OR hospital-service SecurityConfig blocks this endpoint."
+                ));
             }
 
-        } catch (HttpClientErrorException.Forbidden ex) {
-            // This is your current problem
-            throw new IllegalArgumentException(
-                    "403 Forbidden from hospital-service for GET " + url + ". " +
-                    "Meaning: token is invalid/expired OR hospital-service SecurityConfig does not allow this endpoint for PATIENT token. " +
-                    "Fix required in hospital-service security (permit this endpoint for patient-service calls)."
-            );
+            // If 404 -> route/path mismatch (common when moving through gateway)
+            if (wex.getStatusCode().value() == 404) {
+                // Simple fallback: return empty list instead of failing whole flow
+                return Mono.just(List.of());
+            }
 
-        } catch (HttpClientErrorException ex) {
-            throw new IllegalArgumentException(
-                    "Hospital-service error: " + ex.getStatusCode() + " " + ex.getStatusText() +
-                    " for GET " + url
-            );
+            // For other 4xx, bubble up clean error
+            if (wex.getStatusCode().is4xxClientError()) {
+                return Mono.error(new IllegalArgumentException(
+                        "Hospital-service client error: " + wex.getStatusCode().value() +
+                        " for GET " + url
+                ));
+            }
+
+            // For 5xx, return empty list (degrade gracefully)
+            if (wex.getStatusCode().is5xxServerError()) {
+                return Mono.just(List.of());
+            }
         }
+
+        // timeout or network error -> degrade
+        return Mono.just(List.of());
     }
 
     private String normalizeBearer(String authHeader) {
         if (authHeader == null || authHeader.trim().isEmpty()) {
             throw new IllegalArgumentException("Authorization token is required to call hospital-service");
         }
-
         String t = authHeader.trim();
-        if (t.startsWith("Bearer ")) return t;
-        return "Bearer " + t;
+        return t.startsWith("Bearer ") ? t : "Bearer " + t;
     }
 }
